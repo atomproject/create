@@ -9,10 +9,10 @@ var dragAndDropSetup = function () {
     $('.control').draggable({
         addClasses: false,
         scroll: false,
-        appendTo: "body",
-        helper: "clone",
-        cursor: "move",
-        revert: "invalid",
+        appendTo: 'body',
+        helper: 'clone',
+        cursor: 'move',
+        revert: 'invalid',
         drag: function (event, ui) {
             draggedControl = ui.helper.attr('data-component');
         }
@@ -30,13 +30,13 @@ var dragAndDropSetup = function () {
 
     //sortable fields setup
     $form.nestedSortable({
-        placeholder: " flex placeholder-highlight",
+        placeholder: ' flex placeholder-highlight',
         maxLevels: 2,
         tabSize:0,
         scroll:false,
         tolerance: 'pointer',
         branchClass: 'grouped',
-        hoveringClass: "placeholder-highlight",
+        hoveringClass: 'placeholder-highlight',
         listType: 'ul',
         sort: function (e, ui) {
             ui.placeholder.height(ui.helper.height());
@@ -65,7 +65,7 @@ var dragAndDropSetup = function () {
 
     document.addEventListener('adjust-dom',function () {
         var form = document.querySelector('.form');
-        $(".form").html(Polymer.dom(form).innerHTML);
+        $('.form').html(Polymer.dom(form).innerHTML);
     });
 
     //remove field when clicked on remove icon in top right panel
@@ -76,7 +76,7 @@ var dragAndDropSetup = function () {
         if (component.classList.contains('page'))
             category = 'pageComponents';
         showComponentPanel(component.tagName, component, category);
-        if ($('.form').children('.field-container').length == 0)
+        if ($('.form').children('.field-container').length === 0)
             $('.canvas').addClass('empty');
         e.stopImmediatePropagation();
 
@@ -132,7 +132,7 @@ var dragAndDropSetup = function () {
         var ajaxComponent = document.querySelector('#controlCall');
 
         $.ajax({
-            url: "bower_components/" + draggedControl + "/demo/metadata.html",
+            url: 'bower_components/' + draggedControl + '/demo/metadata.html',
             crossDomain: true
         }).done(function (e) {
             renderElement(e, category);
@@ -149,7 +149,7 @@ var dragAndDropSetup = function () {
         componentPanel.component = componentName;
         componentPanel.targetComponent = targetComponent;
         setName(targetComponent);
-        componentPanel.propertySource = 'bower_components/' + componentName + "/property.json";
+        componentPanel.propertySource = 'bower_components/' + componentName + '/property.json';
         componentPanel.setPanel();
         if ((componentName.toLowerCase() !== 't-form' && componentName.toLowerCase() !== 't-page') || $('.canvas .fieldset').length === 0) {
             //$('#preview').hide();
@@ -163,14 +163,14 @@ var dragAndDropSetup = function () {
         }
 
         var pdp = document.getElementById('propertyDrawerPanel');
-        if (pdp.selected == 'main') {
+        if (pdp.selected === 'main') {
             pdp.togglePanel();
         }
         
     }
 
     function setName(targetComponent) {
-        if (targetComponent.name == '') {
+        if (targetComponent.name === '') {
             var component = targetComponent.tagName.slice(2);
             targetComponent.name = component + $subject[0].querySelectorAll(targetComponent.tagName).length;
         }
@@ -180,18 +180,18 @@ var dragAndDropSetup = function () {
     function renderElement(component, category) {
         if (component != null) {
             var container = document.createElement('li');
-            container.title = "Click to Edit. Drag to Reorder.";
-            container.className = "horizontal flex layout field-container";
+            container.title = 'Click to Edit. Drag to Reorder.';
+            container.className = 'horizontal flex layout field-container';
 
             var fieldSet = document.createElement('div');
-            fieldSet.className = "flex fieldset ";
+            fieldSet.className = 'flex fieldset ';
             fieldSet.setAttribute('data-category', category);
             fieldSet.innerHTML = component;
             var hoverPanel = '<div class="hover-panel"><iron-icon class="unmerge" title="Unmerge this item" icon="communication:call-split"></iron-icon><iron-icon class="duplicate" title="Clone this item" icon="content-copy"></iron-icon><iron-icon class="close" title="Remove this item" icon="close"></iron-icon></div>';
             $(container).append('<div class="overlap">' + hoverPanel + '</div>');
             container.appendChild(fieldSet);
             $form.append(container);
-            if ($subject[0].tagName.toLowerCase() == 't-form')
+            if ($subject[0].tagName.toLowerCase() === 't-form')
             {
                 setTimeout(function () {
                     $subject[0].setFields();
@@ -254,18 +254,18 @@ var dragAndDropSetup = function () {
             var metadataFile = getDemoFile(code, subject.name, false);
         }
         else {
-            code = "<html><head>" + '<link rel="import" href="' + atomBaseUrl + '"app/elements.html"><link rel="import" href="theme.html">' + "</head><body>" + code + "</body></html>";
+            code = '<html><head>' + '<link rel="import" href="' + atomBaseUrl + '"app/elements.html"><link rel="import" href="theme.html">' + '</head><body>' + code + '</body></html>';
         }
         var zip = new JSZip();
         $.get('content/theme.html').then(function (responseData) {
-            zip.file("theme.html", responseData);
-            zip.file(subject.name + ".html", code);
+            zip.file('theme.html', responseData);
+            zip.file(subject.name + '.html', code);
             if (subject.tagName.toLowerCase() === 't-form') {
-                zip.folder("demo").file("index.html", indexFile);
-                zip.folder("demo").file("metadata.html", metadataFile);
+                zip.folder('demo').file('index.html', indexFile);
+                zip.folder('demo').file('metadata.html', metadataFile);
             }
-            var content = zip.generate({ type: "blob" });
-            saveAs(content, subject.name + ".zip");
+            var content = zip.generate({ type: 'blob' });
+            saveAs(content, subject.name + '.zip');
         });
 
 
@@ -273,20 +273,20 @@ var dragAndDropSetup = function () {
 
     function getDemoFile(code, componentName, isIndex) {
         if (isIndex) {
-            return "<html><head>" + '<link rel="import" href="../theme.html"><link rel="import" href="../' + componentName + '.html">' + "</head><body><" + componentName + "></" + componentName + "></body></html>";
+            return '<html><head>' + '<link rel="import" href="../theme.html"><link rel="import" href="../' + componentName + '.html">' + '</head><body><' + componentName + '></' + componentName + '></body></html>';
         }
         return "<" + componentName + "></" + componentName + ">";
     }
 
     function wrapInPolymer(code, componentName) {
-        var imports = "<link rel='import' href='" + atomUrl + "bower_components/polymer/polymer.html'></link><link rel='import' href='" + atomBaseUrl + "formComponents/t-form/t-form.html'></link>";
-        var componentTemplate = "<dom-module id='" + componentName + "'><template>" + code + "</template></dom-module>";
-        var polymerScript = "<script>Polymer({is: '" + componentName + "'})</script>";
+        var imports = '<link rel="import" href="' + atomUrl + 'bower_components/polymer/polymer.html"></link><link rel="import" href="' + atomBaseUrl + '"formComponents/t-form/t-form.html"></link>';
+        var componentTemplate = '<dom-module id="' + componentName + '"><template>' + code + '</template></dom-module>';
+        var polymerScript = '<script>Polymer({is: "' + componentName + '})</script>';
         return imports + componentTemplate + polymerScript;
     }
 
     //event listener for elements autosuggest
-    document.addEventListener("on-autosuggest-select", function (event) {
+    document.addEventListener('on-autosuggest-select', function (event) {
         var component = event.detail;
         draggedControl = component.selectedItem.Name;
 
@@ -377,7 +377,7 @@ var dragAndDropSetup = function () {
     //Start code for header functionality..
 
     $('.headerText').on('keydown', function (e) {
-        if (e.which == 13) {
+        if (e.which === 13) {
             $(this).blur();
             // Workaround for webkit's bug
             window.getSelection().removeAllRanges();
@@ -399,7 +399,7 @@ var dragAndDropSetup = function () {
     });
 
     $('.headerText').on('blur', function () {
-        if ($(this).text().trim().length == 0) {
+        if ($(this).text().trim().length === 0) {
             if ($(this).hasClass('form-header')) {
                 $(this).text("Untitled Form");
             } else {
@@ -414,7 +414,7 @@ var dragAndDropSetup = function () {
 
     //code to disable the default behaviour of the tab
     $(document).on('keydown', '#componentSearch',function (objEvent) {
-        if (objEvent.keyCode == 9) {  //tab pressed
+        if (objEvent.keyCode === 9) {  //tab pressed
             objEvent.preventDefault();
         }
     });
