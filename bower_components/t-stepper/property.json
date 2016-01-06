@@ -1,0 +1,40 @@
+{
+    "name": "Stepper",
+    "properties": [
+    {
+        "name": "Data",
+        "fields": {
+            "label": {
+                "name":"Label",
+                "type": "string",
+                "value": "label"
+            },
+            "ico": {
+                "name":"Icon",
+                "type": "iconset",
+                "value": ""
+            }
+        }
+    },{
+        "name": "Properties",
+        "fields": {
+            "styled": {
+                "name":"Other Style",
+                "type": "boolean",
+                "value": false
+            },
+            "min": {
+                "name": "Min Number",
+                "type": "range",
+                "min": 0,
+                "max": 99
+            },
+            "max": {
+                "name": "Max Number",
+                "type": "range",
+                "min": 1,
+                "max": 100
+            }
+        }
+    }]
+}
