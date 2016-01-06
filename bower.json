@@ -64,7 +64,9 @@
     "t-range": "atomelements/t-range#~0.0.0",
     "t-calendar": "atomelements/t-calendar#~0.0.0",
     "t-stepper": "atomelements/t-stepper#~0.0.0",
-    "t-form": "atomelements/t-form#~0.0.0"
+    "t-form": "atomelements/t-form#~0.0.0",
+    "paper-styles": "PolymerElements/paper-styles#~1.1.1",
+    "jquery-ui": "~1.11.4"
   },
   "resolutions": {
     "paper-dialog-scrollable": "1.0.1",
@@ -89,6 +91,7 @@
     "t-radio-group": "master",
     "iron-ajax": "~1.1.1",
     "paper-icon-button": "~1.0.4",
-    "paper-button": "1.0.3"
+    "paper-button": "1.0.3",
+    "paper-styles": "1.0.11"
   }
 }

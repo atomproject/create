@@ -301,7 +301,7 @@ gulp.task('default', ['clean'], function(cb) {
     ['copy', 'styles'],
     'elements',
     [ 'images', 'fonts', 'html'],
-    'vulcanize', 'cache-config',
+    'cache-config',
     cb);
 });
 
