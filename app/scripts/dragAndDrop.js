@@ -132,7 +132,7 @@ var dragAndDropSetup = function () {
         var ajaxComponent = document.querySelector('#controlCall');
 
         $.ajax({
-            url: atomBaseUrl + category + "/" + draggedControl + "/demo/metadata.html",
+            url: "bower_components/" + draggedControl + "/demo/metadata.html",
             crossDomain: true
         }).done(function (e) {
             renderElement(e, category);
@@ -149,7 +149,7 @@ var dragAndDropSetup = function () {
         componentPanel.component = componentName;
         componentPanel.targetComponent = targetComponent;
         setName(targetComponent);
-        componentPanel.propertySource = atomBaseUrl + category + "/" + componentName + "/property.json";
+        componentPanel.propertySource = 'bower_components/' + componentName + "/property.json";
         componentPanel.setPanel();
         if ((componentName.toLowerCase() !== 't-form' && componentName.toLowerCase() !== 't-page') || $('.canvas .fieldset').length === 0) {
             //$('#preview').hide();

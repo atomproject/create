@@ -26,7 +26,7 @@
     "t-button": "atomelements/t-button#master",
     "t-shared-components": "atomelements/t-shared-components#master",
     "t-checkbox": "atomelements/t-checkbox#master",
-    "t-colorpicker": "atomelements/t-colorpicker#master",
+    "t-colorpicker": "atomelements/t-colorpicker#~0.0.0",
     "t-data-feeder": "atomelements/t-data-feeder#master",
     "t-device-view": "atomelements/t-device-view#master",
     "t-autosuggest": "atomelements/t-autosuggest#master",
@@ -37,7 +37,7 @@
     "t-radio-button": "atomelements/t-radio-button#master",
     "t-radio-group": "atomelements/t-radio-group#master",
     "t-scaffold": "atomelements/t-scaffold#master",
-    "t-slider": "atomelements/t-slider#master",
+    "t-slider": "atomelements/t-slider#~0.0.0",
     "paper-dialog": "polymerelements/paper-dialog#~1.0.3",
     "paper-dialog-scrollable": "polymerelements/paper-dialog-scrollable#~1.1.0",
     "paper-drawer-panel": "polymerelements/paper-drawer-panel#~1.0.5",
@@ -59,7 +59,12 @@
     "page": "visionmedia/page.js#~1.6.4",
     "platinum-elements": "PolymerElements/platinum-elements#^1.1.0",
     "paper-menu": "PolymerElements/paper-menu#4fecb43601",
-    "es6-promise": "~3.0.2"
+    "es6-promise": "~3.0.2",
+    "t-checkbox-group": "atomelements/t-checkbox-group#~0.0.0",
+    "t-range": "atomelements/t-range#~0.0.0",
+    "t-calendar": "atomelements/t-calendar#~0.0.0",
+    "t-stepper": "atomelements/t-stepper#~0.0.0",
+    "t-form": "atomelements/t-form#~0.0.0"
   },
   "resolutions": {
     "paper-dialog-scrollable": "1.0.1",
@@ -70,13 +75,20 @@
     "t-shared-components": "master",
     "t-radio-button": "master",
     "paper-behaviors": "1.0.3",
-    "paper-button": "1.0.3",
-    "paper-icon-button": "1.0.3",
     "iron-icon": "1.0.4",
     "iron-icons": "^1.0.0",
     "paper-item": "1.0.2",
     "paper-tabs": "1.0.2",
     "paper-material": "^1.0.0",
-    "paper-menu": "^1.0.0"
+    "paper-menu": "^1.0.0",
+    "t-checkbox": "master",
+    "t-colorpicker": "master",
+    "t-slider": "master",
+    "t-autosuggest": "master",
+    "t-dropdown": "master",
+    "t-radio-group": "master",
+    "iron-ajax": "~1.1.1",
+    "paper-icon-button": "~1.0.4",
+    "paper-button": "1.0.3"
   }
 }

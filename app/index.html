@@ -65,7 +65,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <template is="dom-repeat" items="[[menu.categories]]" as="category">
                             <template is="dom-repeat" items="[[_getElementsInCategory(category)]]" as="component">
                                 <div class="component-link item" data-component$="[[component.name]]">
-                                    <t-button tabindex="0" data-component$="[[component.ame]]" data-category$="[[category.name]]" ico="fusion:[[component.icon]]" icon-left class="control" label="[[component.displayName]]"></t-button>
+                                    <t-button tabindex="0" data-component$="[[component.name]]" data-category$="[[category.name]]" ico="fusion:[[component.icon]]" icon-left class="control" label="[[component.displayName]]"></t-button>
                                 </div>
                             </template>
                         </template>
@@ -103,7 +103,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <t-button label="Preview" id="preview" class="flex"></t-button>
                     <t-button label="Download" id="download" class="flex"></t-button>
                 </div>
-                <t-component-panel responsive-view property-source="@(ViewBag.BaseUrl)components/FormComponents/t-form/property.json" component="t-form">
+                <t-component-panel responsive-view property-source="bower_components/t-form/property.json" component="t-form">
                 </t-component-panel>
             </nav-list>
             <div class="content layout vertical fit container">
