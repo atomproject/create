@@ -3,25 +3,20 @@
     "properties": [{
         "name": "Properties",
             "fields": {
-            "email": {
-                "name":"Email",
+            "message": {
+                "name":"Message",
                 "type": "string",
-                "value": " support@travelnxt.com"
+                "value": "Your password has been changed successfully."
             },
-            "phone": {
-                "name":"Phone no.",
+            "type": {
+                "name": "Notification Type",
                 "type": "string",
-                "value": " 1-855-282-6507"
+                "value": "success"
             },
-            "src": {
-                "name":"Image Source",
-                "type": "string",
-                "value": "http://lorempixel.com/180/46"
-            },
-            "logoUrl": {
-                "name":"Logo url",
-                "type": "string",
-                "value": "http://lorempixel.com/180/46"
+            "active": {
+                "name": "Active",
+                "type": "boolean",
+                "value": true
             }
         }
     }]

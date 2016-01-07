@@ -1,0 +1,51 @@
+{
+    "elements": [{
+        "name": "t-google-map",
+        "category": "page",
+        "icon": "Map",
+        "displayName": "Google Map",
+        "location": "https://github.com/atomelements/t-google-map"
+    }, {
+        "name": "t-image",
+        "category": "page",
+        "icon": "Image",
+        "displayName": "Image",
+        "location": "https://github.com/atomelements/t-image"
+    }, {
+        "name": "t-list",
+        "category": "page",
+        "displayName": "list",
+        "location": "https://github.com/atomelements/t-list"
+    }, {
+        "name": "t-loader",
+        "category": "page",
+        "icon": "Loader",
+        "displayName": "Loader",
+        "location": "https://github.com/atomelements/t-loader"
+    }, {
+        "name": "t-table",
+        "category": "data",
+        "icon": "Table",
+        "displayName": "Table",
+        "location": "https://github.com/atomelements/t-table"
+    }, {
+        "name": "t-tabs",
+        "category": "page",
+        "icon": "Map",
+        "displayName": "Tabs",
+        "location": "https://github.com/atomelements/t-tabs"
+    }, {
+        "name": "t-google-youtube",
+        "category": "page",
+        "icon": "Video",
+        "displayName": "Youtube Video",
+        "location": "https://github.com/atomelements/t-google-youtube"
+    } ],
+    "categories": [{
+        "name": "data",
+        "displayName": "Data"
+    }, {
+        "name": "page",
+        "displayName": "Page"
+    }]
+}
