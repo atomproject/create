@@ -26,7 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="PSK">
-    <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
+    <link rel="shortcut icon"  sizes="192x192" href="favicon.ico">
     <!-- Add to homescreen for Safari on iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -42,10 +42,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- endbuild -->
     <!-- will be replaced with elements/elements.vulcanized.html -->
     <link rel="import" href="elements/elements.html">
-    <link rel="import" href="elements/theme.html">
     <!-- endreplace-->
-    <!-- For shared styles, shared-styles.html import in elements.html -->
-    <style is="custom-style" include="shared-styles"></style>
+    <!-- build:js bower_components/jquery-ui/jquery-ui.min.js -->
+    <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+    <script src="scripts/jquery.nestedSortable.js"></script>
+    <!-- endbuild -->
+
 </head>
 
 <body unresolved class="fullbleed layout vertical">
@@ -118,25 +120,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </t-form>
             </div>
         </t-scaffold>
-        
         <paper-toast id="toast">
             <span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
         </paper-toast>
         <!-- Uncomment next block to enable Service Worker support (1/2) -->
         <paper-toast id="caching-complete" duration="6000" text="Caching complete! This app will work offline.">
         </paper-toast>
-          <platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
+        <platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
             <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
             </platinum-sw-cache>
         </platinum-sw-register>
         <iron-ajax url="elements.json" content-type="application/json" handle-as="json" auto last-response="{{menu}}"></iron-ajax>
     </template>
     <!-- build:js scripts/app.js -->
-    <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
-    <script src="scripts/jquery.nestedSortable.js"></script>
     <script src="scripts/dragAndDrop.js"></script>
     <script src="scripts/app.js"></script>
-
     <!-- endbuild-->
 </body>
 
