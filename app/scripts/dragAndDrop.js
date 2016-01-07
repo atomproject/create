@@ -149,7 +149,7 @@ var dragAndDropSetup = function () {
         componentPanel.component = componentName;
         componentPanel.targetComponent = targetComponent;
         setName(targetComponent);
-        componentPanel.propertySource = 'bower_components/' + componentName + '/property.json';
+        componentPanel.propertySource = 'bower_components/' + componentName.toLowerCase() + '/property.json';
         componentPanel.setPanel();
         if ((componentName.toLowerCase() !== 't-form' && componentName.toLowerCase() !== 't-page') || $('.canvas .fieldset').length === 0) {
             //$('#preview').hide();
