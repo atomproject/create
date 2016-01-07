@@ -31,6 +31,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         });
         return elements;
     };
+    
+    app._getPropertySource = function(builderType){
+        return 'bower_components/'+app.builderType+'/property.json';
+    };
 
     //toggle accordion for menu
     app.toggleAccordion = function(e, item, element) {
@@ -47,6 +51,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             activeItem.classList.remove('active');
         }
 
+    };
+
+    app._onElementsReceived = function(event){
+        app.menu = event.detail.response;
     };
 
     app.displayInstalledToast = function() {
@@ -66,7 +74,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     window.addEventListener('WebComponentsReady', function() {
         setTimeout(function() {
             dragAndDropSetup();
-        }, 0);
+        }, 10);
         // imports are loaded and elements have been registered
     });
 

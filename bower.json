@@ -66,7 +66,17 @@
     "t-stepper": "atomelements/t-stepper#~0.0.0",
     "t-form": "atomelements/t-form#~0.0.0",
     "paper-styles": "PolymerElements/paper-styles#~1.1.1",
-    "jquery-ui": "~1.11.4"
+    "jquery-ui": "~1.11.4",
+    "t-page": "atomelements/t-page#master",
+    "t-loader": "atomelements/t-loader#master",
+    "t-filter": "atomelements/t-filter#master",
+    "t-image": "atomelements/t-image#master",
+    "t-notify": "atomelements/t-notify#master",
+    "t-table": "atomelements/t-table#master",
+    "t-tabs": "atomelements/t-tabs#master",
+    "t-google-youtube": "atomelements/t-google-youtube#master",
+    "t-google-map": "atomelements/t-google-map#master",
+    "t-list": "atomelements/t-list#master"
   },
   "resolutions": {
     "paper-dialog-scrollable": "1.0.1",
@@ -90,8 +100,11 @@
     "t-dropdown": "master",
     "t-radio-group": "master",
     "iron-ajax": "~1.1.1",
-    "paper-icon-button": "~1.0.4",
+    "paper-icon-button": "~1.0.6",
     "paper-button": "1.0.3",
-    "paper-styles": "1.0.11"
+    "paper-styles": "1.0.11",
+    "iron-pages": "1.0.3",
+    "t-filter": "master",
+    "t-notify": "master"
   }
 }
