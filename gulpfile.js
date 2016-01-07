@@ -321,6 +321,7 @@ gulp.task('deploy-gh-pages', function() {
     .pipe($.if(process.env.TRAVIS === 'true', $.ghPages({
       remoteUrl: 'https://$GH_TOKEN@github.com/polymerelements/polymer-starter-kit.git',
       silent: true,
+      force:true,
       branch: 'gh-pages'
     }), $.ghPages()));
 });
