@@ -147,7 +147,7 @@ var dragAndDropSetup = function () {
     function showComponentPanel(componentName, targetComponent, category) {
         var componentPanel = document.querySelector('t-component-panel');
         componentPanel.component = componentName;
-        componentPanel.targetComponent = targetComponent.toLowerCase();
+        componentPanel.targetComponent = targetComponent;
         setName(targetComponent);
         componentPanel.propertySource = 'bower_components/' + componentName.toLowerCase() + '/property.json';
         componentPanel.setPanel();
@@ -172,7 +172,7 @@ var dragAndDropSetup = function () {
     function setName(targetComponent) {
         if (targetComponent.name === '') {
             var component = targetComponent.tagName.toLowerCase().slice(2);
-            targetComponent.name = component + $subject[0].querySelectorAll(targetComponent.tagName).length;
+            targetComponent.name = (component + $subject[0].querySelectorAll(targetComponent.tagName).length).toLowerCase();
         }
     }
 
@@ -301,7 +301,7 @@ var dragAndDropSetup = function () {
     //form click events
     $form.on('click', '.fieldset', function (event) {
         var targetComponent = event.currentTarget.children[0];
-        var componentName = targetComponent.tagName;
+        var componentName = targetComponent.tagName.toLowerCase();
         var category = this.getAttribute('data-category');
         showComponentPanel(componentName, targetComponent, category);
         event.stopImmediatePropagation();
