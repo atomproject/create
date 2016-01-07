@@ -32939,7 +32939,7 @@ Polymer({
     dataChanged: function(change) {
         var path = change.target.dataKey;
         var value = change.target.data;
-
+        this.targetComponent[key] = value;
         value = value.map(function(item) {
             return item.value;
         });
