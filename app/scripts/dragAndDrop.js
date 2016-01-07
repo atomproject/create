@@ -147,9 +147,9 @@ var dragAndDropSetup = function () {
     function showComponentPanel(componentName, targetComponent, category) {
         var componentPanel = document.querySelector('t-component-panel');
         componentPanel.component = componentName;
-        componentPanel.targetComponent = targetComponent;
+        componentPanel.targetComponent = targetComponent.toLowerCase();
         setName(targetComponent);
-        componentPanel.propertySource = 'bower_components/' + componentName + '/property.json';
+        componentPanel.propertySource = 'bower_components/' + componentName.toLowerCase() + '/property.json';
         componentPanel.setPanel();
         if ((componentName.toLowerCase() !== 't-form' && componentName.toLowerCase() !== 't-page') || $('.canvas .fieldset').length === 0) {
             //$('#preview').hide();
@@ -171,7 +171,7 @@ var dragAndDropSetup = function () {
 
     function setName(targetComponent) {
         if (targetComponent.name === '') {
-            var component = targetComponent.tagName.slice(2);
+            var component = targetComponent.tagName.toLowerCase().slice(2);
             targetComponent.name = component + $subject[0].querySelectorAll(targetComponent.tagName).length;
         }
     }
