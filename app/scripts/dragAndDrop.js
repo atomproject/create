@@ -4,6 +4,7 @@ var dragAndDropSetup = function () {
     var $form = $('.form');
     var $subject = $('.canvas');
     var draggedControl = null;
+    var atomUrl = 'https://atomproject.github.io/fusion/'
 
     //draggable menu items setup
     $('.control').draggable({
@@ -52,7 +53,6 @@ var dragAndDropSetup = function () {
             } else {
                 ui.item.children('.fieldset')[0].innerHTML = (Polymer.dom(ui.item.children('.fieldset')[0]).innerHTML);
             }
-            autoSave();
         },
         beforeStop: function (e, ui) {
             ui.item.children('.fieldset')[0].innerHTML = (Polymer.dom(ui.item.children('.fieldset')[0]).innerHTML);
@@ -82,15 +82,10 @@ var dragAndDropSetup = function () {
 
         setTimeout(function () {
             $subject[0].setFields();
-          
         }, 0);
-        setTimeout(function () {
-            autoSave();
-        }, 0);
-
     }
 
-    //duplicate fieldset 
+    //duplicate fieldset
     function duplicate(e) {
         var field = $(e.target).closest('.field-container');
         var markup = Polymer.dom(field[0]).innerHTML;
@@ -99,9 +94,6 @@ var dragAndDropSetup = function () {
             wrapper = '<li title="Click to Edit. Drag to Reorder." class="horizontal grouped flex layout field-container">';
         markup = wrapper + markup + '</li>';
         field.after(markup);
-        setTimeout(function () {
-            autoSave();
-        }, 0);
     }
 
     //unmerge merged fields
@@ -117,9 +109,6 @@ var dragAndDropSetup = function () {
             field.after(markup);
         });
         field.remove();
-        setTimeout(function () {
-            autoSave();
-        }, 0);
     }
 
     //appends dragged, clicked control on to the form
@@ -140,7 +129,6 @@ var dragAndDropSetup = function () {
             // do some error handling
             alert('Error while connecting to server');
         });
-
     }
 
     //generate component panel
@@ -166,7 +154,6 @@ var dragAndDropSetup = function () {
         if (pdp.selected === 'main') {
             pdp.togglePanel();
         }
-        
     }
 
     function setName(targetComponent) {
@@ -191,34 +178,18 @@ var dragAndDropSetup = function () {
             $(container).append('<div class="overlap">' + hoverPanel + '</div>');
             container.appendChild(fieldSet);
             $form.append(container);
-            if ($subject[0].tagName.toLowerCase() === 't-form')
-            {
+            if ($subject[0].tagName.toLowerCase() === 't-form') {
                 setTimeout(function () {
                     $subject[0].setFields();
                 }, 0);
             }
             $(fieldSet).trigger('click');
         }
-        //save the form
-        autoSave();
-
     };
-
-    //auto save on every change
-
-    function autoSave() {
-        setTimeout(function () {
-
-            var form = document.querySelector('.canvas');
-            var code = refactorCode(Polymer.dom(form.parentNode).innerHTML);
-            code = code.replace(new RegExp("\n", 'g'), "");
-            $('#markup').val(btoa(code));
-
-        }, 1000);
-    }
 
     function refactorCode(code) {
         code = code = code.replace("\n", "");
+        // TODO: why is this line needed?
         code = code.replace(new RegExp('<div title="Click to Edit. Drag to Reorder." class="page canvas vertical layout flex">', 'g'), "");
         code = code.replace(new RegExp('<span class="dextop">Click on an element or drag it here to start building your form.</span>', 'g'), "");
         code = code.replace(new RegExp('<span class="mobile">Browse elements using the button above to start building your form.</span>', 'g'), "");
@@ -254,10 +225,10 @@ var dragAndDropSetup = function () {
             var metadataFile = getDemoFile(code, subject.name, false);
         }
         else {
-            code = '<html><head>' + '<link rel="import" href="' + atomBaseUrl + '"app/elements.html"><link rel="import" href="theme.html">' + '</head><body>' + code + '</body></html>';
+            code = '<html><head>' + '<link rel="import" href="' + atomUrl + '"app/elements.html"><link rel="import" href="theme.html">' + '</head><body>' + code + '</body></html>';
         }
         var zip = new JSZip();
-        $.get('content/theme.html').then(function (responseData) {
+        $.get('bower_components/t-shared-components/theme.html').then(function (responseData) {
             zip.file('theme.html', responseData);
             zip.file(subject.name + '.html', code);
             if (subject.tagName.toLowerCase() === 't-form') {
@@ -267,8 +238,6 @@ var dragAndDropSetup = function () {
             var content = zip.generate({ type: 'blob' });
             saveAs(content, subject.name + '.zip');
         });
-
-
     };
 
     function getDemoFile(code, componentName, isIndex) {
@@ -279,9 +248,9 @@ var dragAndDropSetup = function () {
     }
 
     function wrapInPolymer(code, componentName) {
-        var imports = '<link rel="import" href="' + atomUrl + 'bower_components/polymer/polymer.html"></link><link rel="import" href="' + atomBaseUrl + '"formComponents/t-form/t-form.html"></link>';
+        var imports = '<link rel="import" href="' + atomUrl + 'bower_components/polymer/polymer.html"></link><link rel="import" href="' + atomUrl + 'bower_components/t-form/t-form.html"></link>';
         var componentTemplate = '<dom-module id="' + componentName + '"><template>' + code + '</template></dom-module>';
-        var polymerScript = '<script>Polymer({is: "' + componentName + '})</script>';
+        var polymerScript = '<script>Polymer({is: "' + componentName + '"});</script>';
         return imports + componentTemplate + polymerScript;
     }
 
@@ -405,7 +374,6 @@ var dragAndDropSetup = function () {
             } else {
                 $(this).text("Untitled Page");
             }
-
         }
         this.scrollLeft = 0;
         $(this).addClass('inactive');
@@ -418,10 +386,4 @@ var dragAndDropSetup = function () {
             objEvent.preventDefault();
         }
     });
-
-    //Event listener
-    document.addEventListener('property-changed', function () {
-        autoSave();
-    });
-
 };

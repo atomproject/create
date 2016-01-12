@@ -46,6 +46,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- build:js bower_components/jquery-ui/jquery-ui.min.js -->
     <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
     <script src="scripts/jquery.nestedSortable.js"></script>
+    <script src="scripts/jszip.min.js"></script>
+    <script src="scripts/file-saver.js"></script>
     <!-- endbuild -->
 </head>
 
@@ -101,11 +103,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </div>
                         </header-toolbar>
                         <nav-list>
-                            <div class="layout horizontal property-panel-Header" style="display:none;">
-                                <form id='htmlContent' action='@Url.Action("preview")' method='post'>
-                                    <input type='hidden' name='markup' id='markup' />
-                                </form>
-                                <t-button label="Preview" id="preview" class="flex"></t-button>
+                            <div class="layout horizontal property-panel-Header">
+                                <t-button label="Upload" id="preview" class="flex"></t-button>
                                 <t-button label="Download" id="download" class="flex"></t-button>
                             </div>
                             <t-component-panel responsive-view property-source="[[_getPropertySource(builderType)]]" component="[[builderType]]">
@@ -122,7 +121,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </t-form>
                             <t-page hidden$="[[!isPage]]" title="Click to Edit. Drag to Reorder." class="page canvas empty vertical layout flex">
                                 <h2 class="drag-text">
-                    
+
             <span class="dextop">Click on an element or drag it here to start building your page.</span>
             <span class="mobile">Browse elements using the button above to start building your page.</span>
                 </h2>
@@ -136,7 +135,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <section data-route="browser" style="height:100%">
                  <paper-header-panel class="list-panel" main>
         <div class="paper-header">
-            
+
         <paper-toolbar bottom-justify="center" class="header-bar">
             <span class="top flex">
                     <div class="layout horizontal center">
@@ -178,12 +177,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </iron-pages>
         </div>
     </paper-header-panel>
-                    
+
                 </section>
             </iron-pages>
         </div>
     </template>
-    
+
     <platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
         <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
         </platinum-sw-cache>
