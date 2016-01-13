@@ -3,78 +3,65 @@
         "name": "t-autosuggest",
         "category": "form",
         "icon": "Autosuggest",
-        "displayName": "Auto Suggest",
-        "location": "https://github.com/atomelements/t-autosuggest"
+        "displayName": "Auto Suggest"
     }, {
         "name": "t-button",
         "category": "form",
         "icon": "Button",
-        "displayName": "Button",
-        "location": "https://github.com/atomelements/t-button"
+        "displayName": "Button"
     }, {
         "name": "t-calendar",
         "category": "form",
         "icon": "Calendar",
-        "displayName": "Calendar",
-        "location": "https://github.com/atomelements/t-calendar"
+        "displayName": "Calendar"
     }, {
         "name": "t-checkbox-group",
         "category": "form",
         "icon": "Checkbox",
-        "displayName": "Checkbox List",
-        "location": "https://github.com/atomelements/t-checkbox-group"
+        "displayName": "Checkbox List"
     }, {
         "name": "t-colorpicker",
         "category": "form",
         "icon": "Color_Palette",
-        "displayName": "Color Picker",
-        "location": "https://github.com/atomelements/t-colorpicker"
+        "displayName": "Color Picker"
     }, {
         "name": "t-dropdown",
         "category": "form",
         "icon": "Dropdown",
-        "displayName": "Dropdown",
-        "location": "https://github.com/atomelements/t-dropdown"
+        "displayName": "Dropdown"
     }, {
         "name": "t-error-block",
         "category": "page",
-        "displayName": "Error Block",
-        "location": "https://github.com/atomelements/t-error-block"
+        "displayName": "Error Block"
     }, {
         "name": "t-input",
         "category": "form",
         "icon": "Input_Field",
-        "displayName": "Input Field",
-        "location": "https://github.com/atomelements/t-input"
+        "displayName": "Input Field"
     }, {
         "name": "t-radio-group",
         "category": "form",
         "icon": "Radio_List",
-        "displayName": "Radio List",
-        "location": "https://github.com/atomelements/t-radio-group"
+        "displayName": "Radio List"
     }, {
         "name": "t-range",
         "category": "form",
-        "displayName": "Range",
-        "location": "https://github.com/atomelements/t-range"
+        "displayName": "Range"
     }, {
         "name": "t-section-header",
         "category": "form",
         "icon": "Section_Header",
-        "displayName": "Section Header",
-        "location": "https://github.com/atomelements/t-section-header"
+        "displayName": "Section Header"
     }, {
         "name": "t-slider",
         "category": "form",
         "icon": "Slider",
-        "displayName": "Slider",
-        "location": "https://github.com/atomelements/t-slider"
+        "displayName": "Slider"
     }, {
         "name": "t-stepper",
         "category": "form",
         "icon": "Calendar",
-        "displayName": "Stepper",
-        "location": "https://github.com/atomelements/t-stepper"
+        "displayName": "Stepper"
     }],
     "categories": [ {
         "name": "form",
