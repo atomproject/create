@@ -27995,6 +27995,9 @@ module.exports = Array.isArray || function (arr) {
       app.builderUrl = 'page-manifest.json';
       app.canvasName = 'Untitled Page';
       app.$.manifestAjax.generateRequest();
+        setTimeout(function(){
+        dragAndDropSetup();
+      },100);
     });
 
     page('/form', function(data) {
@@ -28004,6 +28007,9 @@ module.exports = Array.isArray || function (arr) {
       app.builderUrl = 'form-manifest.json';
       app.canvasName = 'Untitled Form';
       app.$.manifestAjax.generateRequest();
+      setTimeout(function(){
+        dragAndDropSetup();
+      },100);
     });
 
     // 404
