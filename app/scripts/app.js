@@ -47,6 +47,9 @@
 
     app._onElementsReceived = function(event){
         app.menu = event.detail.response;
+         setTimeout(function(){
+        dragAndDropSetup();
+      },100);
     };
 
     app.displayInstalledToast = function() {
