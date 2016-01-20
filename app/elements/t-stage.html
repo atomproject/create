@@ -205,8 +205,8 @@
         $(inEl).append(fieldset);
       },
 
-      getFieldset: function(name, category) {
-        var html = this._elementMetadataHash[name];
+      getFieldset: function(name, category, html) {
+        html = html || this._elementMetadataHash[name];
 
         this.templatize(this.$.rowTemplate);
         //TODO: check why following binding won't work
@@ -257,11 +257,11 @@
         }
       },
 
-      getNewElementState: function(name, x, y, html) {
+      getNewElementState: function(name, x, y, html, attributes) {
         return {
           name: name,
           html: html || this._elementMetadataHash[name],
-          attributes: {},
+          attributes: attributes || {},
           posX: x,
           posY: y
         };
@@ -526,6 +526,7 @@
           column = row[state.posY];
           column.name = state.name;
           column.html = state.html;
+          column.attributes = state.attributes;
         });
 
         return rows;
@@ -600,6 +601,45 @@
             stateFile: stateFile
           };
         });
+      },
+
+      reset: function() {
+        this._elementSateList = [];
+        this.componentPanelTarget = this.querySelector(this.builderType);
+        this.builderState = this.getNewElementState(this.builderType);
+        this.draggedPosX = null;
+
+        $('li.field-container', this).remove();
+      },
+
+      recreateBuilder: function(stateFile) {
+        var name, attributes, html, state, fieldContainer, fieldSet;
+        var container = this.querySelector('ul.field-container');
+
+        stateFile = JSON.parse(stateFile);
+
+        name = this.builderState.name = stateFile.type
+        attributes = this.builderState.attributes = stateFile.attributes;
+        this.builderState.html = this.updateCode(name, attributes);
+
+        stateFile.rows.forEach(function(row, posX) {
+          fieldContainer = this.getWrapper().querySelector('.field-container');
+
+          row.forEach(function(column, posY) {
+            name = column.name;
+            attributes = column.attributes;
+            html = this.updateCode(name, attributes);
+            state = this.getNewElementState(name, posX, posY, html, attributes);
+            this.push('_elementSateList', state);
+
+            //TODO: persist category in the state file
+            //TODO: column.html and html must end up being same
+            fieldSet = this.getFieldset(name, '', column.html);
+            fieldContainer.appendChild(fieldSet);
+          }.bind(this));
+
+          container.appendChild(fieldContainer);
+        }.bind(this));
       },
 
       attached: function() {

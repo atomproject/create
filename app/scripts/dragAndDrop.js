@@ -5,6 +5,7 @@ var dragAndDropSetup = function () {
   var $subject = $('.canvas');
   var draggedControl = null;
   var atomUrl = 'https://atomproject.github.io/fusion/';
+  var $uploadInput = $('#uploadInput');
 
   //draggable menu items setup
   $('.control').draggable({
@@ -57,12 +58,31 @@ var dragAndDropSetup = function () {
     event.stopPropagation();
   });
 
-  // $('#preview').on('click', function () {
-  //   var form = $('#htmlContent');
-  //   form.attr('target', '_blank');
-  //   $('#htmlContent').submit();
-  //   event.preventDefault();
-  // });
+  $uploadInput.on('change', function() {
+    var stage = document.querySelector('t-stage');
+    var files = this.files;
+    var reader = new FileReader();
+    var stateFile;
+
+    files = Array.prototype.slice.call(files);
+    stateFile = files.find(function(file) {
+      return file.name === 'state.json';
+    });
+
+    if (!stateFile) {
+      return;
+    }
+
+    reader.addEventListener('load', function(ev) {
+      stage.recreateBuilder(ev.target.result);
+    });
+
+    reader.readAsText(stateFile);
+  });
+
+  $('#upload').on('click', function () {
+    $uploadInput[0].click();
+  });
 
   $('#download').on('click', function () {
     download();
