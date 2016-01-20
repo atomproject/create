@@ -1,110 +1,115 @@
 
 (function(document) {
-    'use strict';
+  'use strict';
 
-    // Grab a reference to our auto-binding template
-    // and give it some initial binding values
-    // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
-    var app = document.querySelector('#app');
+  // Grab a reference to our auto-binding template
+  // and give it some initial binding values
+  // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
+  var app = document.querySelector('#app');
 
-    // Sets app default base URL
-    app.baseUrl = '/';
-    app.menu = null;
-    if (window.location.port === '') { // if production
-        // Uncomment app.baseURL below and
-        // set app.baseURL to '/your-pathname/' if running from folder in production
-         app.baseUrl = '/fusion/';
+  // Sets app default base URL
+  app.baseUrl = '/';
+  app.menu = null;
+  if (window.location.port === '') { // if production
+    // Uncomment app.baseURL below and
+    // set app.baseURL to '/your-pathname/' if running from folder in production
+    // app.baseUrl = '/polymer-starter-kit/';
+  }
+
+  // Get elements for menu for a given category
+  app._getElementsInCategory = function(category) {
+    var elements = app.menu.elements.filter(function(element) {
+      return element.category === category.name;
+    });
+    return elements;
+  };
+
+  app._getPropertySource = function(builderType){
+    return 'bower_components/'+app.builderType+'/property.json';
+  };
+
+  //toggle accordion for menu
+  app.toggleAccordion = function(e, item, element) {
+    var currentElement = e.currentTarget;
+    var activeItem = document.querySelector('.menu-item.active');
+
+    if (currentElement.classList.contains('active')) {
+      currentElement.classList.remove('active');
+    } else {
+      currentElement.classList.add('active');
     }
 
-    // Get elements for menu for a given category
-    app._getElementsInCategory = function(category) {
-        var elements = app.menu.elements.filter(function(element) {
-            return element.category === category.name;
-        });
-        return elements;
-    };
-    
-    app._getPropertySource = function(builderType){
-        return 'bower_components/'+app.builderType+'/property.json';
-    };
+    if (activeItem) {
+      activeItem.classList.remove('active');
+    }
 
-    //toggle accordion for menu
-    app.toggleAccordion = function(e, item, element) {
-        var currentElement = e.currentTarget;
-        var activeItem = document.querySelector('.menu-item.active');
+  };
 
-        if (currentElement.classList.contains('active')) {
-            currentElement.classList.remove('active');
-        } else {
-            currentElement.classList.add('active');
-        }
+  app._onElementsReceived = function(event){
+    app.menu = event.detail.response;
+  };
 
-        if (activeItem) {
-            activeItem.classList.remove('active');
-        }
+  app.displayInstalledToast = function() {
+    // Check to make sure caching is actually enabled—it won't be in the dev environment.
+    if (!Polymer.dom(document).querySelector('platinum-sw-cache').disabled) {
+      Polymer.dom(document).querySelector('#caching-complete').show();
+    }
+  };
 
-    };
+  // Listen for template bound event to know when bindings
+  // have resolved and content has been stamped to the page
+  app.addEventListener('dom-change', function() {
+    console.log('Our app is ready to rock!');
+  });
 
-    app._onElementsReceived = function(event){
-        app.menu = event.detail.response;
-         setTimeout(function(){
-        dragAndDropSetup();
-      },100);
-    };
+  // See https://github.com/Polymer/polymer/issues/1381
+  window.addEventListener('WebComponentsReady', function() {
+    setTimeout(function() {
+      var panel = $('t-component-panel')[0];
+      var header = $('.property-panel-Header')[0];
+      var stage = $('t-stage')[0];
 
-    app.displayInstalledToast = function() {
-        // Check to make sure caching is actually enabled—it won't be in the dev environment.
-        if (!Polymer.dom(document).querySelector('platinum-sw-cache').disabled) {
-            Polymer.dom(document).querySelector('#caching-complete').show();
-        }
-    };
+      dragAndDropSetup();
+      stage.initComponentPanel(panel, header);
+    }, 10);
+    // imports are loaded and elements have been registered
+  });
 
-    // Listen for template bound event to know when bindings
-    // have resolved and content has been stamped to the page
-    app.addEventListener('dom-change', function() {
-        console.log('Fusion is ready to rock!');
-    });
+  // Main area's paper-scroll-header-panel custom condensing transformation of
+  // the appName in the middle-container and the bottom title in the bottom-container.
+  // The appName is moved to top and shrunk on condensing. The bottom sub title
+  // is shrunk to nothing on condensing.
+  // window.addEventListener('paper-header-transform', function(e) {
+  //   var appName = Polymer.dom(document).querySelector('#mainToolbar .app-name');
+  //   var middleContainer = Polymer.dom(document).querySelector('#mainToolbar .middle-container');
+  //   var bottomContainer = Polymer.dom(document).querySelector('#mainToolbar .bottom-container');
+  //   var detail = e.detail;
+  //   var heightDiff = detail.height - detail.condensedHeight;
+  //   var yRatio = Math.min(1, detail.y / heightDiff);
+  //   // appName max size when condensed. The smaller the number the smaller the condensed size.
+  //   var maxMiddleScale = 0.50;
+  //   var auxHeight = heightDiff - detail.y;
+  //   var auxScale = heightDiff / (1 - maxMiddleScale);
+  //   var scaleMiddle = Math.max(maxMiddleScale, auxHeight / auxScale + maxMiddleScale);
+  //   var scaleBottom = 1 - yRatio;
 
-    // See https://github.com/Polymer/polymer/issues/1381
-    window.addEventListener('WebComponentsReady', function() {
-        // imports are loaded and elements have been registered
-    });
+  //   // Move/translate middleContainer
+  //   Polymer.Base.transform('translate3d(0,' + yRatio * 100 + '%,0)', middleContainer);
 
-    // Main area's paper-scroll-header-panel custom condensing transformation of
-    // the appName in the middle-container and the bottom title in the bottom-container.
-    // The appName is moved to top and shrunk on condensing. The bottom sub title
-    // is shrunk to nothing on condensing.
-    // window.addEventListener('paper-header-transform', function(e) {
-    //   var appName = Polymer.dom(document).querySelector('#mainToolbar .app-name');
-    //   var middleContainer = Polymer.dom(document).querySelector('#mainToolbar .middle-container');
-    //   var bottomContainer = Polymer.dom(document).querySelector('#mainToolbar .bottom-container');
-    //   var detail = e.detail;
-    //   var heightDiff = detail.height - detail.condensedHeight;
-    //   var yRatio = Math.min(1, detail.y / heightDiff);
-    //   // appName max size when condensed. The smaller the number the smaller the condensed size.
-    //   var maxMiddleScale = 0.50;
-    //   var auxHeight = heightDiff - detail.y;
-    //   var auxScale = heightDiff / (1 - maxMiddleScale);
-    //   var scaleMiddle = Math.max(maxMiddleScale, auxHeight / auxScale + maxMiddleScale);
-    //   var scaleBottom = 1 - yRatio;
+  //   // Scale bottomContainer and bottom sub title to nothing and back
+  //   Polymer.Base.transform('scale(' + scaleBottom + ') translateZ(0)', bottomContainer);
 
-    //   // Move/translate middleContainer
-    //   Polymer.Base.transform('translate3d(0,' + yRatio * 100 + '%,0)', middleContainer);
+  //   // Scale middleContainer appName
+  //   Polymer.Base.transform('scale(' + scaleMiddle + ') translateZ(0)', appName);
+  // });
 
-    //   // Scale bottomContainer and bottom sub title to nothing and back
-    //   Polymer.Base.transform('scale(' + scaleBottom + ') translateZ(0)', bottomContainer);
+  // // Scroll page to top and expand header
+  // app.scrollPageToTop = function() {
+  //   app.$.headerPanelMain.scrollToTop(true);
+  // };
 
-    //   // Scale middleContainer appName
-    //   Polymer.Base.transform('scale(' + scaleMiddle + ') translateZ(0)', appName);
-    // });
-
-    // // Scroll page to top and expand header
-    // app.scrollPageToTop = function() {
-    //   app.$.headerPanelMain.scrollToTop(true);
-    // };
-
-    // app.closeDrawer = function() {
-    //   app.$.paperDrawerPanel.closeDrawer();
-    // };
+  // app.closeDrawer = function() {
+  //   app.$.paperDrawerPanel.closeDrawer();
+  // };
 
 })(document);

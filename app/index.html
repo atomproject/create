@@ -59,6 +59,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <section data-route="canvas" style="height:100%">
           <t-scaffold scaffold-type="builder" style="height:100%">
             <nav-content class="layout vertical fit">
+              <!-- TODO: why are there two elements with same id `componentSearch` -->
               <t-autosuggest id="componentSearch" token-param="DisplayName" data-url="forms/demo/api/Component/find" label="Quick add" no-label-float></t-autosuggest>
               <div class="component-list flex">
                 <paper-item class="horizontal layout">
@@ -110,24 +111,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <t-component-panel responsive-view property-source="[[_getPropertySource(builderType)]]" component="[[builderType]]">
               </t-component-panel>
             </nav-list>
-            <div class="content layout vertical fit container">
-              <t-form hidden$="[[isPage]]" class="canvas empty vertical layout flex">
-                <h2 class="drag-text">
-                  <span class="dextop">Click on an element or drag it here to start building your form.</span>
-                  <span class="mobile">Browse elements using the button above to start building your form.</span>
-                </h2>
-                <ul title="Click to edit form properties." class="form flex sortable empty connectedSortable field-container">
-                </ul>
-              </t-form>
-              <t-page hidden$="[[!isPage]]" title="Click to Edit. Drag to Reorder." class="page canvas empty vertical layout flex">
-                <h2 class="drag-text">
-                  <span class="dextop">Click on an element or drag it here to start building your page.</span>
-                  <span class="mobile">Browse elements using the button above to start building your page.</span>
-                </h2>
-                <ul class="form flex sortable empty connectedSortable field-container">
-                </ul>
-              </t-page>
-            </div>
+            <t-stage class="content layout vertical fit container" builder-type="[[builderType]]"></t-stage>
           </t-scaffold>
           <iron-ajax url="[[builderUrl]]" content-type="application/json" handle-as="json" id="manifestAjax" on-response="_onElementsReceived"></iron-ajax>
         </section>

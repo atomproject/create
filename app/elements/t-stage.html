@@ -1,0 +1,658 @@
+<!-- TODO: add jquery ui and jquery ui nested sortable as dependencies -->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/t-form/t-form.html">
+<link rel="import" href="../bower_components/t-page/t-page.html">
+<link rel="import" href="t-component-code.html">
+<script type="text/javascript" src="../scripts/lodash.custom.js"></script>
+
+<dom-module id="t-stage">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <template is="dom-if" if="{{!isPage(builderType)}}">
+      <t-form class="canvas empty vertical layout flex">
+        <h2 class="drag-text">
+          <span class="dextop">Click on an element or drag it here to start building your form.</span>
+          <span class="mobile">Browse elements using the button above to start building your form.</span>
+        </h2>
+        <ul title="Click to edit form properties." class="form flex sortable empty connectedSortable field-container" data-name="t-form" data-category="form">
+        </ul>
+      </t-form>
+    </template>
+    <template is="dom-if" if="{{isPage(builderType)}}">
+      <t-page title="Click to Edit. Drag to Reorder." class="page canvas empty vertical layout flex">
+        <h2 class="drag-text">
+          <span class="dextop">Click on an element or drag it here to start building your page.</span>
+          <span class="mobile">Browse elements using the button above to start building your page.</span>
+        </h2>
+        <ul class="form flex sortable empty connectedSortable field-container" data-name="t-page" data-category="page">
+        </ul>
+      </t-page>
+    </template>
+
+    <template id="rowTemplate">
+      <li title="Click to Edit. Drag to Reorder." class="horizontal flex layout field-container">
+        <div class="overlap">
+          <div class="hover-panel">
+              <iron-icon class="unmerge" title="Unmerge this item" icon="communication:call-split"></iron-icon>
+              <iron-icon class="duplicate" title="Clone this item" icon="content-copy"></iron-icon>
+              <iron-icon class="close" title="Remove this item" icon="close"></iron-icon>
+          </div>
+        </div>
+        <div class="flex fieldset">
+          <!-- element html goes here -->
+        </div>
+      </li>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 't-stage',
+
+      behaviors: [
+        Polymer.Templatizer
+      ],
+
+      listeners: {
+        'tap': 'handleTap'
+      },
+
+      properties: {
+        _elementMetadataHash: {
+          type: Object,
+          value: function() { return {}; }
+        },
+        _elementSateList: {
+          type: Array,
+          value: function() { return []; }
+        },
+        componentPanelTarget: {
+          type: Object,
+          notify: true
+        },
+        builderType: String
+      },
+
+      beautifyOpts: {
+        wrap_line_length: 80,
+      },
+
+      draggedPosX: null,
+      componentPanel: null,
+      componentPanelHeader: null,
+      builderState: null,
+      componentTemplate: null,
+
+      handleTap: function(e) {
+        var handlers = {
+          '.unmerge' : 'unmerge',
+          '.duplicate' : 'duplicate',
+          '.close' : 'remove',
+          '.fieldset' : 'showPanelForElement',
+          '.overlap': 'showPanelForFirstElement',
+          'li.field-container': 'showPanelForFirstElement',
+          'ul.form': 'showPanelForElement'
+        };
+        var keys = Object.keys(handlers), i, selector;
+
+        for (i = 0; i < keys.length; i++) {
+          selector = keys[i];
+          if ($(e.target).is(selector)) {
+            this[handlers[selector]](e.target);
+          }
+        }
+      },
+
+      unmerge: function(el) {
+        var fieldsets = $(el).closest('.field-container').children('.fieldset');
+
+        fieldsets = Array.prototype.slice.call(fieldsets);
+        this.remove(el);
+        fieldsets.forEach(function(fieldset) {
+          var name = fieldset.getAttribute('data-name');
+          var category = fieldset.getAttribute('data-category');
+
+          this.add(name, category);
+        }.bind(this));
+      },
+
+      duplicate: function(el) {
+        var container, fieldsets, fieldContainer, posX, posY;
+        var $form = $('.form');
+        var $subject = $('.canvas');
+
+        posX = (this.querySelectorAll('li.field-container') || []).length;
+        container = this.getWrapper();
+        fieldContainer = container.querySelector('.field-container');
+        fieldsets = $(el).closest('.field-container').children('.fieldset');
+        fieldsets = Array.prototype.slice.call(fieldsets);
+        fieldsets.length > 1 && fieldContainer.classList.add('grouped');
+
+        fieldsets = fieldsets.forEach(function (fieldset, posY) {
+          var name = fieldset.getAttribute('data-name');
+          var category = fieldset.getAttribute('data-category');
+          //TODO: pass the html as parameter below to duplicate
+          var state = this.getNewElementState(name, posX, posY);
+
+          this.push('_elementSateList', state);
+          fieldset = this.getFieldset(name, category);
+          fieldContainer.appendChild(fieldset);
+        }.bind(this));
+
+        $form.append(container);
+
+        if ($subject[0].tagName.toLowerCase() === 't-form') {
+          setTimeout(function () {
+            $subject[0].setFields();
+          }, 0);
+        }
+        console.log(this._elementSateList);
+      },
+
+      remove: function(el) {
+        var posX, i, state;
+        var fieldContainer = $(el).closest('.field-container')[0];
+        var fieldContainers = this.querySelectorAll('li.field-container') || [];
+
+        fieldContainers = Array.prototype.slice.call(fieldContainers);
+        posX = fieldContainers.indexOf(fieldContainer);
+        for (i = 0; i < this._elementSateList.length; i++) {
+          state = this._elementSateList[i];
+          if (state.posX === posX) {
+            this.splice('_elementSateList', i--, 1);
+          } else if (state.posX >= posX) {
+            --state.posX;
+          }
+        }
+
+        fieldContainer.remove();
+        console.log(this._elementSateList);
+      },
+
+      add: function(name, category) {
+        var container, fieldset, fieldContainer, state;
+        var $form = $('.form');
+        var $subject = $('.canvas');
+        var posX = (this.querySelectorAll('li.field-container') || []).length;
+        var posY = 0;
+
+        container = this.getWrapper();
+        fieldset = this.getFieldset(name, category);
+        fieldContainer = container.querySelector('.field-container');
+        fieldContainer.appendChild(fieldset);
+        state = this.getNewElementState(name, posX, posY);
+
+        $form.append(container);
+        this.push('_elementSateList', state);
+
+        if ($subject[0].tagName.toLowerCase() === 't-form') {
+          setTimeout(function () {
+            $subject[0].setFields();
+          }, 0);
+        }
+        // $(fieldSet).trigger('click');
+        console.log(this._elementSateList);
+      },
+
+      merge: function(inEl, name, category) {
+        var fieldset = this.getFieldset(name, category);
+        inEl.classList.add('grouped');
+        $(inEl).append(fieldset);
+      },
+
+      getFieldset: function(name, category) {
+        var html = this._elementMetadataHash[name];
+
+        this.templatize(this.$.rowTemplate);
+        //TODO: check why following binding won't work
+        container = this.stamp({name: name, category: category});
+        fieldset = container.root.querySelector('.fieldset');
+        fieldset.innerHTML = html;
+        fieldset.setAttribute('data-category', category);
+        fieldset.setAttribute('data-name', name);
+
+        return fieldset;
+      },
+
+      getWrapper: function() {
+        this.templatize(this.$.rowTemplate);
+        //TODO: check why following binding won't work
+        container = this.stamp();
+        fieldset = container.root.querySelector('.fieldset');
+        fieldset.remove();
+
+        return container.root;
+      },
+
+      showPanelForElement: function(el) {
+        var name = el.getAttribute('data-name');
+        var category = el.getAttribute('data-category');
+
+        this.componentPanelTarget = el.querySelector(name);
+        this.showComponentPanel(name, category);
+      },
+
+      showPanelForFirstElement: function(el) {
+        el = $(el).closest('.field-container').children('.fieldset')[0];
+        if (el) {
+          this.showPanelForElement(el);
+        }
+      },
+
+      showComponentPanel: function(name, category) {
+        var $panelHeader = $(this.componentPanelHeader);
+        var propertySource = 'bower_components/' + name + '/property.json';
+
+        this.componentPanel.propertySource = propertySource;
+
+        if (name === 't-form' || name === 't-page') {
+          $panelHeader.show();
+        } else {
+          $panelHeader.hide();
+        }
+      },
+
+      getNewElementState: function(name, x, y, html) {
+        return {
+          name: name,
+          html: html || this._elementMetadataHash[name],
+          attributes: {},
+          posX: x,
+          posY: y
+        };
+      },
+
+      getElementPosition: function(el) {
+        var posX, posY;
+        var fieldContainers = this.querySelectorAll('li.field-container') || [];
+
+        fieldContainers = Array.prototype.slice.call(fieldContainers);
+        fieldContainers.forEach(function(container, index) {
+          var fieldsets = container.querySelectorAll('.fieldset') || [];
+          fieldsets = Array.prototype.slice.call(fieldsets);
+          if (fieldsets.indexOf(el) !== -1) {
+            posY = fieldsets.indexOf(el);
+            posX = index;
+          }
+        });
+
+        if (posX === undefined) {
+          throw new Error('Could not locate the element');
+        }
+
+        return {x: posX, y: posY};
+      },
+
+      updateCode: function(componentName, componentAttributes, componentHtml) {
+        var startTag, endTag, innerHTML, code, attributes;
+
+        if (!componentName) {
+          return;
+        }
+
+        endTag = '</' + componentName + '>';
+        innerHTML = componentHtml || '';
+        //iterate over all the attributes and create
+        //the attribute list for use in start tag
+        attributes = this.serializeAttributes(componentAttributes);
+
+        attributes = attributes ? (' ' + attributes) : '';
+        startTag = '<' + componentName + attributes + '>';
+
+        code = startTag + innerHTML + endTag;
+
+        // return window.html_beautify(code, this.beautifyOpts);
+        return code;
+      },
+
+      serializeAttributes: function(componentAttributes) {
+        var attributes = Object.keys(componentAttributes || {});
+
+        return attributes.map(function(attr) {
+          var attrVal = componentAttributes[attr];
+          var quoteChar = '"';
+          var serializedAttr = [];
+
+          attr = Polymer.CaseMap.camelToDashCase(attr);
+
+          //attribute values can be of only two types
+          //Boolean or String
+          if (this.isBoolean(attrVal)) {
+            if (attrVal) {
+              //only output the attribute
+              return attr;
+            } else {
+              return;
+            }
+          }
+
+          //so the value is not Boolean then it is of type String
+          attrVal = this.serialize(attrVal);
+          attrVal = attrVal.toString();
+
+          //properly escape the attribute value
+          if (attrVal.indexOf('"') !== -1) {
+            if (attrVal.indexOf("'") !== -1) {
+              attrVal = attrVal.replace(/"/g, '&quot;');
+            } else {
+              quoteChar = "'";
+            }
+          }
+
+          //output the attribute and value pair
+          serializedAttr.push(attr);
+          serializedAttr.push('=');
+          serializedAttr.push(quoteChar);
+          serializedAttr.push(attrVal);
+          serializedAttr.push(quoteChar);
+
+          return serializedAttr.join('');
+        }.bind(this)).filter(function(item) {
+          //remove the falsy items from the list
+          return Boolean(item);
+        }).join(' ');
+      },
+
+      isBoolean: function(value) {
+        var toString = Object.prototype.toString;
+
+        //better than `typeof`
+        return toString.call(value) === '[object Boolean]';
+      },
+
+      fieldContainerDragged: function (e, ui) {
+        var fieldContainers = this.querySelectorAll('li.field-container') || [];
+
+        fieldContainers = Array.prototype.slice.call(fieldContainers);
+        this.draggedPosX = fieldContainers.indexOf(ui.item[0]);
+
+        // what the hell does this do?
+        ui.placeholder.height(ui.helper.height());
+      },
+
+      fieldContainerRelocated: function (e, ui) {
+        var fieldsets, inEl, posX, posY, fieldContainer;
+        var fieldContainers = this.querySelectorAll('li.field-container') || [];
+
+        fieldContainers = Array.prototype.slice.call(fieldContainers);
+        fieldsets = ui.item.children('.fieldset');
+        fieldsets = Array.prototype.slice.call(fieldsets);
+
+        if (ui.item.parent().is('ul.field-container')) {
+          fieldContainer = ui.item[0];
+          posX = fieldContainers.indexOf(fieldContainer);
+
+          this._elementSateList.forEach(function(state) {
+            if (state.posX === this.draggedPosX) {
+              state.posX = posX;
+            } else if (this.draggedPosX > posX &&
+                state.posX < this.draggedPosX && state.posX >= posX) {
+              ++state.posX;
+            } else if (state.posX > this.draggedPosX && state.posX <= posX) {
+              --state.posX;
+            }
+          }.bind(this));
+
+          console.log(this._elementSateList);
+
+          return;
+        }
+
+        inEl = ui.item.parent().closest('li.field-container')[0];
+        posX = fieldContainers.indexOf(inEl);
+        posY = $(inEl).children('.fieldset').length;
+
+        fieldsets = fieldsets.forEach(function(fieldset) {
+            var name = fieldset.getAttribute('data-name');
+            var category = fieldset.getAttribute('data-category');
+            this.merge(inEl, name, category);
+        }.bind(this));
+
+        this._elementSateList.forEach(function(state) {
+          if (state.posX === this.draggedPosX) {
+            state.posX = posX;
+            state.posY = posY++;
+          } else if (state.posX > this.draggedPosX) {
+            --state.posX;
+          }
+        }.bind(this));
+
+        console.log(this._elementSateList);
+
+        ui.item.remove();
+      },
+
+      updatePath: function(event) {
+        var key = event.detail.path;
+        var value = event.detail.value;
+        var name, attributes, pos, targetElementState, container;
+
+        if (!this.componentPanelTarget || !key ||
+          value === undefined || value === null) {
+          return;
+        }
+
+        if ($(this.componentPanelTarget).is(this.builderType)) {
+          this.updateBuilderState(key, value);
+          return;
+        }
+
+        value = _.cloneDeep(value);
+        this.componentPanelTarget.set(key, value);
+
+        value = _.cloneDeep(value);
+        container = $(this.componentPanelTarget).closest('.fieldset');
+        container = container[0];
+        name = container.getAttribute('data-name');
+        pos = this.getElementPosition(container);
+        targetElementState = this._elementSateList.find(function(state) {
+          return state.posX === pos.x && state.posY === pos.y;
+        });
+        attributes = targetElementState.attributes;
+        attributes[key] = value;
+        targetElementState.html = this.updateCode(name, attributes);
+      },
+
+      updateBuilderState: function(key, value) {
+        var targetElementState, attributes, name;
+
+        name = this.builderType;
+        targetElementState =  this.builderState;
+        attributes = targetElementState.attributes;
+
+        value = _.cloneDeep(value);
+        this.querySelector(this.builderType).set(key, value);
+
+        value = _.cloneDeep(value);
+        attributes[key] = value;
+        targetElementState.html = this.updateCode(name, attributes);
+      },
+
+      initComponentPanel: function(panel, header) {
+        var target = this.querySelector(this.builderType);
+
+        this.componentPanelTarget = target;
+        this.componentPanel = panel;
+        this.componentPanelHeader = header;
+
+        if (!this.builderState) {
+          this.builderState = this.getNewElementState(this.builderType);
+        }
+
+        panel.addEventListener('path-changed', this.updatePath.bind(this));
+      },
+
+      isPage: function(builderType) {
+        return builderType === 't-page';
+      },
+
+      getStateFile: function(builderState, states) {
+        var stateFile;
+
+        if (!builderState || !states) {
+          return;
+        }
+
+        stateFile = {
+          type: builderState.name,
+          attributes: builderState.attributes,
+          rows: this.getStateHierarchy(states)
+        };
+
+        return JSON.stringify(stateFile, null, 2);
+      },
+
+      getStateHierarchy: function(states) {
+        var rows = [];
+
+        states.forEach(function(state) {
+          var row, column;
+
+          if (!rows[state.posX]) {
+            rows[state.posX] = [];
+          }
+
+          row = rows[state.posX];
+
+          if (!row[state.posY]) {
+            row[state.posY] = {};
+          }
+
+          column = row[state.posY];
+          column.name = state.name;
+          column.html = state.html;
+        });
+
+        return rows;
+      },
+
+      getComponentFile: function(builderState, states) {
+        var context = {}, classes, start, components = [];
+        var end = '</' + this.builderType + '>';
+        var builder = this.querySelector(this.builderType);
+
+        if (!builderState || !states) {
+          return;
+        }
+
+        classes = builder.classList;
+        classes = Array.prototype.slice.call(classes);
+        classes = classes.filter(function(klass) {
+          return ['style-scope', 't-stage'].indexOf(klass) === -1;
+        }).join(' ');
+
+        //side effecting method, it updates `this.builderState`
+        this.updateBuilderState('class', classes);
+        start = this.builderState.html.replace(end, '');
+
+        states
+          .map(function(state) {
+            return state.name;
+          })
+          .sort()
+          .forEach(function(name) {
+            if (components.indexOf(name) === -1) {
+              components.push(name);
+            }
+          });
+
+        context.baseUrl = '';
+        context.builderStartTag = start;
+        context.builderEndTag = end;
+        context.rows = this.getStateHierarchy(states);
+        context.components = components;
+        context.componentName = builder.getAttribute('name');
+
+        return Promise.resolve(this.componentTemplate)
+          .then(function(template) {
+            if (!template) {
+              return $.get('elements/component.jst');
+            }
+
+            return template;
+          })
+          .then(function(template) {
+            if (!_.isFunction(template)) {
+              template = this.componentTemplate = _.template(template);
+            }
+
+            return template(context);
+          }.bind(this));
+      },
+
+      getDownloadFiles: function() {
+        var states = this._elementSateList;
+        var builderState = this.builderState;
+        var stateFile = this.getStateFile(builderState, states);
+        var componentFilePromise = this.getComponentFile(builderState, states);
+        var builder = this.querySelector(this.builderType);
+
+        return componentFilePromise.then(function(componentFile) {
+          return {
+            componentFileName: builder.getAttribute('name') + '.html',
+            componentFile: componentFile,
+            stateFileName: 'state.json',
+            stateFile: stateFile
+          };
+        });
+      },
+
+      attached: function() {
+        var that = this;
+
+        setTimeout(function() {
+          var $form = $('.form');
+          var $subject = $('.canvas');
+
+          //appends dragged, clicked control on to the form
+          function attachControlToForm(category) {
+            var name = draggedControl;
+
+            if ($('.canvas').hasClass('empty')) {
+              $('.canvas').removeClass('empty');
+            }
+
+            $.ajax({
+              url: 'bower_components/' + name + '/demo/metadata.html',
+              crossDomain: true
+            }).done(function (elementHtml) {
+              that._elementMetadataHash[name] = elementHtml;
+              that.add(name, category);
+            }).fail(function (e) {
+              // do some error handling
+              alert('Error while connecting to server');
+            });
+          }
+
+          $form.droppable({
+            drop: function (event, ui) {
+              if (!ui.draggable.hasClass('ui-sortable-helper')) {
+                draggedControl = ui.draggable[0].getAttribute('data-component');
+                attachControlToForm(ui.draggable[0].getAttribute('data-category'));
+              }
+            }
+          });
+
+          $form.nestedSortable({
+            placeholder: 'flex placeholder-highlight',
+            maxLevels: 2,
+            tabSize:0,
+            scroll:false,
+            tolerance: 'pointer',
+            branchClass: 'grouped',
+            hoveringClass: 'placeholder-highlight',
+            listType: 'ul',
+            sort: that.fieldContainerDragged.bind(that),
+            relocate: that.fieldContainerRelocated.bind(that)
+          });
+        });
+      }
+    });
+  </script>
+</dom-module>

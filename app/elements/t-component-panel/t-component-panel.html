@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+
 <link rel="import" href="../../bower_components/t-input/t-input.html">
 <link rel="import" href="../../bower_components/t-button/t-button.html">
 <link rel="import" href="../../bower_components/t-slider/t-slider.html">
@@ -9,20 +10,22 @@
 <link rel="import" href="../../bower_components/t-icon-selector/t-icon-selector.html">
 <link rel="import" href="../../bower_components/t-data-feeder/t-data-feeder.html">
 <link rel="import" href="../../bower_components/t-shared-components/jquery.html">
+
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/t-checkbox/t-checkbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
-<link rel="import" href="../lodash-custom.html">
+
+<script type="text/javascript" src="../../scripts/lodash.custom.js"></script>
 <script src="plugin/jquery.jsonview.js"></script>
 <script src="plugin/styleddropdown.js"></script>
+
 <dom-module id="t-component-panel">
     <link rel="import" type="css" href="component-panel.css">
     <link rel="stylesheet" href="plugin/jquery.jsonview.css">
     <template>
         <div id="controller">
-            <iron-meta key="test" type="Object" value="{{targetComponent}}"></iron-meta>
             <template is="dom-repeat" items="{{_sections}}" as="section">
                 <div class="section">
                     <div class="section-header">{{section.name}}</div>
@@ -52,10 +55,14 @@
                                     <div class="label">
                                         <label class="data-feeder">{{_getValue(_metadata, key, 'name')}}</label>
                                         <div class="flex"></div>
-                                        <t-dropdown data-value$="{{key}}" selected-item-label="{{_getValue(_metadata, key)}}" on-dropdown-value-changed="_dropdownSelectionChanged" data="{{_getValue(_metadata, key, 'values')}}">
+                                        <t-dropdown data-value$="{{key}}"
+                                            selected-item-label="{{_getValue(_metadata, key)}}"
+                                            on-dropdown-value-changed="_dropdownSelectionChanged"
+                                            data="{{_getValue(_metadata, key, 'values')}}">
                                         </t-dropdown>
                                     </div>
                                 </template>
+
                                 <template is="dom-if" if="{{_isLessThanThree(_metadata,key)}}">
                                     <div class="label horizontal layout center">
                                         <p>{{_getValue(_metadata, key,'name')}}</p>
@@ -76,7 +83,10 @@
                             </template>
                             <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'list')}}">
                                 <label class="data-feeder">{{_getValue(_metadata, key, 'name')}}</label>
-                                <t-data-feeder data-key="{{key}}" on-data-changed="dataChanged" data='{{_getValue(_metadata, key)}}'>
+                                <t-data-feeder
+                                   data-key="{{key}}"
+                                   on-data-changed="dataChanged"
+                                   data='{{_getValue(_metadata, key)}}'>
                                 </t-data-feeder>
                             </template>
                             <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'api')}}">
@@ -119,17 +129,7 @@ Polymer({
     is: 't-component-panel',
 
     properties: {
-
         propertyNames: Array,
-
-        targetComponent: {
-            type: Object,
-            value: function() {
-                return null;
-            },
-            notify: true,
-            observer: '_getPropertyNames'
-        },
 
         _metadata: {
             type: Array,
@@ -142,8 +142,7 @@ Polymer({
             type: Array,
             value: function() {
                 return [];
-            },
-            notify: true
+            }
         },
 
         keys: {
@@ -152,7 +151,6 @@ Polymer({
         },
 
         panelName: String,
-        metadataSource: String,
 
         /**
          * The property src
@@ -160,7 +158,8 @@ Polymer({
         propertySource: {
             type: String,
             value: '',
-            notify: true
+            notify: true,
+            observer: 'propertySourceChanged'
         },
 
         jsonResponse: {
@@ -171,18 +170,15 @@ Polymer({
         }
     },
 
-    attached: function() {
-        this.setPanel();
-    },
-
-    setPanel: function() {
+    propertySourceChanged: function(propertySource) {
         this._sections = [];
-        if (this.propertySource !== '')
+        if (propertySource) {
             this.$.call.generateRequest();
+        }
     },
 
     _isTypeMatching: function(metadata, key, type) {
-        if (metadata[key] && metadata[key].type.toLowerCase() == type) {
+        if (metadata[key].type.toLowerCase() == type) {
             return true;
         }
 
@@ -213,9 +209,7 @@ Polymer({
                 //this is due to the way t-data-feeder exposes its api
                 if (metadata[key].type.toLowerCase() === 'list') {
                     value = value.map(function(item) {
-                        return {
-                            value: item
-                        };
+                        return {value: item};
                     });
                 }
 
@@ -269,8 +263,7 @@ Polymer({
                     if (value !== undefined) {
                         //value is the initial value of the property
                         this.fire('path-changed', {
-                            path: propertyKey,
-                            value: property.value
+                            path: propertyKey, value: property.value
                         });
                     }
                 }.bind(this));
@@ -293,21 +286,15 @@ Polymer({
     _textChanged: function(e) {
         var key = e.model._nodes[0].getAttribute('data-value');
         var value = e.target.value;
-        this.targetComponent[key] = value;
-        this.fire('path-changed', {
-            path: key,
-            value: value
-        });
+
+        this.fire('path-changed', {path: key, value: value});
     },
 
     _checkBoxChanged: function(e) {
         var key = e.target.getAttribute("data-value");
         var value = e.target.checked;
-        this.targetComponent[key] = value;
-        this.fire('path-changed', {
-            path: key,
-            value: value
-        });
+
+        this.fire('path-changed', {path: key, value: value});
     },
 
     _radioValueChanged: function(e) {
@@ -316,61 +303,53 @@ Polymer({
         if (e.target.selectedItem != null) {
             key = e.target.getAttribute("data-value");
             value = e.target.selectedItem;
-            this.targetComponent[key] = value;
-            this.fire('path-changed', {
-                path: key,
-                value: value
-            });
+
+            this.fire('path-changed', {path: key, value: value});
         }
     },
 
     _sliderChanged: function(e) {
         var key = e.target.getAttribute("data-value");
         var value = e.target.value;
-        this.targetComponent[key] = value;
-        this.fire('path-changed', {
-            path: key,
-            value: value
-        });
+
+        this.fire('path-changed', {path: key, value: value});
     },
 
     _colorChanged: function(e) {
         var key = e.target.getAttribute("data-value");
         var value = e.target.value;
-        this.targetComponent[key] = value;
-        this.fire('path-changed', {
-            path: key,
-            value: value
-        });
+
+        this.fire('path-changed', {path: key, value: value});
     },
 
     _dropdownSelectionChanged: function(e) {
         var key = e.target.getAttribute("data-value");
         var value = e.target.selectedItemLabel;
-        this.targetComponent[key] = value;
-        this.fire('path-changed', {
-            path: key,
-            value: value
-        });
+
+        this.fire('path-changed', {path: key, value: value});
     },
 
     dataChanged: function(change) {
         var path = change.target.dataKey;
         var value = change.target.data;
+
         value = value.map(function(item) {
             return item.value;
         });
-        this.targetComponent[path] = value;
 
-        this.fire('path-changed', {
-            path: path,
-            value: value
-        });
+        this.fire('path-changed', {path: path, value: value});
     },
 
     _getMetadata: function() {
         this.$.apiMetadata.url = this.$$('#apiInput').value;
         this.$.apiMetadata.generateRequest();
+    },
+
+    _getPropertyNames: function() {
+        if (this.targetComponent != null)
+            this.propertyNames = Object.keys(this.targetComponent.properties);
+        else
+            this.propertyNames = [];
     },
 
     //TODO: verify working
@@ -386,14 +365,6 @@ Polymer({
         //of this componnet anymore
         $(this.$.bindingModal).styleddropdown(this.targetComponent);
     },
-
-    _getPropertyNames: function() {
-        if (this.targetComponent != null)
-            this.propertyNames = Object.keys(this.targetComponent.properties);
-        else
-            this.propertyNames = [];
-    },
-
 
     //TODO: verify working
     _closeModal: function() {
