@@ -1,5 +1,5 @@
 {
-  "name": "atom",
+  "name": "fusion",
   "version": "0.0.0",
   "authors": [
     "Rahul Pilkhwal <rahul.pilkhwal@tavisca.com>",
@@ -7,13 +7,15 @@
     "Sounak Pal <spal@tavisca.com>",
     "Ajinkya Tejankar <tejankarajinkya@gmail.com>"
   ],
-  "description": "",
+  "description": "Page and form designer",
   "main": "",
   "moduleType": [],
   "keywords": [
-    "Web Components"
+    "Web Components",
+    "Designer",
+    "Polymer"
   ],
-  "homepage": "http://atom-project.io/",
+  "homepage": "http://atomproject.github.io/fusion/",
   "private": true,
   "ignore": [
     "**/.*",
@@ -41,10 +43,6 @@
     "paper-dialog": "polymerelements/paper-dialog#~1.0.3",
     "paper-dialog-scrollable": "polymerelements/paper-dialog-scrollable#~1.1.0",
     "paper-drawer-panel": "polymerelements/paper-drawer-panel#~1.0.5",
-    "highlightjs": "*",
-    "fetch": "~0.10.1",
-    "iframe-resizer": "~3.5.1",
-    "particles.js": "~2.0.0",
     "js-beautify": "beautify-web/js-beautify#~1.5.10",
     "webcomponentsjs": "~0.7.19",
     "iron-icon": "PolymerElements/iron-icon#~1.0.7",
