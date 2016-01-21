@@ -7,6 +7,7 @@
   :host *{
     outline:0;    
     box-shadow: none;
+    -webkit-tap-highlight-color:transparent;
   }
 
   :host([label]) label{
@@ -14,6 +15,10 @@
     font-size: var(--form-label-size);
     display: block;
     margin-bottom: var(--form-label-margin);
+    white-space: nowrap; 
+    width: 100%; 
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   :host([no-label-float]) label{
     display: none;
@@ -30,22 +35,20 @@
       z-index: 11;
       color:  #fff;
       background: var(--grey-three);
-      border-radius: 4px;
-      padding: 0px 4px;
+      width: 12px;
+      height: 12px;
+      padding: 3px;
+      border-radius: 50%;
       cursor: pointer;
       display: none;
   }  
 @media(min-width: 601px){
   :host.label-is-floating:hover #clearButton{
     display: block;
-        height: 100%;
-    padding: 13px;
-    box-sizing: border-box;
-    right: 0;
   }
 }
   :host paper-material:hover input{
-    padding-right: 55px!important;  
+    padding-right: 25px!important;  
   }
   #spinner{
       position: absolute;
@@ -76,7 +79,7 @@
   :host paper-material input:-ms-input-placeholder {  
      color: var(--autosuggest-input-placeholder-color);  
   }
-  paper-material.t-autosuggest ::content .autocomplete {
+  :host ::content .autocomplete {
     position: absolute;
     transition: all 0.5s ease 0s;
     max-height: 0;
@@ -86,14 +89,7 @@
     transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
   }
 
-  paper-material.t-autosuggest ::content  div.autocomplete.open {
-    max-height: 80vh;
-    overflow: auto;
-    width:100%;
-    z-index: 1000;
-    background: var(--primary-background-color,#fff);
-    /* box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2); */
-  }
+  
 
   .suggestions{
     width: 100%;
@@ -119,7 +115,7 @@
     box-shadow: none;
   }
 
-  paper-material.t-autosuggest ::content   div.close{
+  :host ::content   div.close{
   position: absolute;
   transition: all 0.5s ease 0s;
   max-height: 0;
@@ -129,21 +125,21 @@
   transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
   }
 
-  paper-material ::content .autocomplete ul  {
+  :host ::content .autocomplete ul  {
     padding: 0;
     margin: 0; 
   }
 
-  paper-material ::content .autocomplete > ul > li.active,
-  paper-material ::content .autocomplete > ul > li:active,
-  paper-material ::content .autocomplete > ul > li:focus, 
-  paper-material ::content .autocomplete > ul > li:hover
+  :host ::content .autocomplete ul li.active,
+  :host ::content .autocomplete ul li:active,
+  :host ::content .autocomplete ul li:focus, 
+  :host ::content .autocomplete ul li:hover
   {
   background-color: #EEEEEE;
   transition: all 0.5s ease 0s;
   }
 
-  paper-material ::content .autocomplete ul > li{
+  :host ::content .autocomplete ul > li{
     cursor: pointer;
     font-size: var(--autosuggest-item-text-size);
     overflow: hidden;
@@ -159,11 +155,11 @@
     border-bottom:1px solid ;
     border-color: var(--autosuggest-item-border-color);
   }
-  paper-material ::content .autocomplete ul > li:last-child{
+  :host ::content .autocomplete ul > li:last-child{
     border:0;
   }
 
-  paper-material ::content .autocomplete ul > li:hover{
+  :host ::content .autocomplete ul > li:hover{
     background: rgb(238,238,238);
   }
 
@@ -208,6 +204,23 @@
     border-bottom:1px solid ;
     border-color: var(--autosuggest-item-border-color);
   }
+
+  :host #cancel{
+    display: none;
+    margin-right: 10px;
+    color:var(--autosuggest-input-value-color);
+  }
+
+  :host ::content .autocomplete.open {
+    overflow: auto;
+    width:100%;
+    max-height: 80vh;
+    z-index: 99;
+    background: var(--primary-background-color,#fff);
+  }
+  /* .label-container{
+    overflow: hidden;
+  } */
 @media (max-width: 600px){
   :host.focused{
     position: fixed;
@@ -218,18 +231,31 @@
     background: #fff;
     z-index: 9;
     box-sizing:border-box;
+    overflow: hidden;
   }
   :host.focused label{
     margin-left: 10px;
+    top: 7px!important;
+    padding-right: 16px;
+    box-sizing: border-box;
   }
   :host.focused paper-material{
     margin: 0 10px;
+  }
+  :host.label-is-floating.focused label{
+    display: none;
+  }
+  :host.focused #cancel{
+    display: block;
   }
   :host.label-is-floating.focused #clearButton{
     display: block;
   }
   
-  :host paper-material input{
-    padding-right: 55px!important;  
+  :host.label-is-floating.focused input{
+    padding-right: 25px!important;  
+  }
+  :host.focused .label-container{
+    position: relative;
   }
 }

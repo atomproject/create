@@ -259,6 +259,14 @@ This element is `display:block` by default, but you can set the `inline` attribu
     properties: {
 
       /**
+       * Set to true to fire the validate method on blur
+       */
+      fireBlur: {
+        type: Boolean,
+        value: true
+      },
+
+      /**
        * Set to true to disable the floating label. The label disappears when the input value is
        * not null.
        */
@@ -400,6 +408,9 @@ This element is `display:block` by default, but you can set the `inline` attribu
 
     _onBlur: function() {
       this._setFocused(false);
+      if(this.domHost.required && this.fireBlur){
+        this.domHost.validate();
+      }
     },
 
     _onInput: function(event) {

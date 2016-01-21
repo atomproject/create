@@ -144,7 +144,7 @@ var AutoComplete = (function () {
                         input.addEventListener("position", positionLambda);
                         input.addEventListener("destroy", destroyLambda);
 
-                        Polymer.dom(component.querySelector('paper-material')).appendChild(result);
+                        Polymer.dom(component.querySelector('#append')).appendChild(result);
                         
                         input.onfocus = focusLamdba;
 

@@ -20,14 +20,9 @@ For more details see the
 What is the polyfill?
 ---------------------
 
-The polyfill is a JavaScript implementation of the Web Animations API. It is
-supported on modern versions of all major browsers, including:
-
-* Chrome
-* Firefox 27+
-* IE10+ (including Edge)
-* Safari (iOS) 7.1+
-* Safari (Mac) 9+
+The polyfill is a JavaScript implementation of the Web Animations API. It works
+on modern versions of all major browsers. For more details about browser
+support see <https://www.polymer-project.org/resources/compatibility.html>.
 
 Getting Started
 ---------------
@@ -36,21 +31,19 @@ Here's a simple example of an animation that scales and changes the opacity of
 a `<div>` over 0.5 seconds. The animation alternates producing a pulsing
 effect.
 
-```html
-<script src="web-animations.min.js"></script>
-<div class="pulse" style="width:150px;">Hello world!</div>
-<script>
-    var elem = document.querySelector('.pulse');
-    var animation = elem.animate([
-        {opacity: 0.5, transform: "scale(0.5)"},
-        {opacity: 1.0, transform: "scale(1)"}
-    ], {
-        direction: 'alternate',
-        duration: 500,
-        iterations: Infinity
-    });
-</script>
-```
+    <script src="web-animations.min.js"></script>
+    <div class="pulse" style="width:150px;">Hello world!</div>
+    <script>
+        var elem = document.querySelector('.pulse');
+        var animation = elem.animate([
+            {opacity: 0.5, transform: "scale(0.5)"},
+            {opacity: 1.0, transform: "scale(1)"}
+        ], {
+            direction: 'alternate',
+            duration: 500,
+            iterations: Infinity
+        });
+    </script>
 
 Web Animations supports off-main-thread animations, and also allows procedural
 generation of animations and fine-grained control of animation playback. See
@@ -131,15 +124,11 @@ The polyfill will automatically detect the correctly prefixed name to use when
 writing animated properties back to the platform. Where possible, the polyfill
 will only accept unprefixed versions of experimental features. For example:
 
-```js
-var effect = new KeyframeEffect(elem, {"transform": "translate(100px, 100px)"}, 2000);
-```
+    var effect = new KeyframeEffect(elem, {"transform": "translate(100px, 100px)"}, 2000);
 
 will work in all browsers that implement a conforming version of transform, but
 
-```js
-var effect = new KeyframeEffect(elem, {"-webkit-transform": "translate(100px, 100px)"}, 2000);
-```
+    var effect = new KeyframeEffect(elem, {"-webkit-transform": "translate(100px, 100px)"}, 2000);
 
 will not work anywhere.
 

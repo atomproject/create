@@ -50,10 +50,10 @@ style this element.
 
 </style>		
 			<template is="dom-if" if="[[!multiLine]]">
-				<t-master-input id="input" label="{{label}}" type="{{type}}" auto-validate$="{{autoValidate}}"  disabled$="{{disabled}}"  no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}" maxlength="{{maxLength}}" pattern="{{pattern}}" error-message="{{errorMessage}}" prevent-invalid-input$="{{preventInvalidInput}}" required$="{{required}}" value="{{value}}" on-value-change="_invalid"></t-master-input>
+				<t-master-input id="input" label="{{label}}" type="{{type}}" validate-on-blur="{{validateOnBlur}}" auto-validate$="{{autoValidate}}"  disabled$="{{disabled}}"  no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}" maxlength="{{maxLength}}" pattern="{{pattern}}" error-message="{{errorMessage}}" prevent-invalid-input$="{{preventInvalidInput}}" required$="{{required}}" value="{{value}}" on-value-change="_invalid"></t-master-input>
 			</template>
 			<template is="dom-if" if="[[multiLine]]">
-				<t-textarea id="textArea" label="{{label}}" disabled$="{{disabled}}" no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}"  maxlength="{{maxLength}}" value="{{value}}" error-message="{{errorMessage}}" rows$="{{rows}}" max-rows$="{{maxRows}}" required$="{{required}}" ></t-textarea>
+				<t-textarea id="input" label="{{label}}" disabled$="{{disabled}}" validate-on-blur="{{validateOnBlur}}"  no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}"  maxlength="{{maxLength}}" value="{{value}}" error-message="{{errorMessage}}" rows$="{{rows}}" max-rows$="{{maxRows}}" required$="{{required}}" ></t-textarea>
 			</template>
 		</template>
 
@@ -109,6 +109,14 @@ Polymer({
 			type: Boolean,
 			value: false,
 			reflectToAttribute: true
+		},
+
+		/**
+       * Set to true to validate on blur
+       */
+		validateOnBlur:  {
+			type: Boolean,
+			value: true
 		},
 
  		/**
@@ -186,6 +194,7 @@ Polymer({
 			reflectToAttribute: true
 		},
 
+
 		/**
        * The initial number of rows.
        *
@@ -229,7 +238,7 @@ Polymer({
 	},
 
 	validate: function(){
-		return this.$$('#input').validate();
+		return Polymer.dom(this.root).querySelector('#input').validate();
 	}
 });	
 </script>
