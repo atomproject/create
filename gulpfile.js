@@ -148,6 +148,7 @@ gulp.task('copy', function() {
 
   var elements = gulp.src(['app/elements/**/*.html',
       'app/elements/**/*.css',
+      'app/elements/**/*.jst',
       'app/elements/**/*.js'
     ])
     .pipe(gulp.dest(dist('elements')));
@@ -264,7 +265,7 @@ gulp.task('serve', [ 'styles', 'elements', 'images'], function() {
     }
   });
 
-  gulp.watch(['app/**/*.html'], reload);
+  gulp.watch(['app/**/*.{html,jst}'], reload);
   gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
   gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
   gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['lint']);
@@ -288,7 +289,7 @@ gulp.task('serve:dist', ['default'], function() {
     // Run as an https by uncommenting 'https: true'
     // Note: this uses an unsigned certificate which on first access
     //       will present a certificate warning in the browser.
-    // https: true,
+    https: true,
     server: dist(),
     middleware: [historyApiFallback()]
   });

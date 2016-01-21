@@ -8,12 +8,10 @@
   var app = document.querySelector('#app');
 
   // Sets app default base URL
-  app.baseUrl = '/';
+  app.baseUrl = '';
   app.menu = null;
-  if (window.location.port === '') { // if production
-    // Uncomment app.baseURL below and
-    // set app.baseURL to '/your-pathname/' if running from folder in production
-    // app.baseUrl = '/polymer-starter-kit/';
+  if (window.location.port === '') {
+    app.baseUrl = '/fusion';
   }
 
   // Get elements for menu for a given category
@@ -59,7 +57,7 @@
   // Listen for template bound event to know when bindings
   // have resolved and content has been stamped to the page
   app.addEventListener('dom-change', function() {
-    console.log('Our app is ready to rock!');
+    console.log('Fusion app is ready to rock!');
   });
 
   // See https://github.com/Polymer/polymer/issues/1381

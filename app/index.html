@@ -48,6 +48,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script src="scripts/jquery.nestedSortable.js"></script>
   <script src="scripts/jszip.min.js"></script>
   <script src="scripts/file-saver.js"></script>
+  <script src="scripts/lodash.custom.js"></script>
   <!-- endbuild -->
 </head>
 
@@ -122,7 +123,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <paper-toolbar bottom-justify="center" class="header-bar">
                 <span class="top flex"></span>
                 <div class="layout horizontal center">
-                  <img src="../images/fusion-logo.png" alt="Go Back to Previous page" />
+                  <img src="images/fusion-logo.png" alt="Go Back to Previous page" />
                   <h2 class="headerText inactive">Welcome to the atom-project tryout</h2>
                 </div>
                 <div class="login-section top">
@@ -136,42 +137,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <paper-tab data-tab="element" href="#element">Element</paper-tab>
                   </paper-tabs>
                 </div>
-            </paper-toolbar>
-        </div>
-        <div class="content fit">
-            <iron-pages attr-for-selected="data-tab" selected="{{tab}}" style="height:100%">
-                                <div data-tab="form" class="layout fit horizontal center-justified">
-                                    <div class="form-pages-tab">
-                                        <a href="{{baseUrl}}form">Launch Form builder</a>
-                                    </div>
-                                </div>
-                                <div data-tab="page"class="layout fit horizontal center-justified">
-                                    <div class="form-pages-tab">
-                                        <a href="{{baseUrl}}page">Launch Page builder</a>
-                                    </div>
-                                </div>
-                                <div data-tab="email" class="layout fit horizontal center center-justified">
-                                    <div class="under-construction"></div>
-                                </div>
-                                <div data-tab="element" class="layout fit horizontal center center-justified">
-                                    <div class="under-construction"></div>
-                                </div>
-                            </iron-pages>
-        </div>
-    </paper-header-panel>
-
-                </section>
-            </iron-pages>
-        </div>
-    </template>
-
-    <platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
-        <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
-        </platinum-sw-cache>
-    </platinum-sw-register>
-    <!-- build:js scripts/app.js -->
-    <script src="scripts/dragAndDrop.js"></script>
-    <script src="scripts/app.js"></script>
-    <!-- endbuild-->
+              </paper-toolbar>
+            </div>
+            <div class="content fit">
+              <iron-pages attr-for-selected="data-tab" selected="{{tab}}" style="height:100%">
+                <div data-tab="form" class="layout fit horizontal center-justified">
+                  <div class="form-pages-tab">
+                    <a href="form">Launch Form builder</a>
+                  </div>
+                </div>
+                <div data-tab="page" class="layout fit horizontal center-justified">
+                  <div class="form-pages-tab">
+                    <a href="page">Launch Page builder</a>
+                  </div>
+                </div>
+                <div data-tab="email" class="layout fit horizontal center center-justified">
+                  <div class="under-construction"></div>
+                </div>
+                <div data-tab="element" class="layout fit horizontal center center-justified">
+                  <div class="under-construction"></div>
+                </div>
+              </iron-pages>
+            </div>
+          </paper-header-panel>
+        </section>
+      </iron-pages>
+    </div>
+  </template>
+  <platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
+    <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
+    </platinum-sw-cache>
+  </platinum-sw-register>
+  <!-- build:js scripts/app.js -->
+  <script src="scripts/dragAndDrop.js"></script>
+  <script src="scripts/app.js"></script>
+  <!-- endbuild-->
 </body>
+
 </html>
