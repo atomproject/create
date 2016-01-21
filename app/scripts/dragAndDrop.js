@@ -74,6 +74,7 @@ var dragAndDropSetup = function () {
     }
 
     reader.addEventListener('load', function(ev) {
+      stage.reset();
       stage.recreateBuilder(ev.target.result);
     });
 
