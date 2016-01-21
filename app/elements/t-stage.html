@@ -18,7 +18,7 @@
           <span class="dextop">Click on an element or drag it here to start building your form.</span>
           <span class="mobile">Browse elements using the button above to start building your form.</span>
         </h2>
-        <ul title="Click to edit form properties." class="form flex sortable empty connectedSortable field-container" data-name="t-form" data-category="form">
+        <ul title="Click to edit form properties." class="form flex sortable empty connectedSortable field-container">
         </ul>
       </t-form>
     </template>
@@ -28,7 +28,7 @@
           <span class="dextop">Click on an element or drag it here to start building your page.</span>
           <span class="mobile">Browse elements using the button above to start building your page.</span>
         </h2>
-        <ul class="form flex sortable empty connectedSortable field-container" data-name="t-page" data-category="page">
+        <ul class="form flex sortable empty connectedSortable field-container">
         </ul>
       </t-page>
     </template>
@@ -95,7 +95,7 @@
           '.fieldset' : 'showPanelForElement',
           '.overlap': 'showPanelForFirstElement',
           'li.field-container': 'showPanelForFirstElement',
-          'ul.form': 'showPanelForElement'
+          '*': 'showPanelForBuilder'
         };
         var keys = Object.keys(handlers), i, selector;
 
@@ -103,6 +103,7 @@
           selector = keys[i];
           if ($(e.target).is(selector)) {
             this[handlers[selector]](e.target);
+            return;
           }
         }
       },
@@ -121,13 +122,12 @@
       },
 
       duplicate: function(el) {
-        var container, fieldsets, fieldContainer, posX, posY;
-        var $form = $('.form');
+        var fieldsets, fieldContainer, posX, posY;
+        var container = this.querySelector('ul.field-container');
         var $subject = $('.canvas');
 
         posX = (this.querySelectorAll('li.field-container') || []).length;
-        container = this.getWrapper();
-        fieldContainer = container.querySelector('.field-container');
+        fieldContainer = this.getWrapper();
         fieldsets = $(el).closest('.field-container').children('.fieldset');
         fieldsets = Array.prototype.slice.call(fieldsets);
         fieldsets.length > 1 && fieldContainer.classList.add('grouped');
@@ -143,14 +143,13 @@
           fieldContainer.appendChild(fieldset);
         }.bind(this));
 
-        $form.append(container);
+        container.appendChild(fieldContainer);
 
         if ($subject[0].tagName.toLowerCase() === 't-form') {
           setTimeout(function () {
             $subject[0].setFields();
           }, 0);
         }
-        console.log(this._elementSateList);
       },
 
       remove: function(el) {
@@ -170,23 +169,21 @@
         }
 
         fieldContainer.remove();
-        console.log(this._elementSateList);
       },
 
       add: function(name, category) {
-        var container, fieldset, fieldContainer, state;
-        var $form = $('.form');
+        var fieldset, fieldContainer, state;
+        var container = this.querySelector('ul.field-container');
         var $subject = $('.canvas');
         var posX = (this.querySelectorAll('li.field-container') || []).length;
         var posY = 0;
 
-        container = this.getWrapper();
+        fieldContainer = this.getWrapper();
         fieldset = this.getFieldset(name, category);
-        fieldContainer = container.querySelector('.field-container');
         fieldContainer.appendChild(fieldset);
         state = this.getNewElementState(name, posX, posY);
 
-        $form.append(container);
+        container.appendChild(fieldContainer);
         this.push('_elementSateList', state);
 
         if ($subject[0].tagName.toLowerCase() === 't-form') {
@@ -195,7 +192,6 @@
           }, 0);
         }
         // $(fieldSet).trigger('click');
-        console.log(this._elementSateList);
       },
 
       merge: function(inEl, name, category) {
@@ -225,7 +221,7 @@
         fieldset = container.root.querySelector('.fieldset');
         fieldset.remove();
 
-        return container.root;
+        return container.root.querySelector('.field-container');
       },
 
       showPanelForElement: function(el) {
@@ -233,7 +229,7 @@
         var category = el.getAttribute('data-category');
 
         this.componentPanelTarget = el.querySelector(name);
-        this.showComponentPanel(name, category);
+        this.showComponentPanel(name);
       },
 
       showPanelForFirstElement: function(el) {
@@ -243,26 +239,24 @@
         }
       },
 
-      showComponentPanel: function(name, category) {
+      showPanelForBuilder: function() {
+        this.componentPanelTarget = this.querySelector(this.builderType);
+        this.showComponentPanel(this.builderType);
+      },
+
+      showComponentPanel: function(name) {
         var $panelHeader = $(this.componentPanelHeader);
         var propertySource = 'bower_components/' + name + '/property.json';
 
         this.componentPanel.propertySource = propertySource;
-
-        if (name === 't-form' || name === 't-page') {
-          $panelHeader.show();
-        } else {
-          $panelHeader.hide();
-        }
+        name === this.builderType ? $panelHeader.show() : $panelHeader.hide();
       },
 
       getNewElementState: function(name, x, y, html, attributes) {
         return {
-          name: name,
+          name: name, posX: x, posY: y,
           html: html || this._elementMetadataHash[name],
-          attributes: attributes || {},
-          posX: x,
-          posY: y
+          attributes: attributes || {}
         };
       },
 
@@ -397,8 +391,6 @@
             }
           }.bind(this));
 
-          console.log(this._elementSateList);
-
           return;
         }
 
@@ -420,8 +412,6 @@
             --state.posX;
           }
         }.bind(this));
-
-        console.log(this._elementSateList);
 
         ui.item.remove();
       },
@@ -622,7 +612,7 @@
         this.builderState.html = this.updateCode(name, attributes);
 
         stateFile.rows.forEach(function(row, posX) {
-          fieldContainer = this.getWrapper().querySelector('.field-container');
+          fieldContainer = this.getWrapper();
 
           row.forEach(function(column, posY) {
             name = column.name;
@@ -641,6 +631,23 @@
         }.bind(this));
       },
 
+      //appends dragged, clicked control on to the form
+      attachControlToForm: function(name, category) {
+        if ($('.canvas').hasClass('empty')) {
+          $('.canvas').removeClass('empty');
+        }
+
+        $.get('bower_components/' + name + '/demo/metadata.html')
+          .done(function (elementHtml) {
+            this._elementMetadataHash[name] = elementHtml;
+            this.add(name, category);
+          }.bind(this))
+          .fail(function (e) {
+            // do some error handling
+            alert('Error while connecting to server');
+          }.bind(this));
+      },
+
       attached: function() {
         var that = this;
 
@@ -648,31 +655,11 @@
           var $form = $('.form');
           var $subject = $('.canvas');
 
-          //appends dragged, clicked control on to the form
-          function attachControlToForm(category) {
-            var name = draggedControl;
-
-            if ($('.canvas').hasClass('empty')) {
-              $('.canvas').removeClass('empty');
-            }
-
-            $.ajax({
-              url: 'bower_components/' + name + '/demo/metadata.html',
-              crossDomain: true
-            }).done(function (elementHtml) {
-              that._elementMetadataHash[name] = elementHtml;
-              that.add(name, category);
-            }).fail(function (e) {
-              // do some error handling
-              alert('Error while connecting to server');
-            });
-          }
-
           $form.droppable({
             drop: function (event, ui) {
               if (!ui.draggable.hasClass('ui-sortable-helper')) {
-                draggedControl = ui.draggable[0].getAttribute('data-component');
-                attachControlToForm(ui.draggable[0].getAttribute('data-category'));
+                window.draggedControl = ui.draggable[0].getAttribute('data-component');
+                that.attachControlToForm(ui.draggable[0].getAttribute('data-category'));
               }
             }
           });

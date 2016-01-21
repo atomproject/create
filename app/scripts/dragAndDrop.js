@@ -20,10 +20,10 @@ var dragAndDropSetup = function () {
     }
   });
 
-  document.addEventListener('adjust-dom',function () {
-    var form = document.querySelector('.form');
-    $('.form').html(Polymer.dom(form).innerHTML);
-  });
+  // document.addEventListener('adjust-dom',function () {
+  //   var form = document.querySelector('.form');
+  //   $('.form').html(Polymer.dom(form).innerHTML);
+  // });
 
   function download() {
     var zip = new JSZip();
@@ -45,18 +45,18 @@ var dragAndDropSetup = function () {
       });
   };
 
-  //event listener for elements autosuggest
-  document.addEventListener('on-autosuggest-select', function (event) {
-    var component = event.detail;
-    draggedControl = component.selectedItem.Name;
+  // //event listener for elements autosuggest
+  // document.addEventListener('on-autosuggest-select', function (event) {
+  //   var component = event.detail;
+  //   draggedControl = component.selectedItem.Name;
 
-    attachControlToForm(component.selectedItem.Category);
+  //   attachControlToForm(component.selectedItem.Category);
 
-    //clear autoggest and remove focus from there after attaching
-    component.$.autoSuggest.value = "";
-    component.$.autoSuggest.blur();
-    event.stopPropagation();
-  });
+  //   //clear autoggest and remove focus from there after attaching
+  //   component.$.autoSuggest.value = "";
+  //   component.$.autoSuggest.blur();
+  //   event.stopPropagation();
+  // });
 
   $uploadInput.on('change', function() {
     var stage = document.querySelector('t-stage');
@@ -91,52 +91,68 @@ var dragAndDropSetup = function () {
 
   // // //other click events
 
-  // // //append form elements to form on click
-  // // $('body').on('click', '.control', function (event) {
-  // //   draggedControl = event.currentTarget.getAttribute('data-component');
-  // //   attachControlToForm(event.currentTarget.getAttribute('data-category'));
-  // // });
+  //append form elements to form on click
+  $('body').on('click', '.control', function (event) {
+    var stage = document.querySelector('t-stage');
+    var category = event.currentTarget.getAttribute('data-category');
+    var name;
 
-  // $('.component-list').on('click', 'paper-item.menuitem', function () {
-  //   $(this).add('.component-list').toggleClass('active');
-  // });
+    name = draggedControl = event.currentTarget.getAttribute('data-component');
+    stage.attachControlToForm(name, category);
+  });
+
+  $('.component-list').on('click', 'paper-item.menuitem', function () {
+    $(this).add('.component-list').toggleClass('active');
+  });
 
   // // //Start code for header functionality..
 
-  // $('.headerText').on('keydown', function (e) {
-  //   if (e.which === 13) {
-  //     $(this).blur();
-  //     // Workaround for webkit's bug
-  //     window.getSelection().removeAllRanges();
-  //   }
-  // });
-  // $('.headerText').on('focus', function () {
-  //   $(this).removeClass('inactive');
-  //   var el = this;
-  //   requestAnimationFrame(function () {
-  //     selectElementContents(el);
-  //   });
-  //   function selectElementContents(el) {
-  //     var range = document.createRange();
-  //     range.selectNodeContents(el);
-  //     var sel = window.getSelection();
-  //     sel.removeAllRanges();
-  //     sel.addRange(range);
-  //   }
-  // });
+  $('.headerText').on('keydown', function (e) {
+    if (e.which === 13) {
+      $(this).blur();
+      // Workaround for webkit's bug
+      window.getSelection().removeAllRanges();
+    }
+  });
 
-  // $('.headerText').on('blur', function () {
-  //   if ($(this).text().trim().length === 0) {
-  //     if ($(this).hasClass('form-header')) {
-  //       $(this).text("Untitled Form");
-  //     } else {
-  //       $(this).text("Untitled Page");
-  //     }
-  //   }
-  //   this.scrollLeft = 0;
-  //   $(this).addClass('inactive');
-  // });
-  // //end code for header functionality..
+  $('.headerText').on('focus', function () {
+    var el = this;
+
+    function selectElementContents(el) {
+      var range = document.createRange();
+      range.selectNodeContents(el);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    $(this).removeClass('inactive');
+    requestAnimationFrame(function () {
+      selectElementContents(el);
+    });
+  });
+
+  $('.headerText').on('blur', function () {
+    var stage = document.querySelector('t-stage');
+    var heading = $(this).text().trim();
+    var name = heading.toLowerCase().replace(/\s+/, '-');
+    var $this = $(this);
+
+    if (heading.length === 0) {
+      if ($this.hasClass('form-header')) {
+        $this.text("Untitled Form");
+      } else {
+        $this.text("Untitled Page");
+      }
+    } else {
+      stage.updateBuilderState('heading', heading);
+      stage.updateBuilderState('name', name);
+    }
+
+    this.scrollLeft = 0;
+    $this.addClass('inactive');
+  });
+  //end code for header functionality..
 
   // //code to disable the default behaviour of the tab
   // $(document).on('keydown', '#componentSearch',function (objEvent) {
