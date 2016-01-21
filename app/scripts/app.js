@@ -69,7 +69,7 @@
 
       dragAndDropSetup();
       stage.initComponentPanel(panel, header);
-    }, 10);
+    }, 500);
     // imports are loaded and elements have been registered
   });
 
