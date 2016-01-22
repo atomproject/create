@@ -69,8 +69,8 @@ var dragAndDropSetup = function () {
   });
 
   // TODO: what does this do?
-  $('.component-list').on('click', 'paper-item.menuitem', function () {
-    $(this).add('.component-list').toggleClass('active');
+  $('.component-list').on('click', 'paper-item.menu-item', function () {
+    $('.component-list').toggleClass('active');
   });
 
   $('.headerText').on('keydown', function (e) {
