@@ -1,64 +1,21 @@
 var dragAndDropSetup = function () {
-
-  // declared variables
-  var $form = $('.form');
-  var $subject = $('.canvas');
-  var draggedControl = null;
-  var atomUrl = 'https://atomproject.github.io/fusion/';
-  var $uploadInput = $('#uploadInput');
-
-  //draggable menu items setup
+  // draggable menu items setup
   $('.control').draggable({
     addClasses: false,
     scroll: false,
     appendTo: 'body',
     helper: 'clone',
     cursor: 'move',
-    revert: 'invalid',
-    drag: function (event, ui) {
-      draggedControl = ui.helper.attr('data-component');
-    }
+    revert: 'invalid'
   });
 
-  // document.addEventListener('adjust-dom',function () {
-  //   var form = document.querySelector('.form');
-  //   $('.form').html(Polymer.dom(form).innerHTML);
-  // });
+  // trigger the click on the input element with `type="file"`
+  $('#upload').on('click', function () {
+    document.querySelector('#uploadInput').click();
+  });
 
-  function download() {
-    var zip = new JSZip();
-    var stage = document.querySelector('t-stage');
-
-    if (!stage) {
-      return;
-    }
-
-    stage.getDownloadFiles()
-      .then(function(files) {
-        var content;
-
-        zip.file(files.componentFileName, files.componentFile);
-        zip.file(files.stateFileName, files.stateFile);
-
-        content = zip.generate({ type: 'blob' });
-        saveAs(content, files.componentFileName.replace('.html', '.zip'));
-      });
-  };
-
-  // //event listener for elements autosuggest
-  // document.addEventListener('on-autosuggest-select', function (event) {
-  //   var component = event.detail;
-  //   draggedControl = component.selectedItem.Name;
-
-  //   attachControlToForm(component.selectedItem.Category);
-
-  //   //clear autoggest and remove focus from there after attaching
-  //   component.$.autoSuggest.value = "";
-  //   component.$.autoSuggest.blur();
-  //   event.stopPropagation();
-  // });
-
-  $uploadInput.on('change', function() {
+  // triggered when user selects a file, read the file and reset the builder
+  $('#uploadInput').on('change', function() {
     var stage = document.querySelector('t-stage');
     var files = this.files;
     var reader = new FileReader();
@@ -81,40 +38,50 @@ var dragAndDropSetup = function () {
     reader.readAsText(stateFile);
   });
 
-  $('#upload').on('click', function () {
-    $uploadInput[0].click();
-  });
-
+  // create the zip file and and download it
   $('#download').on('click', function () {
-    download();
+    var zip = new JSZip();
+    var stage = document.querySelector('t-stage');
+
+    if (!stage) {
+      return;
+    }
+
+    stage.getDownloadFiles()
+      .then(function(files) {
+        var content;
+
+        zip.file(files.componentFileName, files.componentFile);
+        zip.file(files.stateFileName, files.stateFile);
+
+        content = zip.generate({ type: 'blob' });
+        saveAs(content, files.componentFileName.replace('.html', '.zip'));
+      });
   });
 
-  // // //other click events
-
-  //append form elements to form on click
+  // append form elements to form on click
   $('body').on('click', '.control', function (event) {
     var stage = document.querySelector('t-stage');
     var category = event.currentTarget.getAttribute('data-category');
-    var name;
+    var name = event.currentTarget.getAttribute('data-component');
 
-    name = draggedControl = event.currentTarget.getAttribute('data-component');
     stage.attachControlToForm(name, category);
   });
 
+  // TODO: what does this do?
   $('.component-list').on('click', 'paper-item.menuitem', function () {
     $(this).add('.component-list').toggleClass('active');
   });
 
-  // // //Start code for header functionality..
-
   $('.headerText').on('keydown', function (e) {
     if (e.which === 13) {
       $(this).blur();
-      // Workaround for webkit's bug
+      // workaround for webkit's bug
       window.getSelection().removeAllRanges();
     }
   });
 
+  // select the header text on focus
   $('.headerText').on('focus', function () {
     var el = this;
 
@@ -132,6 +99,7 @@ var dragAndDropSetup = function () {
     });
   });
 
+  // update the builder attributes on focus out and reset the text
   $('.headerText').on('blur', function () {
     var stage = document.querySelector('t-stage');
     var heading = $(this).text().trim();
@@ -152,12 +120,28 @@ var dragAndDropSetup = function () {
     this.scrollLeft = 0;
     $this.addClass('inactive');
   });
-  //end code for header functionality..
 
   // //code to disable the default behaviour of the tab
   // $(document).on('keydown', '#componentSearch',function (objEvent) {
   //   if (objEvent.keyCode === 9) {  //tab pressed
   //     objEvent.preventDefault();
   //   }
+  // });
+  // document.addEventListener('adjust-dom',function () {
+  //   var form = document.querySelector('.form');
+  //   $('.form').html(Polymer.dom(form).innerHTML);
+  // });
+
+  // //event listener for elements autosuggest
+  // document.addEventListener('on-autosuggest-select', function (event) {
+  //   var component = event.detail;
+  //   draggedControl = component.selectedItem.Name;
+
+  //   attachControlToForm(component.selectedItem.Category);
+
+  //   //clear autoggest and remove focus from there after attaching
+  //   component.$.autoSuggest.value = "";
+  //   component.$.autoSuggest.blur();
+  //   event.stopPropagation();
   // });
 };

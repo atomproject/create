@@ -1,0 +1,112 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<script>
+  Polymer.StateConverterBehavior = {
+    getNewElementState: function(name, x, y, html, attributes) {
+      return {
+        name: name, posX: x, posY: y,
+        html: html || this._elementMetadataHash[name],
+        attributes: attributes || {}
+      };
+    },
+
+    getNewBuilderState: function(name, builder) {
+      var classes, state = { attributes: {} };
+
+      classes = builder.classList;
+      classes = Array.prototype.slice.call(classes);
+      classes = classes.filter(function(klass) {
+        return ['style-scope', 't-stage'].indexOf(klass) === -1;
+      }).join(' ');
+
+      state.name = name;
+      state.attributes.class = classes;
+      state.html = this.getComponentCode(state.name, state.attributes);
+
+      return state;
+    },
+
+    getStateFile: function(builderState, states) {
+      var stateFile;
+
+      if (!builderState || !states) {
+        return;
+      }
+
+      stateFile = {
+        type: builderState.name,
+        attributes: builderState.attributes,
+        rows: this.getStateHierarchy(states)
+      };
+
+      return JSON.stringify(stateFile, null, 2);
+    },
+
+    getStateHierarchy: function(states) {
+      var rows = [];
+
+      states.forEach(function(state) {
+        var row, column;
+
+        if (!rows[state.posX]) {
+          rows[state.posX] = [];
+        }
+
+        row = rows[state.posX];
+
+        if (!row[state.posY]) {
+          row[state.posY] = {};
+        }
+
+        column = row[state.posY];
+        column.name = state.name;
+        column.html = state.html;
+        column.attributes = state.attributes;
+      });
+
+      return rows;
+    },
+
+    getComponentFile: function(builderState, states) {
+      var context = {}, components = [], endTag;
+
+      if (!builderState || !states) {
+        return;
+      }
+
+      states
+        .map(function(state) {
+          return state.name;
+        })
+        .sort()
+        .forEach(function(name) {
+          if (components.indexOf(name) === -1) {
+            components.push(name);
+          }
+        });
+
+      context.baseUrl = '';
+      context.builderEndTag = endTag = '</' + builderState.name + '>';
+      context.builderStartTag = builderState.html.replace(endTag, '');
+      context.rows = this.getStateHierarchy(states);
+      context.components = components;
+      context.componentName = builderState.attributes.name;
+
+      return Promise.resolve(this.componentTemplate)
+        .then(function(template) {
+          if (!template) {
+            return $.get('elements/component.jst');
+          }
+
+          return template;
+        })
+        .then(function(template) {
+          if (!_.isFunction(template)) {
+            template = this.componentTemplate = _.template(template);
+          }
+
+          return template(context);
+        }.bind(this));
+    }
+  }
+</script>
