@@ -128,8 +128,8 @@
           $container.nestedSortable({
             placeholder: 'flex placeholder-highlight',
             maxLevels: 2,
-            tabSize:0,
-            scroll:false,
+            tabSize: 0,
+            scroll: false,
             tolerance: 'pointer',
             branchClass: 'grouped',
             hoveringClass: 'placeholder-highlight',
@@ -143,13 +143,16 @@
       addToBuilder: function(e, ui) {
         var name, category;
 
-        if (ui.draggable.hasClass('ui-sortable-helper')) {
+        if (_.isString(e) && _.isString(ui)) {
+          name = e, category = ui;
+        } else if (ui.draggable.hasClass('ui-sortable-helper')) {
           return;
+        } else {
+          name =  ui.draggable[0].getAttribute('data-component');
+          category = ui.draggable[0].getAttribute('data-category');
         }
 
         $(this.builderType).removeClass('empty');
-        name =  ui.draggable[0].getAttribute('data-component');
-        category = ui.draggable[0].getAttribute('data-category');
 
         $.get('bower_components/' + name + '/demo/metadata.html')
           .done(function (elementHtml) {
@@ -171,12 +174,12 @@
       fieldContainerRelocated: function (e, ui) {
         // this is a simple relocation of a container
         if (ui.item.parent().is('ul.field-container')) {
-          this.relocate(ui.item[0]);
+          this.relocate(ui.item[0], this.draggedPosX);
           return;
         }
 
         // this is the case of merging containers
-        this.merge(ui.item[0]);
+        this.merge(ui.item[0], this.draggedPosX);
         ui.item.remove();
       },
       /* section: end */
@@ -249,49 +252,90 @@
             this.querySelector(this.builderType).setFields();
           }.bind(this), 0)
         }
+        console.log(this._elementSateList);
       },
 
       unmerge: function(el) {
-        var fieldsets = $(el).closest('.field-container').children('.fieldset');
+        var fieldContainer = $(el).closest('li.field-container')[0];
+        var fieldsets = fieldContainer.querySelectorAll('.fieldset');
+        var fieldContainers = this.querySelectorAll('li.field-container') || [];
+        var container = this.querySelector('ul.field-container');
+        var posX;
 
-        fieldsets = Array.prototype.slice.call(fieldsets);
-        this.remove(el);
-        fieldsets.forEach(function(fieldset) {
+        fieldContainers = Array.prototype.slice.call(fieldContainers);
+        fieldsets = Array.prototype.slice.call(fieldsets, 1);
+        posX = fieldContainers.indexOf(fieldContainer);
+
+        this._elementSateList.forEach(function(state) {
+          if (state.posX > posX) {
+            state.posX += fieldsets.length;
+          }
+        });
+
+        fieldsets.forEach(function(fieldset, index) {
+          var posY = index + 1;
           var name = fieldset.getAttribute('data-name');
           var category = fieldset.getAttribute('data-category');
+          var state = this._elementSateList.find(function(item) {
+            return item.posX === posX && item.posY === posY;
+          });
+          var html = state.html;
+          var newFieldContainer;
 
-          this.add(name, category);
+          fieldset.remove();
+          fieldset = this.getFieldset(name, category, html);
+          (newFieldContainer = this.getWrapper()).appendChild(fieldset);
+          container.insertBefore(newFieldContainer, fieldContainer.nextSibling);
+
+          state.posX = posX + posY;
+          state.posY = 0;
         }.bind(this));
+
+        fieldContainer.classList.remove('grouped');
+        console.log(this._elementSateList);
       },
 
       duplicate: function(el) {
-        var fieldsets, fieldContainer, posX, posY;
+        var fieldContainer = $(el).closest('li.field-container')[0];
+        var fieldsets = fieldContainer.querySelectorAll('.fieldset');
+        var fieldContainers = this.querySelectorAll('li.field-container') || [];
         var container = this.querySelector('ul.field-container');
+        var posX, newFieldContainer;
 
-        posX = (this.querySelectorAll('li.field-container') || []).length;
-        fieldContainer = this.getWrapper();
-        fieldsets = $(el).closest('.field-container').children('.fieldset');
+        fieldContainers = Array.prototype.slice.call(fieldContainers);
         fieldsets = Array.prototype.slice.call(fieldsets);
-        fieldsets.length > 1 && fieldContainer.classList.add('grouped');
+        posX = fieldContainers.indexOf(fieldContainer);
 
-        fieldsets = fieldsets.forEach(function (fieldset, posY) {
+        this._elementSateList.forEach(function(state) {
+          if (state.posX > posX) {
+            state.posX += 1;
+          }
+        });
+
+        newFieldContainer = this.getWrapper()
+        fieldsets.forEach(function(fieldset, posY) {
           var name = fieldset.getAttribute('data-name');
           var category = fieldset.getAttribute('data-category');
-          //TODO: pass the html as parameter below to duplicate
-          var state = this.getNewElementState(name, posX, posY);
+          var state = this._elementSateList.find(function(item) {
+            return item.posX === posX && item.posY === posY;
+          });
+          var html = state.html;
+          var newState;
 
-          this.push('_elementSateList', state);
-          fieldset = this.getFieldset(name, category);
-          fieldContainer.appendChild(fieldset);
+          fieldset = this.getFieldset(name, category, html);
+          newFieldContainer.appendChild(fieldset);
+
+          newState = this.getNewElementState(name, posX + 1, posY, html);
+          this.push('_elementSateList', newState);
         }.bind(this));
 
-        container.appendChild(fieldContainer);
-
-        if (this.builderType === 't-form') {
-          setTimeout(function() {
-            this.querySelector(this.builderType).setFields();
-          }.bind(this), 0)
+        if (fieldsets.length > 1) {
+          newFieldContainer.classList.add('grouped');
         }
+
+        container.insertBefore(newFieldContainer, fieldContainer.nextSibling);
+        Polymer.updateStyles();
+        console.log(this._elementSateList);
       },
 
       remove: function(el) {
@@ -301,6 +345,7 @@
 
         fieldContainers = Array.prototype.slice.call(fieldContainers);
         posX = fieldContainers.indexOf(fieldContainer);
+
         for (i = 0; i < this._elementSateList.length; i++) {
           state = this._elementSateList[i];
           if (state.posX === posX) {
@@ -311,41 +356,40 @@
         }
 
         fieldContainer.remove();
+        console.log(this._elementSateList);
       },
 
-      merge: function(mergedContainer) {
+      merge: function(mergedContainer, draggedPosX) {
         var fieldsets, inEl, posX, posY;
         var fieldContainers = this.querySelectorAll('li.field-container') || [];
 
         fieldContainers = Array.prototype.slice.call(fieldContainers);
-        fieldsets = mergedContainer.querySelectorAll('.fieldset');
-        fieldsets = Array.prototype.slice.call(fieldsets);
-
-        // this is the case of merging containers
         inEl = $(mergedContainer).parent().closest('li.field-container')[0];
         posX = fieldContainers.indexOf(inEl);
         posY = $(inEl).children('.fieldset').length;
 
-        fieldsets = fieldsets.forEach(function(fieldset) {
-            var name = fieldset.getAttribute('data-name');
-            var category = fieldset.getAttribute('data-category');
-            var fieldset = this.getFieldset(name, category);
-
-            inEl.classList.add('grouped');
-            $(inEl).append(fieldset);
-        }.bind(this));
+        $(mergedContainer)
+          .children('.fieldset')
+          .siblings('.overlap')
+          .remove()
+          .end()
+          .unwrap()
+          .unwrap()
+          .closest('li.field-container')
+          .addClass('grouped');
 
         this._elementSateList.forEach(function(state) {
-          if (state.posX === this.draggedPosX) {
+          if (state.posX === draggedPosX) {
             state.posX = posX;
             state.posY = posY++;
-          } else if (state.posX > this.draggedPosX) {
+          } else if (state.posX > draggedPosX) {
             --state.posX;
           }
         }.bind(this));
+        console.log(this._elementSateList);
       },
 
-      relocate: function(relocatedContainer) {
+      relocate: function(relocatedContainer, draggedPosX) {
         var fieldsets, inEl, posX;
         var fieldContainers = this.querySelectorAll('li.field-container') || [];
 
@@ -356,15 +400,16 @@
         posX = fieldContainers.indexOf(relocatedContainer);
 
         this._elementSateList.forEach(function(state) {
-          if (state.posX === this.draggedPosX) {
+          if (state.posX === draggedPosX) {
             state.posX = posX;
-          } else if (this.draggedPosX > posX &&
-              state.posX < this.draggedPosX && state.posX >= posX) {
+          } else if (draggedPosX > posX &&
+              state.posX < draggedPosX && state.posX >= posX) {
             ++state.posX;
-          } else if (state.posX > this.draggedPosX && state.posX <= posX) {
+          } else if (state.posX > draggedPosX && state.posX <= posX) {
             --state.posX;
           }
         }.bind(this));
+        console.log(this._elementSateList);
       },
       /* section: end */
 

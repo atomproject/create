@@ -65,7 +65,7 @@ var dragAndDropSetup = function () {
     var category = event.currentTarget.getAttribute('data-category');
     var name = event.currentTarget.getAttribute('data-component');
 
-    stage.attachControlToForm(name, category);
+    stage.addToBuilder(name, category);
   });
 
   // TODO: what does this do?
