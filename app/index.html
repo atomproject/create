@@ -50,6 +50,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script src="scripts/file-saver.js"></script>
   <script src="scripts/lodash.custom.js"></script>
   <!-- endbuild -->
+
+  <style is="custom-style">
+    section[data-route="browser"] .header-bar {
+        background: #fff;
+        color: #555555;
+        padding: 0 20px;
+    }
+
+    section[data-route="browser"] .header-bar t-button {
+        color:var(--light-primary-color);
+    }
+
+    section[data-route="browser"] .header-bar > div {
+        padding: 0;
+    }
+
+    section[data-route="browser"] .header-bar > div#topBar{
+        height: 64px;
+    }
+
+    section[data-route="browser"] .header-bar > div#bottomBar paper-tabs #selectionBar{
+        background-color: var(--default-primary-color);
+        height: 1px;
+    }
+
+    @media (max-width: 639px){
+        section[data-route="browser"] paper-toolbar {
+            height: auto;
+        }
+    }
+  </style>
 </head>
 
 <body unresolved class="fullbleed layout vertical">
@@ -98,7 +129,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <t-autosuggest id="componentSearch" token-param="DisplayName" data-url="forms/demo/api/Component/find" label="Quick add" no-label-float></t-autosuggest>
             </search-bar>
             <header-toolbar>
-              <div class="layout horizontal center">
+              <div class="layout horizontal center top">
                 <img src="images/fusion-logo.png" alt="Go Back to Previous page" />
                 <h2 class="headerText form-header inactive" contenteditable>{{canvasName}}</h2>
                 <iron-icon icon="icons:create"></iron-icon>
@@ -121,11 +152,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <paper-header-panel class="list-panel" main>
             <div class="paper-header">
               <paper-toolbar bottom-justify="center" class="header-bar">
-                <span class="top flex"></span>
-                <div class="layout horizontal center">
-                  <img src="images/fusion-logo.png" alt="Go Back to Previous page" />
-                  <h2 class="headerText inactive">Welcome to the atom-project tryout</h2>
-                </div>
+                <span class="top flex">
+                  <div class="layout horizontal center">
+                    <img src="images/fusion-logo.png" alt="Go Back to Previous page" />
+                    <h2 class="headerText inactive">Welcome to the atom-project tryout</h2>
+                  </div>
+                </span>
                 <div class="bottom">
                   <paper-tabs attr-for-selected="data-tab" selected="{{tab}}" noink class="bottom">
                     <paper-tab data-tab="form" href="#form">Form</paper-tab>

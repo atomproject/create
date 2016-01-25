@@ -62,15 +62,12 @@
 
   // See https://github.com/Polymer/polymer/issues/1381
   window.addEventListener('WebComponentsReady', function() {
-    setTimeout(function() {
-      var panel = $('t-component-panel')[0];
-      var header = $('.property-panel-Header')[0];
-      var stage = $('t-stage')[0];
+    var panel = $('t-component-panel')[0];
+    var header = $('.property-panel-Header')[0];
+    var stage = $('t-stage')[0];
 
-      dragAndDropSetup();
-      stage.initComponentPanel(panel, header);
-    }, 500);
-    // imports are loaded and elements have been registered
+    stage.componentPanel = panel;
+    stage.componentPanelHeader = header;
   });
 
   // Main area's paper-scroll-header-panel custom condensing transformation of
