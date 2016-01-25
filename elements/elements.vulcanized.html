@@ -32237,15 +32237,20 @@ Polymer({
           type: Object,
           notify: true
         },
-        builderType: String
+        builderType: String,
+        componentPanel: Object
       },
+
+      observers: [
+        'initComponentPanel(builderType, componentPanel)',
+        'setupListeners(builderType)'
+      ],
 
       beautifyOpts: {
         wrap_line_length: 80,
       },
 
       draggedPosX: null,
-      componentPanel: null,
       componentPanelHeader: null,
       builderState: null,
       componentTemplate: null,
@@ -32276,9 +32281,9 @@ Polymer({
         }
       },
 
-      attached: function() {
+      setupListeners: function() {
         setTimeout(function() {
-          var $container = $('ul.field-container');
+          var $container = $('ul.field-container', this);
 
           $container.droppable({
             drop: this.addToBuilder.bind(this)
@@ -32713,19 +32718,19 @@ Polymer({
         name === this.builderType ? $panelHeader.show() : $panelHeader.hide();
       },
 
-      initComponentPanel: function(panel, header) {
-        var classes, state, builderType = this.builderType;
-        var builder = this.querySelector(builderType);
+      initComponentPanel: function(builderType) {
+        setTimeout(function() {
+          var builder = this.querySelector(builderType);
+          var panel = this.componentPanel;
 
-        this.componentPanelTarget = builder;
-        this.componentPanel = panel;
-        this.componentPanelHeader = header;
+          this.componentPanelTarget = builder;
 
-        if (!this.builderState) {
-          this.builderState = this.getNewBuilderState(builderType, builder);
-        }
+          if (!this.builderState) {
+            this.builderState = this.getNewBuilderState(builderType, builder);
+          }
 
-        panel.addEventListener('path-changed', this.updatePath.bind(this));
+          panel.addEventListener('path-changed', this.updatePath.bind(this));
+        }.bind(this));
       }
       /* section: end */
     });
@@ -50001,6 +50006,7 @@ module.exports = Array.isArray || function (arr) {
     // });
 
     page('/', function() {
+      app.tab="form";
       app.route = 'browser';
     });
 
@@ -50017,6 +50023,7 @@ module.exports = Array.isArray || function (arr) {
       app.builderUrl = 'page-manifest.json';
       app.canvasName = 'Untitled Page';
       app.$.manifestAjax.generateRequest();
+      setTimeout(dragAndDropSetup);
     });
 
     page('/form', function(data) {
@@ -50026,6 +50033,7 @@ module.exports = Array.isArray || function (arr) {
       app.builderUrl = 'form-manifest.json';
       app.canvasName = 'Untitled Form';
       app.$.manifestAjax.generateRequest();
+      setTimeout(dragAndDropSetup);
     });
 
     // 404

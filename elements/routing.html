@@ -38,6 +38,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     // });
 
     page('/', function() {
+      app.tab="form";
       app.route = 'browser';
     });
 
@@ -54,6 +55,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.builderUrl = 'page-manifest.json';
       app.canvasName = 'Untitled Page';
       app.$.manifestAjax.generateRequest();
+      setTimeout(dragAndDropSetup);
     });
 
     page('/form', function(data) {
@@ -63,6 +65,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app.builderUrl = 'form-manifest.json';
       app.canvasName = 'Untitled Form';
       app.$.manifestAjax.generateRequest();
+      setTimeout(dragAndDropSetup);
     });
 
     // 404
