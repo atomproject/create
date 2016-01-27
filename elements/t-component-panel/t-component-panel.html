@@ -25,78 +25,78 @@
     <link rel="stylesheet" href="plugin/jquery.jsonview.css">
     <template>
         <div id="controller">
-            <template is="dom-repeat" items="{{_sections}}" as="section">
+            <template is="dom-repeat" items="{{sections}}" as="section">
                 <div class="section">
                     <div class="section-header">{{section.name}}</div>
-                    <template is="dom-repeat" items="{{_getKeys(section)}}" as="key">
+                    <template is="dom-repeat" items="{{section.attributes}}" as="attribute">
                         <div class="layout justified">
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'boolean')}}">
-                                <t-checkbox checkbox-right data-value$="{{key}}" checked$="{{_getValue(_metadata, key)}}" on-change="_checkBoxChanged">{{_getValue(_metadata, key,'name')}}</t-checkbox>
+                            <template is="dom-if" if="{{_isType(attribute,'boolean')}}">
+                                <t-checkbox checkbox-right data-value$="{{attribute.key}}" checked$="{{attribute.value}}" on-change="_checkBoxChanged">{{attribute.name}}</t-checkbox>
                             </template>
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'color')}}">
-                                <t-colorpicker label$="{{_getValue(_metadata, key,'name')}}" color$="{{_getValue(_metadata, key)}}" data-value$="{{key}}" on-color-selected="_colorChanged"></t-colorpicker>
+                            <template is="dom-if" if="{{_isType(attribute,'color')}}">
+                                <t-colorpicker label$="{{attribute.name}}" color$="{{attribute.value}}" data-value$="{{attribute.key}}" on-color-selected="_colorChanged"></t-colorpicker>
                             </template>
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'number')}}">
+                            <template is="dom-if" if="{{_isType(attribute,'number')}}">
                                 <div class="center horizontal layout">
-                                    <t-input label$="{{_getValue(_metadata, key,'name')}}" data-value$="{{key}}" value="{{_getValue(_metadata, key)}}" on-keyup="_textChanged"></t-input>
+                                    <t-input label$="{{attribute.name}}" data-value$="{{attribute.key}}" value="{{attribute.value}}" on-keyup="_textChanged"></t-input>
                                 </div>
                             </template>
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'range')}}">
+                            <template is="dom-if" if="{{_isType(attribute,'range')}}">
                                 <div class="center horizontal layout">
-                                    <p>{{_getValue(_metadata, key,'name')}}</p>
+                                    <p>{{attribute.name}}</p>
                                     <div class="flex"></div>
-                                    <t-slider data-value$="{{key}}" pin editable dragging min$="{{_getValue(_metadata,key, 'min')}}" value$="{{_getValue(_metadata,key)}}" max$="{{_getValue(_metadata,key, 'max')}}" on-change="_sliderChanged">
+                                    <t-slider data-value$="{{attribute.key}}" pin editable dragging min$="{{attribute.min}}" value$="{{attribute.value}}" max$="{{attribute.max}}" on-change="_sliderChanged">
                                     </t-slider>
                                 </div>
                             </template>
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'options')}}">
-                                <template is="dom-if" if="{{_isGreaterThanThree(_metadata,key)}}">
+                            <template is="dom-if" if="{{_isType(attribute,'options')}}">
+                                <template is="dom-if" if="{{_isGreaterThanThree(attribute.values)}}">
                                     <div class="label">
-                                        <label class="data-feeder">{{_getValue(_metadata, key, 'name')}}</label>
+                                        <label class="data-feeder">{{attribute.name}}</label>
                                         <div class="flex"></div>
-                                        <t-dropdown data-value$="{{key}}"
-                                            selected-item-label="{{_getValue(_metadata, key)}}"
+                                        <t-dropdown data-value$="{{attribute.key}}"
+                                            selected-item-label="{{attribute.value}}"
                                             on-dropdown-value-changed="_dropdownSelectionChanged"
-                                            data="{{_getValue(_metadata, key, 'values')}}">
+                                            data="{{attribute.values}}">
                                         </t-dropdown>
                                     </div>
                                 </template>
 
-                                <template is="dom-if" if="{{_isLessThanThree(_metadata,key)}}">
+                                <template is="dom-if" if="{{_isLessThanThree(attribute.values)}}">
                                     <div class="label horizontal layout center">
-                                        <p>{{_getValue(_metadata, key,'name')}}</p>
+                                        <p>{{attribute.name}}</p>
                                         <div class="flex"></div>
-                                        <t-radio-group pill-button selected-item="{{_getValue(_metadata, key, 'index')}}" data-value$="{{key}}" on-t-radio-group-changed="_radioValueChanged">
-                                            <template is="dom-repeat" items="{{_getValue(_metadata, key, 'values')}}" as="val">
+                                        <t-radio-group pill-button selected-item="{{attribute.index}}" data-value$="{{attribute.key}}" on-t-radio-group-changed="_radioValueChanged">
+                                            <template is="dom-repeat" items="{{attribute.values}}" as="val">
                                                 <t-radio-button name="{{val}}">{{val}}</t-radio-button>
                                             </template>
                                         </t-radio-group>
                                     </div>
                                 </template>
                             </template>
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'string')}}">
-                                <t-input label$="{{_getValue(_metadata, key,'name')}}" data-value$="{{key}}" value="{{_getValue(_metadata, key)}}" on-keyup="_textChanged"></t-input>
+                            <template is="dom-if" if="{{_isType(attribute,'string')}}">
+                                <t-input label$="{{attribute.name}}" data-value$="{{attribute.key}}" value="{{attribute.value}}" on-keyup="_textChanged"></t-input>
                             </template>
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'iconset')}}">
-                                <t-icon-selector data-value$="{{key}}" label$="{{_getValue(_metadata, key,'name')}}" value="{{_getValue(_metadata, key)}}" on-icon-changed="_textChanged"></t-icon-selector>
+                            <template is="dom-if" if="{{_isType(attribute,'iconset')}}">
+                                <t-icon-selector data-value$="{{attribute.key}}" label$="{{attribute.name}}" value="{{attribute.value}}" on-icon-changed="_textChanged"></t-icon-selector>
                             </template>
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'list')}}">
-                                <label class="data-feeder">{{_getValue(_metadata, key, 'name')}}</label>
+                            <template is="dom-if" if="{{_isType(attribute,'list')}}">
+                                <label class="data-feeder">{{attribute.name}}</label>
                                 <t-data-feeder
-                                   data-key="{{key}}"
+                                   data-key="{{attribute.key}}"
                                    on-data-changed="dataChanged"
-                                   data='{{_getValue(_metadata, key)}}'>
+                                   data='{{_toDataFeederContract(attribute.value)}}'>
                                 </t-data-feeder>
                             </template>
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'api')}}">
+                            <template is="dom-if" if="{{_isType(attribute,'api')}}">
                                 <div class="layout horizontal">
-                                    <t-input id="apiInput" class="flex" label$="{{_getValue(_metadata, key,'name')}}" data-value$="{{key}}"></t-input>
+                                    <t-input id="apiInput" class="flex" label$="{{attribute.name}}" data-value$="{{attribute.key}}"></t-input>
                                     <t-button only-icon ico="link" on-click="_getMetadata"></t-button>
                                 </div>
                                 <t-button class="link" on-click="_openModal" label="YOLO"></t-button>
                             </template>
-                            <template is="dom-if" if="{{_isTypeMatching(_metadata,key,'action')}}">
-                                <t-button class="primary" raised on-click="fireAction" label="{{_getValue(_metadata, key,'name')}}"></t-button>
+                            <template is="dom-if" if="{{_isType(attribute,'action')}}">
+                                <t-button class="primary" raised on-click="fireAction" label="{{attribute.name}}"></t-button>
                             </template>
                         </div>
                     </template>
@@ -130,23 +130,11 @@ Polymer({
     properties: {
         propertyNames: Array,
 
-        _metadata: {
+        sections: {
             type: Array,
             value: function() {
                 return [];
             }
-        },
-
-        _sections: {
-            type: Array,
-            value: function() {
-                return [];
-            }
-        },
-
-        keys: {
-            type: Array,
-            value: []
         },
 
         panelName: String,
@@ -170,85 +158,52 @@ Polymer({
     },
 
     propertySourceChanged: function(propertySource) {
-        this._sections = [];
+        this.sections = [];
         if (propertySource) {
             this.$.call.generateRequest();
         }
     },
 
-    _isTypeMatching: function(metadata, key, type) {
-        if (metadata[key].type.toLowerCase() == type) {
+    _isType: function(attribute, type) {
+        if (attribute.type.toLowerCase() == type) {
             return true;
         }
 
         return false;
     },
 
-    _isRange: function(metadata, key) {
-        return (metadata[key].min !== undefined && metadata[key].max !== undefined);
+    _toDataFeederContract: function(value) {
+        return value.map(function(item) {
+            return {value: item};
+        });
     },
 
-    _getMin: function(metadata, key) {
-        return metadata[key].range[0];
+    _isGreaterThanThree: function(values) {
+        return values.length > 3;
     },
 
-    _getValue: function(metadata, key, field) {
-        var value;
-
-        switch (field) {
-            case 'values':
-                value = metadata[key].values;
-                break;
-            case 'name':
-                value = metadata[key].name;
-                break;
-            case undefined:
-                value = metadata[key].value;
-
-                //this is due to the way t-data-feeder exposes its api
-                if (metadata[key].type.toLowerCase() === 'list') {
-                    value = value.map(function(item) {
-                        return {value: item};
-                    });
-                }
-
-                break;
-            default:
-                value = metadata[key][field];
-        }
-
-        return value;
-    },
-
-    _isGreaterThanThree: function(metadata, key) {
-        return metadata[key].values.length > 3;
-    },
-
-    _isLessThanThree: function(metadata, key) {
-        return metadata[key].values.length <= 3;
-    },
-
-    _getKeys: function(section) {
-        var keys = Object.keys(section.fields);
-        return keys;
+    _isLessThanThree: function(values) {
+        return values.length <= 3;
     },
 
     _handleResponse: function(event) {
-        var metadata = {};
+        var sections = [];
         var errorMessage = "Error occured while retrieving properties.";
 
         this.isDataComponent = false;
 
         if (event.detail.response != null) {
             this.panelName = event.detail.response.name;
-            this._sections = event.detail.response.properties;
 
             //each property panel consists of multiple sections
-            this._sections.forEach(function(section) {
+            event.detail.response.properties.forEach(function(section) {
+                var newSection = { name: section.name, attributes: [] };
+
+                sections.push(newSection);
+
                 //sections contains an object `fields` which
                 //is a map of property names and it's metadata
                 var fieldKeys = Object.keys(section.fields);
-
                 //each value in fieldKeys is the name of
                 //the property to be displayed
                 fieldKeys.forEach(function(propertyKey) {
@@ -257,7 +212,7 @@ Polymer({
                     var property = section.fields[propertyKey];
                     var value = property.value;
 
-                    metadata[propertyKey] = property;
+                    property.key = propertyKey;
 
                     if (value !== undefined) {
                         //value is the initial value of the property
@@ -265,10 +220,12 @@ Polymer({
                             path: propertyKey, value: property.value
                         });
                     }
+
+                    newSection.attributes.push(property);
                 }.bind(this));
             }.bind(this));
 
-            this._metadata = metadata;
+            this.sections = sections;
         } else {
             this.$.controller.textContent = errorMessage;
         }
