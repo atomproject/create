@@ -393,7 +393,14 @@
           }
         }
 
-        fieldContainer.remove();
+        // something gets screwed up if we remove the fieldContainer now
+        // nothing happens in case of unmerge even when fieldContainers are
+        // removed there and this has started to occur since a1f85387
+        // check out the 7e8141fc05ed134d4 for a working example
+        // TODO: what the hell is happening below?
+        setTimeout(function() {
+          fieldContainer.remove();
+        });
         console.log(this._elementSateList);
       },
 
