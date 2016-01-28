@@ -31,21 +31,21 @@
                     <template is="dom-repeat" items="{{section.attributes}}" as="attribute">
                         <div class="layout justified">
                             <template is="dom-if" if="{{_isType(attribute,'boolean')}}">
-                                <t-checkbox checkbox-right data-value$="{{attribute.key}}" checked$="{{attribute.value}}" on-change="_checkBoxChanged">{{attribute.name}}</t-checkbox>
+                                <t-checkbox checkbox-right data-key$="{{attribute.key}}" checked="{{attribute.value}}" on-change="_checkBoxChanged">{{attribute.name}}</t-checkbox>
                             </template>
                             <template is="dom-if" if="{{_isType(attribute,'color')}}">
-                                <t-colorpicker label$="{{attribute.name}}" color$="{{attribute.value}}" data-value$="{{attribute.key}}" on-color-selected="_colorChanged"></t-colorpicker>
+                                <t-colorpicker label$="{{attribute.name}}" color="{{attribute.value}}" data-key$="{{attribute.key}}" on-color-selected="_colorChanged"></t-colorpicker>
                             </template>
                             <template is="dom-if" if="{{_isType(attribute,'number')}}">
                                 <div class="center horizontal layout">
-                                    <t-input label$="{{attribute.name}}" data-value$="{{attribute.key}}" value="{{attribute.value}}" on-keyup="_textChanged"></t-input>
+                                    <t-input label$="{{attribute.name}}" data-key$="{{attribute.key}}" value="{{attribute.value}}" on-keyup="_textChanged"></t-input>
                                 </div>
                             </template>
                             <template is="dom-if" if="{{_isType(attribute,'range')}}">
                                 <div class="center horizontal layout">
                                     <p>{{attribute.name}}</p>
                                     <div class="flex"></div>
-                                    <t-slider data-value$="{{attribute.key}}" pin editable dragging min$="{{attribute.min}}" value$="{{attribute.value}}" max$="{{attribute.max}}" on-change="_sliderChanged">
+                                    <t-slider data-key$="{{attribute.key}}" pin editable dragging min="{{attribute.min}}" value="{{attribute.value}}" max="{{attribute.max}}" on-change="_sliderChanged">
                                     </t-slider>
                                 </div>
                             </template>
@@ -54,7 +54,7 @@
                                     <div class="label">
                                         <label class="data-feeder">{{attribute.name}}</label>
                                         <div class="flex"></div>
-                                        <t-dropdown data-value$="{{attribute.key}}"
+                                        <t-dropdown data-key$="{{attribute.key}}"
                                             selected-item-label="{{attribute.value}}"
                                             on-dropdown-value-changed="_dropdownSelectionChanged"
                                             data="{{attribute.values}}">
@@ -66,7 +66,7 @@
                                     <div class="label horizontal layout center">
                                         <p>{{attribute.name}}</p>
                                         <div class="flex"></div>
-                                        <t-radio-group pill-button selected-item="{{attribute.index}}" data-value$="{{attribute.key}}" on-t-radio-group-changed="_radioValueChanged">
+                                        <t-radio-group pill-button selected-item="{{attribute.index}}" data-key$="{{attribute.key}}" on-t-radio-group-changed="_radioValueChanged">
                                             <template is="dom-repeat" items="{{attribute.values}}" as="val">
                                                 <t-radio-button name="{{val}}">{{val}}</t-radio-button>
                                             </template>
@@ -75,10 +75,10 @@
                                 </template>
                             </template>
                             <template is="dom-if" if="{{_isType(attribute,'string')}}">
-                                <t-input label$="{{attribute.name}}" data-value$="{{attribute.key}}" value="{{attribute.value}}" on-keyup="_textChanged"></t-input>
+                                <t-input label$="{{attribute.name}}" data-key$="{{attribute.key}}" value="{{attribute.value}}" on-keyup="_textChanged"></t-input>
                             </template>
                             <template is="dom-if" if="{{_isType(attribute,'iconset')}}">
-                                <t-icon-selector data-value$="{{attribute.key}}" label$="{{attribute.name}}" value="{{attribute.value}}" on-icon-changed="_textChanged"></t-icon-selector>
+                                <t-icon-selector data-key$="{{attribute.key}}" label$="{{attribute.name}}" value="{{attribute.value}}" on-icon-changed="_textChanged"></t-icon-selector>
                             </template>
                             <template is="dom-if" if="{{_isType(attribute,'list')}}">
                                 <label class="data-feeder">{{attribute.name}}</label>
@@ -90,7 +90,7 @@
                             </template>
                             <template is="dom-if" if="{{_isType(attribute,'api')}}">
                                 <div class="layout horizontal">
-                                    <t-input id="apiInput" class="flex" label$="{{attribute.name}}" data-value$="{{attribute.key}}"></t-input>
+                                    <t-input id="apiInput" class="flex" label$="{{attribute.name}}" data-key$="{{attribute.key}}"></t-input>
                                     <t-button only-icon ico="link" on-click="_getMetadata"></t-button>
                                 </div>
                                 <t-button class="link" on-click="_openModal" label="YOLO"></t-button>
@@ -186,46 +186,50 @@ Polymer({
         return values.length <= 3;
     },
 
+    getSections: function(properties) {
+      var sections = [];
+
+      properties.forEach(function(section) {
+          var newSection = { name: section.name, attributes: [] };
+
+          sections.push(newSection);
+
+          //sections contains an object `fields` which
+          //is a map of property names and it's metadata
+          var fieldKeys = Object.keys(section.fields);
+          //each value in fieldKeys is the name of
+          //the property to be displayed
+          fieldKeys.forEach(function(propertyKey) {
+              //property is the metadata associated with
+              //the current property
+              var property = section.fields[propertyKey];
+              var value = property.value;
+
+              property.key = propertyKey;
+
+              if (value !== undefined) {
+                  //value is the initial value of the property
+                  this.fire('path-changed', {
+                      path: propertyKey, value: property.value
+                  });
+              }
+
+              newSection.attributes.push(property);
+          }.bind(this));
+      }.bind(this));
+
+      return sections;
+    },
+
     _handleResponse: function(event) {
-        var sections = [];
         var errorMessage = "Error occured while retrieving properties.";
+        var response = event.detail.response;
 
         this.isDataComponent = false;
 
-        if (event.detail.response != null) {
-            this.panelName = event.detail.response.name;
-
-            //each property panel consists of multiple sections
-            event.detail.response.properties.forEach(function(section) {
-                var newSection = { name: section.name, attributes: [] };
-
-                sections.push(newSection);
-
-                //sections contains an object `fields` which
-                //is a map of property names and it's metadata
-                var fieldKeys = Object.keys(section.fields);
-                //each value in fieldKeys is the name of
-                //the property to be displayed
-                fieldKeys.forEach(function(propertyKey) {
-                    //property is the metadata associated with
-                    //the current property
-                    var property = section.fields[propertyKey];
-                    var value = property.value;
-
-                    property.key = propertyKey;
-
-                    if (value !== undefined) {
-                        //value is the initial value of the property
-                        this.fire('path-changed', {
-                            path: propertyKey, value: property.value
-                        });
-                    }
-
-                    newSection.attributes.push(property);
-                }.bind(this));
-            }.bind(this));
-
-            this.sections = sections;
+        if (response != null) {
+            this.panelName = response.name;
+            this.sections = this.getSections(response.properties);
         } else {
             this.$.controller.textContent = errorMessage;
         }
@@ -240,14 +244,14 @@ Polymer({
     },
 
     _textChanged: function(e) {
-        var key = e.model._nodes[0].getAttribute('data-value');
+        var key = e.model._nodes[0].getAttribute('data-key');
         var value = e.target.value;
 
         this.fire('path-changed', {path: key, value: value});
     },
 
     _checkBoxChanged: function(e) {
-        var key = e.target.getAttribute("data-value");
+        var key = e.target.getAttribute("data-key");
         var value = e.target.checked;
 
         this.fire('path-changed', {path: key, value: value});
@@ -257,7 +261,7 @@ Polymer({
         var key, value;
 
         if (e.target.selectedItem != null) {
-            key = e.target.getAttribute("data-value");
+            key = e.target.getAttribute("data-key");
             value = e.target.selectedItem;
 
             this.fire('path-changed', {path: key, value: value});
@@ -265,21 +269,21 @@ Polymer({
     },
 
     _sliderChanged: function(e) {
-        var key = e.target.getAttribute("data-value");
+        var key = e.target.getAttribute("data-key");
         var value = e.target.value;
 
         this.fire('path-changed', {path: key, value: value});
     },
 
     _colorChanged: function(e) {
-        var key = e.target.getAttribute("data-value");
+        var key = e.target.getAttribute("data-key");
         var value = e.target.value;
 
         this.fire('path-changed', {path: key, value: value});
     },
 
     _dropdownSelectionChanged: function(e) {
-        var key = e.target.getAttribute("data-value");
+        var key = e.target.getAttribute("data-key");
         var value = e.target.selectedItemLabel;
 
         this.fire('path-changed', {path: key, value: value});
