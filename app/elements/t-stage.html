@@ -592,7 +592,15 @@
         var $panelHeader = $(this.componentPanelHeader);
         var sections = this.componentPanel.getSections(properties);
 
-        this.componentPanel.sections = sections;
+        // something wierd is happening here, you have to reset the
+        // sections to an empty array first only then component panel
+        // renders properly
+        // TODO: find out what's happening below
+        this.componentPanel.sections = [];
+        setTimeout(function() {
+          this.componentPanel.sections = sections;
+        }.bind(this));
+
         name === this.builderType ? $panelHeader.show() : $panelHeader.hide();
       },
 
