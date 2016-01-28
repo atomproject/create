@@ -574,6 +574,9 @@
             fieldContainer.appendChild(fieldSet);
           }.bind(this));
 
+          if (row.length > 1) {
+            fieldContainer.classList.add('grouped');
+          }
           container.appendChild(fieldContainer);
         }.bind(this));
 
