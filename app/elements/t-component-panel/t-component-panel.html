@@ -297,6 +297,14 @@ Polymer({
             return item.value;
         });
 
+        this.sections.forEach(function(section) {
+          section.attributes.forEach(function(attribute) {
+            if (attribute.key === path) {
+              attribute.value = value;
+            }
+          });
+        });
+
         this.fire('path-changed', {path: path, value: value});
     },
 
