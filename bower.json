@@ -59,10 +59,10 @@
     "paper-menu": "PolymerElements/paper-menu#4fecb43601",
     "es6-promise": "~3.0.2",
     "t-checkbox-group": "atomelements/t-checkbox-group#~0.0.0",
-    "t-range": "atomelements/t-range#~0.0.0",
-    "t-calendar": "atomelements/t-calendar#~0.0.0",
-    "t-stepper": "atomelements/t-stepper#~0.0.0",
-    "t-form": "atomelements/t-form#~0.0.0",
+    "t-range": "atomelements/t-range#master",
+    "t-calendar": "atomelements/t-calendar#master",
+    "t-stepper": "atomelements/t-stepper#master",
+    "t-form": "atomelements/t-form#master",
     "paper-styles": "PolymerElements/paper-styles#~1.1.1",
     "jquery-ui": "~1.11.4",
     "t-page": "atomelements/t-page#master",
@@ -74,7 +74,8 @@
     "t-tabs": "atomelements/t-tabs#master",
     "t-google-youtube": "atomelements/t-google-youtube#master",
     "t-google-map": "atomelements/t-google-map#master",
-    "t-list": "atomelements/t-list#master"
+    "t-list": "atomelements/t-list#master",
+    "t-error-block": "atomelements/t-error-block#master"
   },
   "resolutions": {
     "paper-dialog-scrollable": "1.0.1",
@@ -103,6 +104,9 @@
     "paper-styles": "1.0.11",
     "iron-pages": "1.0.3",
     "t-filter": "master",
-    "t-notify": "master"
+    "t-notify": "master",
+    "t-checkbox-group": "master",
+    "t-range": "master",
+    "t-error-block": "master"
   }
 }

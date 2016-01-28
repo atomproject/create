@@ -15,10 +15,15 @@ module.exports = function() {
   return through.obj(function (file, enc, cb) {
     if (file.isBuffer()) {
       let json = JSON.parse(file.contents);
-      let metadata = {};
+      let metadata = {}, stageFilePath = 'app/elements/t-stage.html';
+
+      json.elements.push({name: 't-form', demoFilePath: stageFilePath});
+      json.elements.push({name: 't-page', demoFilePath: stageFilePath});
 
       json.elements.forEach(el => {
         let demoFilePath = `bower_components/${el.name}/demo/index.html`;
+        demoFilePath = el.demoFilePath || demoFilePath;
+
         let propertyFilePath = `bower_components/${el.name}/property.json`;
         let $ = cheerio.load(read(demoFilePath, 'utf-8'));
         let property = JSON.parse(read(propertyFilePath, 'utf-8'));

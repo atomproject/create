@@ -524,7 +524,7 @@
 
         this._elementSateList = [];
         this.componentPanelTarget = this.querySelector(this.builderType);
-        this.builderState = this.getNewBuilderState(this.builderType, builder);
+        this.builderState = this.getNewElementState(this.builderType);
         this.draggedPosX = null;
 
         // TODO: also reset the state of the builder (t-form)
@@ -548,8 +548,8 @@
           row.forEach(function(column, posY) {
             name = column.name;
             attributes = column.attributes;
-            html = this.getComponentCode(name, attributes);
-            state = this.getNewElementState(name, posX, posY, html, attributes);
+            column.html = this.getComponentCode(name, attributes);
+            state = this.getNewElementState(column, posX, posY);
             this.push('_elementSateList', state);
 
             //TODO: persist category in the state file
@@ -560,6 +560,11 @@
 
           container.appendChild(fieldContainer);
         }.bind(this));
+
+        // if there actually are some elements then remove class `empty`
+        if (stateFile.rows.length > 0) {
+          $(this.builderType, this).removeClass('empty');
+        }
       },
       /* section: end */
 
@@ -584,8 +589,10 @@
       },
 
       showPanelForBuilder: function() {
-        this.componentPanelTarget = this.querySelector(this.builderType);
-        this.showComponentPanel(this.builderType);
+        var type = this.builderType;
+
+        this.componentPanelTarget = this.querySelector(type);
+        this.showComponentPanel(type, this.metadata[type].property.properties);
       },
 
       showComponentPanel: function(name, properties) {
@@ -612,9 +619,10 @@
           this.componentPanelTarget = builder;
 
           if (!this.builderState) {
-            this.builderState = this.getNewBuilderState(builderType, builder);
+            this.builderState = this.getNewElementState(builderType);
           }
 
+          this.showPanelForBuilder();
           panel.addEventListener('path-changed', this.updatePath.bind(this));
         }.bind(this));
       }

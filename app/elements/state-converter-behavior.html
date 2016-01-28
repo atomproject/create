@@ -30,22 +30,6 @@
       };
     },
 
-    getNewBuilderState: function(name, builder) {
-      var classes, state = { attributes: {} };
-
-      classes = builder.classList;
-      classes = Array.prototype.slice.call(classes);
-      classes = classes.filter(function(klass) {
-        return ['style-scope', 't-stage'].indexOf(klass) === -1;
-      }).join(' ');
-
-      state.name = name;
-      state.attributes.class = classes;
-      state.html = this.getComponentCode(state.name, state.attributes);
-
-      return state;
-    },
-
     getStateFile: function(builderState, states) {
       var stateFile;
 
@@ -73,15 +57,12 @@
         }
 
         row = rows[state.posX];
+        column = row[state.posY] = {};
 
-        if (!row[state.posY]) {
-          row[state.posY] = {};
-        }
-
-        column = row[state.posY];
         column.name = state.name;
         column.html = state.html;
         column.attributes = state.attributes;
+        column.property = state.property;
       });
 
       return rows;

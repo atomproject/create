@@ -273,7 +273,7 @@ gulp.task('serve', [ 'styles', 'elements', 'images', 'metadata' ], function() {
   });
 
   gulp.watch(['app/**/*.{html,jst}'], reload);
-  gulp.watch(['app/metadata/*.json'], ['metadata', reload]);
+  gulp.watch(['app/*-manifest.json'], ['metadata', reload]);
   gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
   gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
   gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['lint']);
