@@ -66,10 +66,6 @@
       },
 
       properties: {
-        _elementMetadataHash: {
-          type: Object,
-          value: function() { return {}; }
-        },
         _elementSateList: {
           type: Array,
           value: function() { return []; }
@@ -84,7 +80,8 @@
 
       observers: [
         'initComponentPanel(builderType, componentPanel)',
-        'setupListeners(builderType)'
+        'setupListeners(builderType)',
+        'getMetadata(builderType)'
       ],
 
       beautifyOpts: {
@@ -95,6 +92,7 @@
       componentPanelHeader: null,
       builderState: null,
       componentTemplate: null,
+      metadata: null,
 
       isPage: function(builderType) {
         return builderType === 't-page';
@@ -120,6 +118,50 @@
             return;
           }
         }
+      },
+
+      getMetadata: function(builderType) {
+        var loc = _.template('metadata/<%= type %>.json');
+        var type = this.isPage(builderType) ? 'page' : 'form';
+
+        loc = loc({ type: type });
+        return Promise.resolve()
+          .then(function() {
+            if (!this.metadata) {
+              return Promise.resolve($.getJSON(loc));
+            }
+          }.bind(this))
+          .then(function(metadata) {
+            if (this.metadata) {
+              return this.metadata;
+            }
+
+            this.metadata = metadata;
+            Object.keys(metadata).forEach(function(name) {
+              var attributes, meta = metadata[name];
+
+              if (meta.attributes) {
+                attributes = meta.attributes;
+              } else {
+                attributes = meta.attributes = {};
+              }
+
+              (meta.property.properties || []).forEach(function(prop) {
+                var fields = prop.fields || {};
+
+                Object.keys(fields).forEach(function(field) {
+                  var attrName = field;
+                  var value = fields[field].value;
+
+                  if (value !== null && value !== undefined) {
+                    attributes[attrName] = value;
+                  }
+                });
+              });
+
+              meta.html = this.getComponentCode(name, attributes);
+            }.bind(this));
+          }.bind(this));
       },
 
       setupListeners: function() {
@@ -159,11 +201,7 @@
 
         $(this.builderType).removeClass('empty');
 
-        $.get('bower_components/' + name + '/demo/metadata.html')
-          .done(function (elementHtml) {
-            this._elementMetadataHash[name] = elementHtml;
-            this.add(name, category);
-          }.bind(this));
+        this.getMetadata().then(this.add.bind(this, name, category));
       },
 
       fieldContainerDragged: function (e, ui) {
@@ -185,13 +223,12 @@
 
         // this is the case of merging containers
         this.merge(ui.item[0], this.draggedPosX);
-        ui.item.remove();
       },
       /* section: end */
 
       /* section: utils */
       getFieldset: function(name, category, html) {
-        html = html || this._elementMetadataHash[name];
+        html = html || this.metadata[name].html;
 
         this.templatize(this.$.rowTemplate);
         //TODO: check why following binding won't work
@@ -206,7 +243,6 @@
 
       getWrapper: function() {
         this.templatize(this.$.rowTemplate);
-        //TODO: check why following binding won't work
         container = this.stamp();
         fieldset = container.root.querySelector('.fieldset');
         fieldset.remove();
@@ -321,16 +357,13 @@
         fieldsets.forEach(function(fieldset, posY) {
           var name = fieldset.getAttribute('data-name');
           var category = fieldset.getAttribute('data-category');
-          var state = this._elementSateList.find(function(item) {
-            return item.posX === posX && item.posY === posY;
-          });
-          var html = state.html;
-          var newState;
+          var states = this._elementSateList;
+          var newState = this.getNewElementState(states, posX, posY);
 
-          fieldset = this.getFieldset(name, category, html);
+          fieldset = this.getFieldset(name, category, newState.html);
           newFieldContainer.appendChild(fieldset);
 
-          newState = this.getNewElementState(name, posX + 1, posY, html);
+          newState.posX++;
           this.push('_elementSateList', newState);
         }.bind(this));
 
@@ -534,9 +567,13 @@
       showPanelForElement: function(el) {
         var name = el.getAttribute('data-name');
         var category = el.getAttribute('data-category');
+        var pos = this.getElementPosition(el);
+        var state = this._elementSateList.find(function(item) {
+          return item.posX === pos.x && item.posY === pos.y;
+        });
 
         this.componentPanelTarget = el.querySelector(name);
-        this.showComponentPanel(name);
+        this.showComponentPanel(name, state.property.properties);
       },
 
       showPanelForFirstElement: function(el) {
@@ -551,11 +588,11 @@
         this.showComponentPanel(this.builderType);
       },
 
-      showComponentPanel: function(name) {
+      showComponentPanel: function(name, properties) {
         var $panelHeader = $(this.componentPanelHeader);
-        var propertySource = 'bower_components/' + name + '/property.json';
+        var sections = this.componentPanel.getSections(properties);
 
-        this.componentPanel.propertySource = propertySource;
+        this.componentPanel.sections = sections;
         name === this.builderType ? $panelHeader.show() : $panelHeader.hide();
       },
 

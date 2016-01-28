@@ -23,6 +23,7 @@ var glob = require('glob-all');
 var historyApiFallback = require('connect-history-api-fallback');
 var packageJson = require('./package.json');
 var crypto = require('crypto');
+var createMetadata = require('./create-metadata');
 // var ghPages = require('gulp-gh-pages');
 
 var AUTOPREFIXER_BROWSERS = [
@@ -95,6 +96,12 @@ var optimizeHtmlTask = function(src, dest) {
       title: 'html'
     }));
 };
+
+gulp.task('metadata', function() {
+  return gulp.src('app/*-manifest.json')
+    .pipe(createMetadata())
+    .pipe(gulp.dest('app/metadata'));
+});
 
 // Compile and automatically prefix stylesheets
 gulp.task('styles', function() {
@@ -239,7 +246,7 @@ gulp.task('clean', function() {
 });
 
 // Watch files for changes & reload
-gulp.task('serve', [ 'styles', 'elements', 'images'], function() {
+gulp.task('serve', [ 'styles', 'elements', 'images', 'metadata' ], function() {
   browserSync({
     port: 5000,
     notify: false,
@@ -266,6 +273,7 @@ gulp.task('serve', [ 'styles', 'elements', 'images'], function() {
   });
 
   gulp.watch(['app/**/*.{html,jst}'], reload);
+  gulp.watch(['app/metadata/*.json'], ['metadata', reload]);
   gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
   gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
   gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['lint']);

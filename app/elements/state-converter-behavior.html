@@ -2,11 +2,31 @@
 
 <script>
   Polymer.StateConverterBehavior = {
-    getNewElementState: function(name, x, y, html, attributes) {
+    getNewElementState: function(name, x, y) {
+      var meta, states;
+
+      if (_.isArray(name)) {
+        states = name;
+        meta = states.find(function(item) {
+          return item.posX === x && item.posY === y;
+        });
+        name = meta.name;
+      } else if (_.isObject(name)) {
+        meta = name;
+        return {
+          posX: x, posY: y,
+          name: meta.name, html: meta.html,
+          attributes: meta.attributes, property: meta.property
+        }
+      } else {
+        meta = this.metadata[name]
+      }
+
       return {
         name: name, posX: x, posY: y,
-        html: html || this._elementMetadataHash[name],
-        attributes: attributes || {}
+        html: meta.html,
+        attributes: _.cloneDeep(meta.attributes),
+        property: _.cloneDeep(meta.property)
       };
     },
 

@@ -1,5 +1,6 @@
 node_modules
 dist
+app/metadata
 bower_components
 .tmp
 .publish/
