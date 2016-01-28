@@ -107,6 +107,7 @@
     "t-notify": "master",
     "t-checkbox-group": "master",
     "t-range": "master",
-    "t-error-block": "master"
+    "t-error-block": "master",
+    "t-loader": "master"
   }
 }

@@ -534,21 +534,30 @@
         this.builderState = this.getNewElementState(this.builderType);
         this.draggedPosX = null;
 
-        // TODO: also reset the state of the builder (t-form)
         $('li.field-container', this).remove();
       },
 
       recreateBuilder: function(stateFile) {
         var name, attributes, html, state, fieldContainer, fieldSet;
         var container = this.querySelector('ul.field-container');
+        var builder = this.querySelector(this.builderType);
 
         stateFile = JSON.parse(stateFile);
 
-        // TODO: apply state to the builder (t-form element)
-        name = this.builderState.name = stateFile.type
+        // re-create the builder state
+        name = this.builderState.name = stateFile.type;
         attributes = this.builderState.attributes = stateFile.attributes;
+        this.builderState.property = stateFile.property;
         this.builderState.html = this.getComponentCode(name, attributes);
 
+        // apply new state to the builder
+        attributes = this.builderState.attributes;
+        Object.keys(attributes).forEach(function(key) {
+          var value = _.cloneDeep(attributes[key]);
+          builder.set(key, value);
+        }.bind(this));
+
+        // re-create elements in the builder
         stateFile.rows.forEach(function(row, posX) {
           fieldContainer = this.getWrapper();
 
