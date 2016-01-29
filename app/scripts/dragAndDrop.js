@@ -51,11 +51,11 @@ var dragAndDropSetup = function () {
       .then(function(files) {
         var content;
 
-        zip.file(files.componentFileName, files.componentFile);
+        zip.file(files.name, files.contents);
         zip.file(files.stateFileName, files.stateFile);
 
         content = zip.generate({ type: 'blob' });
-        saveAs(content, files.componentFileName.replace('.html', '.zip'));
+        saveAs(content, files.name.replace('.html', '.zip'));
       });
   });
 

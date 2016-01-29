@@ -155,10 +155,11 @@ gulp.task('copy', function() {
 
   var elements = gulp.src(['app/elements/**/*.html',
       'app/elements/**/*.css',
-      'app/elements/**/*.jst',
       'app/elements/**/*.js'
     ])
     .pipe(gulp.dest(dist('elements')));
+
+  var templates = gulp.src(['app/templates/**/*.jst']);
 
   var swBootstrap = gulp.src(['bower_components/platinum-sw/bootstrap/*.js'])
     .pipe(gulp.dest(dist('elements/bootstrap')));
@@ -170,7 +171,7 @@ gulp.task('copy', function() {
     .pipe($.rename('elements.vulcanized.html'))
     .pipe(gulp.dest(dist('elements')));
 
-  return merge(app, bower, elements, vulcanized, swBootstrap, swToolbox)
+  return merge(app, bower, elements, templates, vulcanized, swBootstrap, swToolbox)
     .pipe($.size({
       title: 'copy'
     }));
@@ -272,8 +273,8 @@ gulp.task('serve', [ 'styles', 'elements', 'images', 'metadata' ], function() {
     }
   });
 
-  gulp.watch(['app/**/*.{html,jst}'], reload);
-  gulp.watch(['app/*-manifest.json'], ['metadata', reload]);
+  gulp.watch(['app/**/*.{html,jst}', 'app/metadata/*.json'], reload);
+  gulp.watch(['app/*-manifest.json', 'create-metadata.js'], ['metadata', reload]);
   gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
   gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
   gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['lint']);

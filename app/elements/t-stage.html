@@ -92,7 +92,6 @@
       draggedPosX: null,
       componentPanelHeader: null,
       builderState: null,
-      componentTemplate: null,
 
       isPage: function(builderType) {
         return builderType === 't-page';
@@ -515,14 +514,16 @@
       getDownloadFiles: function() {
         var states = this._elementSateList;
         var builderState = this.builderState;
-        var stateFile = this.getStateFile(builderState, states);
-        var componentFilePromise = this.getComponentFile(builderState, states);
         var builder = this.querySelector(this.builderType);
+        // TODO: shouldn't do thi, persist builder state properly
+        var name = builderState.attributes.name = builder.getAttribute('name');
+        var stateFile = this.getStateFile(builderState, states);
+        var filePromise = this.getBuilderFile(builderState, states);
 
-        return componentFilePromise.then(function(componentFile) {
+        return filePromise.then(function(contents) {
           return {
-            componentFileName: builder.getAttribute('name') + '.html',
-            componentFile: componentFile,
+            name: name + '.html',
+            contents: contents,
             stateFileName: 'state.json',
             stateFile: stateFile
           };
