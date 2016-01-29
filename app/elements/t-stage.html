@@ -75,11 +75,12 @@
           notify: true
         },
         builderType: String,
-        componentPanel: Object
+        componentPanel: Object,
+        metadata: Object,
       },
 
       observers: [
-        'initComponentPanel(builderType, componentPanel)',
+        'initComponentPanel(builderType, componentPanel, metadata)',
         'setupListeners(builderType)',
         'getMetadata(builderType)'
       ],
@@ -92,7 +93,6 @@
       componentPanelHeader: null,
       builderState: null,
       componentTemplate: null,
-      metadata: null,
 
       isPage: function(builderType) {
         return builderType === 't-page';
@@ -136,9 +136,9 @@
               return this.metadata;
             }
 
-            this.metadata = metadata;
             Object.keys(metadata).forEach(function(name) {
               var attributes, meta = metadata[name];
+              var innerHTML = meta.innerHTML || '';
 
               if (meta.attributes) {
                 attributes = meta.attributes;
@@ -159,8 +159,10 @@
                 });
               });
 
-              meta.html = this.getComponentCode(name, attributes);
+              meta.html = this.getComponentCode(name, attributes, innerHTML);
             }.bind(this));
+
+            this.metadata = metadata;
           }.bind(this));
       },
 
@@ -201,6 +203,7 @@
 
         $(this.builderType).removeClass('empty');
 
+        //TODO: BUG. `getMetadata` function depends on `builderType`
         this.getMetadata().then(this.add.bind(this, name, category));
       },
 
@@ -276,7 +279,6 @@
       add: function(name, category) {
         var fieldset, fieldContainer, state;
         var container = this.querySelector('ul.field-container');
-        var $subject = $('.canvas');
         var posX = (this.querySelectorAll('li.field-container') || []).length;
         var posY = 0;
 
@@ -462,7 +464,8 @@
       updatePath: function(event) {
         var key = event.detail.path;
         var value = event.detail.value;
-        var name, attributes, pos, targetElementState, container;
+        var name, attributes, pos, targetElementState, container, innerHTML;
+        var html;
 
         if (!this.componentPanelTarget || !key ||
           value === undefined || value === null) {
@@ -486,8 +489,10 @@
           return state.posX === pos.x && state.posY === pos.y;
         });
         attributes = targetElementState.attributes;
+        innerHTML = targetElementState.innerHTML;
         attributes[key] = value;
-        targetElementState.html = this.getComponentCode(name, attributes);
+        html = this.getComponentCode(name, attributes, innerHTML);
+        targetElementState.html = html;
       },
 
       updateBuilderState: function(key, value) {
@@ -562,9 +567,10 @@
           fieldContainer = this.getWrapper();
 
           row.forEach(function(column, posY) {
+            var innerHTML = column.innerHTML;
             name = column.name;
             attributes = column.attributes;
-            column.html = this.getComponentCode(name, attributes);
+            column.html = this.getComponentCode(name, attributes, innerHTML);
             state = this.getNewElementState(column, posX, posY);
             this.push('_elementSateList', state);
 
@@ -630,10 +636,9 @@
         name === this.builderType ? $panelHeader.show() : $panelHeader.hide();
       },
 
-      initComponentPanel: function(builderType) {
+      initComponentPanel: function(builderType, panel) {
         setTimeout(function() {
           var builder = this.querySelector(builderType);
-          var panel = this.componentPanel;
 
           this.componentPanelTarget = builder;
 
