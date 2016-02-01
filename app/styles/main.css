@@ -24,16 +24,6 @@ body {
 
 /**** menu css starts ****/
 
-#mainDrawerPanel.t-scaffold-builder .component-list {
-    overflow: auto;
-}
-
-.element-group {
-    max-height: 0;
-    overflow: hidden;
-    transition: 0.3s ease all;
-}
-
 .menu-item.active + .element-group {
     max-height: 1000px;
 }
