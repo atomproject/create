@@ -24,6 +24,7 @@ var historyApiFallback = require('connect-history-api-fallback');
 var packageJson = require('./package.json');
 var crypto = require('crypto');
 var createMetadata = require('./gulp-plugins/create-metadata');
+var createFormAndPage = require('./gulp-plugins/create-form-and-page');
 // var ghPages = require('gulp-gh-pages');
 
 var AUTOPREFIXER_BROWSERS = [
@@ -101,6 +102,12 @@ gulp.task('metadata', function() {
   return gulp.src('app/*-manifest.json')
     .pipe(createMetadata())
     .pipe(gulp.dest('app/metadata'));
+});
+
+gulp.task('createFormAndPage', function() {
+  return gulp.src(dist('/index.html'))
+    .pipe(createFormAndPage())
+    .pipe(gulp.dest(dist('/')));
 });
 
 // Compile and automatically prefix stylesheets
@@ -317,6 +324,7 @@ gulp.task('default', ['clean'], function(cb) {
     'elements',
     [ 'images', 'fonts', 'html'],
     'vulcanize', 'cache-config',
+    'createFormAndPage',
     cb);
 });
 
