@@ -23,7 +23,7 @@ var glob = require('glob-all');
 var historyApiFallback = require('connect-history-api-fallback');
 var packageJson = require('./package.json');
 var crypto = require('crypto');
-var createMetadata = require('./create-metadata');
+var createMetadata = require('./gulp-plugins/create-metadata');
 // var ghPages = require('gulp-gh-pages');
 
 var AUTOPREFIXER_BROWSERS = [
@@ -159,7 +159,11 @@ gulp.task('copy', function() {
     ])
     .pipe(gulp.dest(dist('elements')));
 
-  var templates = gulp.src(['app/templates/**/*.jst']);
+  var templates = gulp.src(['app/templates/**/*.jst'])
+    .pipe(gulp.dest(dist('templates')));
+
+  var metadata = gulp.src(['app/metadata/*.json'])
+    .pipe(gulp.dest(dist('metadata')));
 
   var swBootstrap = gulp.src(['bower_components/platinum-sw/bootstrap/*.js'])
     .pipe(gulp.dest(dist('elements/bootstrap')));
@@ -171,7 +175,7 @@ gulp.task('copy', function() {
     .pipe($.rename('elements.vulcanized.html'))
     .pipe(gulp.dest(dist('elements')));
 
-  return merge(app, bower, elements, templates, vulcanized, swBootstrap, swToolbox)
+  return merge(app, bower, elements, templates, vulcanized, swBootstrap, swToolbox, metadata)
     .pipe($.size({
       title: 'copy'
     }));
@@ -274,7 +278,7 @@ gulp.task('serve', [ 'styles', 'elements', 'images', 'metadata' ], function() {
   });
 
   gulp.watch(['app/**/*.{html,jst}', 'app/metadata/*.json'], reload);
-  gulp.watch(['app/*-manifest.json', 'create-metadata.js'], ['metadata', reload]);
+  gulp.watch(['app/*-manifest.json', 'gulp-plugins/create-metadata.js'], ['metadata', reload]);
   gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
   gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
   gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['lint']);
@@ -308,6 +312,7 @@ gulp.task('serve:dist', ['default'], function() {
 gulp.task('default', ['clean'], function(cb) {
   // Uncomment 'cache-config' if you are going to use service workers.
   runSequence(
+    'metadata',
     ['copy', 'styles'],
     'elements',
     [ 'images', 'fonts', 'html'],
