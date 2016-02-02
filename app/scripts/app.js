@@ -10,8 +10,29 @@
   // Sets app default base URL
   app.baseUrl = '';
   app.menu = null;
+
+
   if (window.location.port === '') {
     app.baseUrl = '/fusion';
+  }
+
+  if (window.location.pathname === '/page') {
+    app.builderType = 't-page';
+    app.isPage = true;
+    app.builderUrl = 'page-manifest.json';
+    app.canvasName = 'Untitled Page';
+    app.tab="page";
+    app.route ='canvas';
+  } else if (window.location.pathname === '/form') {
+    app.builderType ='t-form';
+    app.isPage = false;
+    app.builderUrl = 'form-manifest.json';
+    app.canvasName = 'Untitled Form';
+    app.tab="form";
+    app.route ='canvas';
+  } else if (window.location.pathname === '/') {
+    app.tab="form";
+    app.route ='browser';
   }
 
   // Get elements for menu for a given category
@@ -45,6 +66,7 @@
 
   app._onElementsReceived = function(event){
     app.menu = event.detail.response;
+    setTimeout(dragAndDropSetup);
   };
 
   app.displayInstalledToast = function() {
@@ -57,7 +79,8 @@
   // Listen for template bound event to know when bindings
   // have resolved and content has been stamped to the page
   app.addEventListener('dom-change', function() {
-    console.log('Fusion app is ready to rock!');
+    if (!app.$.manifestAjax) return;
+    app.$.manifestAjax.generateRequest();
   });
 
   // See https://github.com/Polymer/polymer/issues/1381
@@ -69,42 +92,4 @@
     stage.componentPanel = panel;
     stage.componentPanelHeader = header;
   });
-
-  // Main area's paper-scroll-header-panel custom condensing transformation of
-  // the appName in the middle-container and the bottom title in the bottom-container.
-  // The appName is moved to top and shrunk on condensing. The bottom sub title
-  // is shrunk to nothing on condensing.
-  // window.addEventListener('paper-header-transform', function(e) {
-  //   var appName = Polymer.dom(document).querySelector('#mainToolbar .app-name');
-  //   var middleContainer = Polymer.dom(document).querySelector('#mainToolbar .middle-container');
-  //   var bottomContainer = Polymer.dom(document).querySelector('#mainToolbar .bottom-container');
-  //   var detail = e.detail;
-  //   var heightDiff = detail.height - detail.condensedHeight;
-  //   var yRatio = Math.min(1, detail.y / heightDiff);
-  //   // appName max size when condensed. The smaller the number the smaller the condensed size.
-  //   var maxMiddleScale = 0.50;
-  //   var auxHeight = heightDiff - detail.y;
-  //   var auxScale = heightDiff / (1 - maxMiddleScale);
-  //   var scaleMiddle = Math.max(maxMiddleScale, auxHeight / auxScale + maxMiddleScale);
-  //   var scaleBottom = 1 - yRatio;
-
-  //   // Move/translate middleContainer
-  //   Polymer.Base.transform('translate3d(0,' + yRatio * 100 + '%,0)', middleContainer);
-
-  //   // Scale bottomContainer and bottom sub title to nothing and back
-  //   Polymer.Base.transform('scale(' + scaleBottom + ') translateZ(0)', bottomContainer);
-
-  //   // Scale middleContainer appName
-  //   Polymer.Base.transform('scale(' + scaleMiddle + ') translateZ(0)', appName);
-  // });
-
-  // // Scroll page to top and expand header
-  // app.scrollPageToTop = function() {
-  //   app.$.headerPanelMain.scrollToTop(true);
-  // };
-
-  // app.closeDrawer = function() {
-  //   app.$.paperDrawerPanel.closeDrawer();
-  // };
-
 })(document);

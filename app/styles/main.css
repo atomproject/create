@@ -292,7 +292,7 @@ div.property-panel-Header t-button {
     color: #07c5f2;
 }
 
-div.content h2.drag-text {
+t-stage h2.drag-text {
     margin: 0;
     position: absolute;
     transform: translateX(-50%) translateY(-50%);
