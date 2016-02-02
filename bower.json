@@ -74,7 +74,8 @@
     "t-google-youtube": "atomelements/t-google-youtube#master",
     "t-google-map": "atomelements/t-google-map#master",
     "t-list": "atomelements/t-list#master",
-    "t-error-block": "atomelements/t-error-block#master"
+    "t-error-block": "atomelements/t-error-block#master",
+    "paper-toast": "PolymerElements/paper-toast#~1.1.3"
   },
   "resolutions": {
     "paper-dialog-scrollable": "1.0.1",

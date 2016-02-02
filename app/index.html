@@ -80,6 +80,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             height: auto;
         }
     }
+
+    .component-list paper-item {
+      font-family: var(--primary-font-family);
+    }
   </style>
 </head>
 
@@ -191,6 +195,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </section>
       </iron-pages>
     </div>
+
+    <paper-toast id="toast"></paper-toast>
   </template>
   <platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
     <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">

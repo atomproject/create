@@ -330,6 +330,7 @@ t-stage h2.drag-text {
     white-space: nowrap;
     overflow: hidden;
     min-width: 100px;
+    max-width: 80vw;
 }
 
 .headerText.inactive {

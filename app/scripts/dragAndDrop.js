@@ -27,12 +27,17 @@ var dragAndDropSetup = function () {
     });
 
     if (!stateFile) {
+      app.$.toast.text = 'Not state.json file. You can only upload state.json file.';
+      app.$.toast.open();
       return;
     }
 
     reader.addEventListener('load', function(ev) {
       stage.reset();
+      // TODO: what happens if the file uploaded file is not a valid state file?
       stage.recreateBuilder(ev.target.result);
+      app.$.toast.text = 'Builder restored to the state.json successfully.';
+      app.$.toast.open();
     });
 
     reader.readAsText(stateFile);

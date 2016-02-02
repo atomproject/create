@@ -66,7 +66,7 @@
                                     <div class="label horizontal layout center">
                                         <p>{{attribute.name}}</p>
                                         <div class="flex"></div>
-                                        <t-radio-group pill-button selected-item="{{attribute.index}}" data-key$="{{attribute.key}}" on-t-radio-group-changed="_radioValueChanged">
+                                        <t-radio-group pill-button selected-item="{{_getIndex(attribute.values, attribute.value)}}" data-key$="{{attribute.key}}" on-t-radio-group-changed="_radioValueChanged">
                                             <template is="dom-repeat" items="{{attribute.values}}" as="val">
                                                 <t-radio-button name="{{val}}">{{val}}</t-radio-button>
                                             </template>
@@ -182,6 +182,10 @@ Polymer({
         return values.length > 3;
     },
 
+    _getIndex: function(arr, val) {
+      return arr.indexOf(val);
+    },
+
     _isLessThanThree: function(values) {
         return values.length <= 3;
     },
@@ -258,11 +262,18 @@ Polymer({
     },
 
     _radioValueChanged: function(e) {
-        var key, value;
+        var key, value, index;
 
         if (e.target.selectedItem != null) {
             key = e.target.getAttribute("data-key");
-            value = e.target.selectedItem;
+            index = e.target.selectedItem;
+
+            // TODO: __HACK__ remove asap. Fix radion button group.
+            if (Object.prototype.toString.call(index) === '[object Number]') {
+                value = e.model.get('attribute.values')[index];
+            } else {
+                value = index;
+            }
 
             this.fire('path-changed', {path: key, value: value});
         }
