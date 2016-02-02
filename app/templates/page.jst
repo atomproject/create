@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title><%= builderName %></title>
+
+  <!-- Web Components Polyfill -->
+  <script src="http://atomproject.github.io/elements/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="<%= baseUrl %>/bower_components/t-page/t-page.html">
+  <%
+    components.forEach(function(name) {
+    %><link rel="import" href="<%= baseUrl %>/bower_components/<%= name %>/<%= name %>.html"><%
+    });
+  %>
+
+</head>
+<body unresolved>
+  <%= builderStartTag %>
+    <div class="flex">
+      <%
+        rows.forEach(function(row) {
+          %><div class="horizontal flex layout grouped"><%
+            row.forEach(function(column) {
+              %><div class="flex fieldset"><%= column.html %></div><%
+            });
+          %></div><%
+        });
+      %>
+    </div>
+  <%= builderEndTag %>
+</body>
+</html>

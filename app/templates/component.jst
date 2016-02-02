@@ -1,3 +1,4 @@
+<!-- TODO: add baseUrl in the context -->
 <link rel="import" href="<%= baseUrl %>/bower_components/polymer/polymer.html">
 <link rel="import" href="<%= baseUrl %>/bower_components/t-form/t-form.html">
 <%
@@ -6,7 +7,7 @@
   });
 %>
 
-<dom-module id="<%= builderName %>">
+<dom-module id="<%= componentName %>">
   <template>
     <%= builderStartTag %>
       <div class="form flex">
@@ -25,7 +26,7 @@
 
   <script>
     Polymer({
-      is: "<%= builderName %>"
+      is: "<%= componentName %>"
     });
   </script>
 </dom-module>
