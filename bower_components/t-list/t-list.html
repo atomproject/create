@@ -214,7 +214,9 @@ after the list became visible again. e.g.
         color: #000000;
         background: #ffffff;
     }
-
+    #ajaxLoaderContainer{
+        padding: 10px 0;
+     } 
     .error-message{
         font-size:var(--font-12,12px);
         color:var(-grey-four,#777777);
@@ -239,8 +241,7 @@ after the list became visible again. e.g.
             <template is="dom-if" if="[[withFilter]]">
                 <div class=" layout horizontal center filter-block" hidden$="[[_noResultsMatched]]">
                     <span class="total-results">
-                    <span>{{_getFilteredRatio(data.pagingInfo)}}</span>
-                    <span>results</span>
+                        {{_getFilteredRatio(data.pagingInfo)}}
                     </span>
                     <span class="flex"></span>
                     <span>{{_filterCount}}</span>
@@ -263,7 +264,7 @@ after the list became visible again. e.g.
             </div>
             <div class="error-message padding-horizontal-10" hidden$="[[_noResultsMatched]]">[[note]]</div>
             <div class="absolute horizontal layout center-justified" hidden$="{{_contentLoaded}}">
-                <t-loader id="contentLoader" active="{{!_contentLoaded}}"></t-loader>
+                <t-loader id="contentLoader" active></t-loader>
             </div>
             <div class="layout vertical" style="height:100%">
                 <!--  selection-enabled has been removed to handle behaviour for Iphone-6-->
@@ -271,7 +272,7 @@ after the list became visible again. e.g.
                     <content></content>
                 </t-simple-list>
             </div>
-            <div id="ajaxLoaderContainer" class="horizontal layout flex center-justified padding-horzintal-10">
+            <div id="ajaxLoaderContainer" hidden$="[[!ajaxLoaderContainer]]" class="horizontal layout flex center-justified padding-horzintal-10">
                 <t-loader id="ajaxLoader" active></t-loader>
             </div>
         </div>
@@ -543,7 +544,7 @@ after the list became visible again. e.g.
                 var component = this;
                 $(window).scroll(function (event) {
                     if (!component._scrollFired) {
-                        component.$.ajaxLoaderContainer.style.display = 'none';
+                        component.ajaxLoaderContainer =false;
                         if (($(window).scrollTop() + $(window).height() > $(document).height() - 800)) {
                             if (component._list.length < component.data.pagingInfo.filteredCount)
                                 component._getNextDataSet();
@@ -576,7 +577,7 @@ after the list became visible again. e.g.
 
             _getList: function () {
                 var component = this;
-                this.$.ajaxLoaderContainer.style.display = 'none';
+                this.ajaxLoaderContainer =false;
                 if (component.data != null && component.data.status.isSuccessful) {
                     if (this._isSorted) {
                         this._isSorted = false;
@@ -600,7 +601,6 @@ after the list became visible again. e.g.
                     }
                 }
 
-                this.$.ajaxLoader.active = false;
                 component.$.list.fire('resize');
 
             },
@@ -732,8 +732,7 @@ after the list became visible again. e.g.
 
             _getNextDataSet: function () {
 
-                this.$.ajaxLoaderContainer.style.display = 'flex';
-                this.$.ajaxLoader.active = true;
+                this.ajaxLoaderContainer =true;
                 if (this._isFiltering) {
                     this._skip = this._skip + 20;
                     this.$.applyFilterCall.url = this.filterResultsApi + "&" + this._defaultSorting + this.sortBy + "&$skip=" + this._skip;
@@ -758,7 +757,7 @@ after the list became visible again. e.g.
 
             _getFilteredRatio: function (pagingInfo) {
                 if (pagingInfo != undefined)
-                    return pagingInfo.filteredCount + "/" + pagingInfo.total;
+                    return pagingInfo.filteredCount + "/" + pagingInfo.total + " results";
             },
 
             _hideList: function (noResultFound) {

@@ -127,7 +127,8 @@ Polymer({
         singularLabel:{
           type: String,
           value:'',
-          reflectToAttribute : true
+          reflectToAttribute : true,
+          observer:'_setLabel'
         },
 
         _label:{
@@ -138,12 +139,15 @@ Polymer({
         pluralLabel:{
           type: String,
           value:'',
-          reflectToAttribute : true
+          reflectToAttribute : true,
+          observer:'_setLabel'
         },
+
         secondaryLabel:{
           type: String,
           value:'',
-          reflectToAttribute : true
+          reflectToAttribute : true,
+          observer:'_setLabel'
         },
 
         min:{
@@ -233,20 +237,14 @@ Polymer({
     },
 
     addTap:function(){
-      if(this.count < this.max)
-      {
+      if(this.count < this.max) {
         this.count++;
-        this._setLabel();
-        this.fire('count-change');
       }    
     },
 
     minusTap:function(){
-      if(this.count > this.min)
-      {
+      if(this.count > this.min) {
         this.count--;
-        this._setLabel();
-        this.fire('count-change');
       }
     },
 
@@ -261,8 +259,6 @@ Polymer({
             default :
                 this._label = this.pluralLabel;
         }
-        
-       
     },
 
     checkDisableMinus:function(count,min){

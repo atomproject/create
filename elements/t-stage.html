@@ -66,10 +66,6 @@
       },
 
       properties: {
-        _elementMetadataHash: {
-          type: Object,
-          value: function() { return {}; }
-        },
         _elementSateList: {
           type: Array,
           value: function() { return []; }
@@ -79,12 +75,14 @@
           notify: true
         },
         builderType: String,
-        componentPanel: Object
+        componentPanel: Object,
+        metadata: Object,
       },
 
       observers: [
-        'initComponentPanel(builderType, componentPanel)',
-        'setupListeners(builderType)'
+        'initComponentPanel(builderType, componentPanel, metadata)',
+        'setupListeners(builderType)',
+        'getMetadata(builderType)'
       ],
 
       beautifyOpts: {
@@ -94,7 +92,6 @@
       draggedPosX: null,
       componentPanelHeader: null,
       builderState: null,
-      componentTemplate: null,
 
       isPage: function(builderType) {
         return builderType === 't-page';
@@ -120,6 +117,52 @@
             return;
           }
         }
+      },
+
+      getMetadata: function(builderType) {
+        var loc = _.template('metadata/<%= type %>.json');
+        var type = this.isPage(builderType) ? 'page' : 'form';
+
+        loc = loc({ type: type });
+        return Promise.resolve()
+          .then(function() {
+            if (!this.metadata) {
+              return Promise.resolve($.getJSON(loc));
+            }
+          }.bind(this))
+          .then(function(metadata) {
+            if (this.metadata) {
+              return this.metadata;
+            }
+
+            Object.keys(metadata).forEach(function(name) {
+              var attributes, meta = metadata[name];
+              var innerHTML = meta.innerHTML || '';
+
+              if (meta.attributes) {
+                attributes = meta.attributes;
+              } else {
+                attributes = meta.attributes = {};
+              }
+
+              (meta.property.properties || []).forEach(function(prop) {
+                var fields = prop.fields || {};
+
+                Object.keys(fields).forEach(function(field) {
+                  var attrName = field;
+                  var value = fields[field].value;
+
+                  if (value !== null && value !== undefined) {
+                    attributes[attrName] = value;
+                  }
+                });
+              });
+
+              meta.html = this.getComponentCode(name, attributes, innerHTML);
+            }.bind(this));
+
+            this.metadata = metadata;
+          }.bind(this));
       },
 
       setupListeners: function() {
@@ -159,11 +202,8 @@
 
         $(this.builderType).removeClass('empty');
 
-        $.get('bower_components/' + name + '/demo/metadata.html')
-          .done(function (elementHtml) {
-            this._elementMetadataHash[name] = elementHtml;
-            this.add(name, category);
-          }.bind(this));
+        //TODO: BUG. `getMetadata` function depends on `builderType`
+        this.getMetadata().then(this.add.bind(this, name, category));
       },
 
       fieldContainerDragged: function (e, ui) {
@@ -185,13 +225,12 @@
 
         // this is the case of merging containers
         this.merge(ui.item[0], this.draggedPosX);
-        ui.item.remove();
       },
       /* section: end */
 
       /* section: utils */
       getFieldset: function(name, category, html) {
-        html = html || this._elementMetadataHash[name];
+        html = html || this.metadata[name].html;
 
         this.templatize(this.$.rowTemplate);
         //TODO: check why following binding won't work
@@ -206,7 +245,6 @@
 
       getWrapper: function() {
         this.templatize(this.$.rowTemplate);
-        //TODO: check why following binding won't work
         container = this.stamp();
         fieldset = container.root.querySelector('.fieldset');
         fieldset.remove();
@@ -240,7 +278,6 @@
       add: function(name, category) {
         var fieldset, fieldContainer, state;
         var container = this.querySelector('ul.field-container');
-        var $subject = $('.canvas');
         var posX = (this.querySelectorAll('li.field-container') || []).length;
         var posY = 0;
 
@@ -321,16 +358,13 @@
         fieldsets.forEach(function(fieldset, posY) {
           var name = fieldset.getAttribute('data-name');
           var category = fieldset.getAttribute('data-category');
-          var state = this._elementSateList.find(function(item) {
-            return item.posX === posX && item.posY === posY;
-          });
-          var html = state.html;
-          var newState;
+          var states = this._elementSateList;
+          var newState = this.getNewElementState(states, posX, posY);
 
-          fieldset = this.getFieldset(name, category, html);
+          fieldset = this.getFieldset(name, category, newState.html);
           newFieldContainer.appendChild(fieldset);
 
-          newState = this.getNewElementState(name, posX + 1, posY, html);
+          newState.posX++;
           this.push('_elementSateList', newState);
         }.bind(this));
 
@@ -360,7 +394,14 @@
           }
         }
 
-        fieldContainer.remove();
+        // something gets screwed up if we remove the fieldContainer now
+        // nothing happens in case of unmerge even when fieldContainers are
+        // removed there and this has started to occur since a1f85387
+        // check out the 7e8141fc05ed134d4 for a working example
+        // TODO: what the hell is happening below?
+        setTimeout(function() {
+          fieldContainer.remove();
+        });
         console.log(this._elementSateList);
       },
 
@@ -422,7 +463,8 @@
       updatePath: function(event) {
         var key = event.detail.path;
         var value = event.detail.value;
-        var name, attributes, pos, targetElementState, container;
+        var name, attributes, pos, targetElementState, container, innerHTML;
+        var html;
 
         if (!this.componentPanelTarget || !key ||
           value === undefined || value === null) {
@@ -446,8 +488,10 @@
           return state.posX === pos.x && state.posY === pos.y;
         });
         attributes = targetElementState.attributes;
+        innerHTML = targetElementState.innerHTML;
         attributes[key] = value;
-        targetElementState.html = this.getComponentCode(name, attributes);
+        html = this.getComponentCode(name, attributes, innerHTML);
+        targetElementState.html = html;
       },
 
       updateBuilderState: function(key, value) {
@@ -470,14 +514,16 @@
       getDownloadFiles: function() {
         var states = this._elementSateList;
         var builderState = this.builderState;
-        var stateFile = this.getStateFile(builderState, states);
-        var componentFilePromise = this.getComponentFile(builderState, states);
         var builder = this.querySelector(this.builderType);
+        // TODO: shouldn't do thi, persist builder state properly
+        var name = builderState.attributes.name = builder.getAttribute('name');
+        var stateFile = this.getStateFile(builderState, states);
+        var filePromise = this.getBuilderFile(builderState, states);
 
-        return componentFilePromise.then(function(componentFile) {
+        return filePromise.then(function(contents) {
           return {
-            componentFileName: builder.getAttribute('name') + '.html',
-            componentFile: componentFile,
+            name: name + '.html',
+            contents: contents,
             stateFileName: 'state.json',
             stateFile: stateFile
           };
@@ -491,32 +537,42 @@
 
         this._elementSateList = [];
         this.componentPanelTarget = this.querySelector(this.builderType);
-        this.builderState = this.getNewBuilderState(this.builderType, builder);
+        this.builderState = this.getNewElementState(this.builderType);
         this.draggedPosX = null;
 
-        // TODO: also reset the state of the builder (t-form)
         $('li.field-container', this).remove();
       },
 
       recreateBuilder: function(stateFile) {
         var name, attributes, html, state, fieldContainer, fieldSet;
         var container = this.querySelector('ul.field-container');
+        var builder = this.querySelector(this.builderType);
 
         stateFile = JSON.parse(stateFile);
 
-        // TODO: apply state to the builder (t-form element)
-        name = this.builderState.name = stateFile.type
+        // re-create the builder state
+        name = this.builderState.name = stateFile.type;
         attributes = this.builderState.attributes = stateFile.attributes;
+        this.builderState.property = stateFile.property;
         this.builderState.html = this.getComponentCode(name, attributes);
 
+        // apply new state to the builder
+        attributes = this.builderState.attributes;
+        Object.keys(attributes).forEach(function(key) {
+          var value = _.cloneDeep(attributes[key]);
+          builder.set(key, value);
+        }.bind(this));
+
+        // re-create elements in the builder
         stateFile.rows.forEach(function(row, posX) {
           fieldContainer = this.getWrapper();
 
           row.forEach(function(column, posY) {
+            var innerHTML = column.innerHTML;
             name = column.name;
             attributes = column.attributes;
-            html = this.getComponentCode(name, attributes);
-            state = this.getNewElementState(name, posX, posY, html, attributes);
+            column.html = this.getComponentCode(name, attributes, innerHTML);
+            state = this.getNewElementState(column, posX, posY);
             this.push('_elementSateList', state);
 
             //TODO: persist category in the state file
@@ -525,8 +581,16 @@
             fieldContainer.appendChild(fieldSet);
           }.bind(this));
 
+          if (row.length > 1) {
+            fieldContainer.classList.add('grouped');
+          }
           container.appendChild(fieldContainer);
         }.bind(this));
+
+        // if there actually are some elements then remove class `empty`
+        if (stateFile.rows.length > 0) {
+          $(this.builderType, this).removeClass('empty');
+        }
       },
       /* section: end */
 
@@ -534,9 +598,13 @@
       showPanelForElement: function(el) {
         var name = el.getAttribute('data-name');
         var category = el.getAttribute('data-category');
+        var pos = this.getElementPosition(el);
+        var state = this._elementSateList.find(function(item) {
+          return item.posX === pos.x && item.posY === pos.y;
+        });
 
         this.componentPanelTarget = el.querySelector(name);
-        this.showComponentPanel(name);
+        this.showComponentPanel(name, state.property.properties);
       },
 
       showPanelForFirstElement: function(el) {
@@ -547,29 +615,39 @@
       },
 
       showPanelForBuilder: function() {
-        this.componentPanelTarget = this.querySelector(this.builderType);
-        this.showComponentPanel(this.builderType);
+        var type = this.builderType;
+
+        this.componentPanelTarget = this.querySelector(type);
+        this.showComponentPanel(type, this.metadata[type].property.properties);
       },
 
-      showComponentPanel: function(name) {
+      showComponentPanel: function(name, properties) {
         var $panelHeader = $(this.componentPanelHeader);
-        var propertySource = 'bower_components/' + name + '/property.json';
+        var sections = this.componentPanel.getSections(properties);
 
-        this.componentPanel.propertySource = propertySource;
+        // something wierd is happening here, you have to reset the
+        // sections to an empty array first only then component panel
+        // renders properly
+        // TODO: find out what's happening below
+        this.componentPanel.sections = [];
+        setTimeout(function() {
+          this.componentPanel.sections = sections;
+        }.bind(this));
+
         name === this.builderType ? $panelHeader.show() : $panelHeader.hide();
       },
 
-      initComponentPanel: function(builderType) {
+      initComponentPanel: function(builderType, panel) {
         setTimeout(function() {
           var builder = this.querySelector(builderType);
-          var panel = this.componentPanel;
 
           this.componentPanelTarget = builder;
 
           if (!this.builderState) {
-            this.builderState = this.getNewBuilderState(builderType, builder);
+            this.builderState = this.getNewElementState(builderType);
           }
 
+          this.showPanelForBuilder();
           panel.addEventListener('path-changed', this.updatePath.bind(this));
         }.bind(this));
       }

@@ -4,15 +4,25 @@
     {
         "name": "Data",
         "fields": {
-            "label": {
-                "name":"Label",
+            "singularLabel": {
+                "name":"Singular Label",
                 "type": "string",
-                "value": "label"
+                "value": "Adult"
+            },
+            "pluralLabel": {
+                "name":"Plural Label",
+                "type": "string",
+                "value": "Adults"
+            },
+            "secondaryLabel": {
+                "name":"Secondary Label",
+                "type": "string",
+                "value": "(>12 years)"
             },
             "ico": {
                 "name":"Icon",
                 "type": "iconset",
-                "value": ""
+                "value": "icons:face"
             }
         }
     },{

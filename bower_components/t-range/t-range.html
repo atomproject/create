@@ -25,8 +25,9 @@ Example:
             display: block;
             width: 90%;
             margin: 0 auto;
+            font-family: var(--primary-font-family, 'Open Sans');
         }
-        
+
         .noUi-target,
         .noUi-target * {
             -webkit-touch-callout: none;
@@ -208,105 +209,186 @@ Example:
             padding-bottom: 15px;
         }
         </style>
+        <div hidden$="[[noLabel]]">[[label]]</div>
         <div class="horizontal layout reading">
-            <div class="flex">[[from]]</div>
-            <div>[[to]]</div>
+            <div class="flex">[[formatValue(from)]]</div>
+            <div>[[formatValue(to)]]</div>
         </div>
         <div id="range"></div>
     </template>
 </dom-module>
 <script>
-Polymer({
+    Polymer({
 
-    is: 't-range',
+        is: 't-range',
 
-    properties: {
+        properties: {
 
-        from: {
-            type: Number,
-            notify: true,
-            observer: '_minChanged'
+            from: {
+                type: Object,
+                notify: true,
+                observer: '_minChanged'
+            },
+
+            label: String,
+
+            noLabel: {
+                type: Boolean,
+                value: true
+            },
+
+            showTwelveHourClock: {
+                type: Boolean,
+                value: false
+            },
+
+            editable: {
+                type: Boolean,
+                value: false
+            },
+
+            to: {
+                type: Object,
+                notify: true,
+                observer: '_maxChanged'
+            },
+
+            min: {
+                type: Object,
+                notify: true,
+                observer: '_rangeChanged'
+            },
+
+            max: {
+                type: Object,
+                notify: true,
+                observer: '_rangeChanged'
+            },
+
+            step: {
+                type: Object,
+                value: 1,
+                reflectToAttribute: true
+            },
+
+            rangeType: {
+                type: String,
+                value: 'number',
+                observer: '_rangeTypeChanged'
+            },
         },
 
-        editable: {
-            type: Boolean,
-            value: false
-        },
 
-        to: {
-            type: Number,
-            notify: true,
-            observer: '_maxChanged'
-        },
-
-        min: {
-            type: Number,
-            reflectToAttribute: true,
-            value: 0
-        },
-
-        max: {
-            type: Number,
-            reflectToAttribute: true,
-            value: 100
-        },
-
-        step: {
-            type: Number,
-            value: 1,
-            reflectToAttribute: true
-        }
-    },
-
-    attached: function() {
-
-        this._initiate();
-    },
-
-    _initiate: function() {
-
-        var rangeElement = this;
-
-        this.from = this.min;
-        this.to = this.max;
-
-        noUiSlider.create(this.$.range, {
-            start: [this.min, this.max],
-            connect: true,
-            range: {
-                'min': this.min,
-                'max': this.max
+        _rangeTypeChanged: function () {
+            if (this.rangeType && this.min && this.max) {
+                this._initiate();
             }
-        });
+        },
 
-        this.$.range.noUiSlider.on('update', function(values, handle) {
-            if (handle) {
-                rangeElement.to = parseInt(values[handle]);
-            } else {
-                rangeElement.from = parseInt(values[handle]);
+        formatValue: function (value) {
+            switch (this.rangeType) {
+                case 'date':
+                    return this._formatDate(value);
+                case 'number':
+                    return parseInt(value);
             }
-        });
+        },
 
-        this.$.range.noUiSlider.on('set', function(values, handle) {
-            rangeElement.fire('range-change');
-        });
+        _formatDate: function (time) {
+            var date = new Date(parseInt(time));
+            var day = date.toDateString().substr(0, 3);
+            return day + ', ' + this._getTime(date);
+        },
+
+        _getTime: function (date) {
+            var formattedTime = '';
+            var hours = date.getHours();
+            if (hours < 10) {
+                if (hours === 0 && this.showTwelveHourClock)
+                    formattedTime = '12';
+                else
+                    formattedTime = '0' + formattedTime + hours;
+            }
+            else {
+                if (hours > 12 && this.showTwelveHourClock) {
+                    hours = hours - 12;
+                    formattedTime = hours.toString();
+                }
+                else {
+                    formattedTime = formattedTime + hours;
+                }
+            }
+            formattedTime = formattedTime + ':';
+            if (date.getMinutes() < 10) {
+                formattedTime = formattedTime + '0';
+            }
+            formattedTime = formattedTime + date.getMinutes();
+            if (this.showTwelveHourClock) {
+
+                if (date.getHours() >= 12)
+                    formattedTime = formattedTime + " pm";
+                else
+                    formattedTime = formattedTime + " am";
+            }
+
+            return formattedTime;
+        },
+
+        _initiate: function () {
+
+            var rangeElement = this;
+
+            this.from = this.min;
+            this.to = this.max;
+
+            if (this.$.range.noUiSlider) {
+                this.$.range.noUiSlider.destroy();
+            }
+            noUiSlider.create(this.$.range, {
+                start: [this.min, this.max],
+                connect: true,
+                tooltips: true,
+                range: {
+                    'min': parseInt(this.min),
+                    'max': parseInt(this.max)
+                }
+            }, true);
+
+            this.$.range.noUiSlider.on('update', function (values, handle) {
+                if (handle) {
+                    rangeElement.to = values[handle];
+                } else {
+                    rangeElement.from = values[handle];
+                }
+            });
+
+            this.$.range.noUiSlider.on('change', function (values, handle) {
+
+                rangeElement.fire('range-change');
+            });
 
 
-    },
+        },
 
-    _minChanged: function() {
-        if (this.to != undefined && this.from != undefined) {
-            if (this.$.range.noUiSlider != undefined)
-                this.$.range.noUiSlider.set([parseInt(this.from), null]);
-        }
-    },
+        _minChanged: function () {
+            if (this.to && this.from) {
+                if (this.$.range.noUiSlider)
+                    this.$.range.noUiSlider.set([this.from, null]);
+            }
+        },
 
-    _maxChanged: function() {
-        if (this.to != undefined && this.from != undefined) {
-            if (this.$.range.noUiSlider != undefined)
-                this.$.range.noUiSlider.set([null, parseInt(this.to)]);
-        }
-    },
+        _rangeChanged: function () {
+            if (this.min && this.max) {
+                this._initiate();
+            }
+        },
 
-})
+        _maxChanged: function () {
+            if (this.to && this.from) {
+                if (this.$.range.noUiSlider != undefined)
+                    this.$.range.noUiSlider.set([null, this.to]);
+            }
+        },
+
+    })
 </script>

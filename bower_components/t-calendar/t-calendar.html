@@ -277,20 +277,31 @@ Polymer({
     /*
      * Private method to clear the value
      */
-    _floatedLabel: function() {
-
+    _floatedLabel: function(newValue, oldValue) {
         if (this.selectedDate.length > 0) {
             this.classList.add('label-is-floating');
         } else {
             this.classList.remove('label-is-floating');
         }
+
+        //component load condition
+        //patch ATOM-505 added picker as a condition
+        if(!this.picker && !newValue && !oldValue)
+            return;
+
+        //break loop condition 
+        if(newValue && oldValue && newValue == oldValue)
+            return;
+
+        this.picker.set('select', newValue, { format: this.format });
+        
     },
     /**
      * Function to validate if the date is selected
      */
     validate: function() {
         if (this.required) {
-            if ((this.selectedDate.length) > 0) {
+            if (this.selectedDate && this.selectedDate.length > 0) {
                 if ('.no-value') {
                     $(this).removeClass('no-value');
                 }

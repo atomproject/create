@@ -2,28 +2,41 @@
 
 <script>
   Polymer.StateConverterBehavior = {
-    getNewElementState: function(name, x, y, html, attributes) {
-      return {
-        name: name, posX: x, posY: y,
-        html: html || this._elementMetadataHash[name],
-        attributes: attributes || {}
-      };
+    properties: {
+      templateCache: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      }
     },
 
-    getNewBuilderState: function(name, builder) {
-      var classes, state = { attributes: {} };
+    getNewElementState: function(name, x, y) {
+      var meta, states;
 
-      classes = builder.classList;
-      classes = Array.prototype.slice.call(classes);
-      classes = classes.filter(function(klass) {
-        return ['style-scope', 't-stage'].indexOf(klass) === -1;
-      }).join(' ');
+      if (_.isArray(name)) {
+        states = name;
+        meta = states.find(function(item) {
+          return item.posX === x && item.posY === y;
+        });
+        name = meta.name;
+      } else if (_.isObject(name)) {
+        meta = name;
+        return {
+          posX: x, posY: y,
+          name: meta.name, html: meta.html,
+          attributes: meta.attributes, property: meta.property
+        }
+      } else {
+        meta = this.metadata[name]
+      }
 
-      state.name = name;
-      state.attributes.class = classes;
-      state.html = this.getComponentCode(state.name, state.attributes);
-
-      return state;
+      return {
+        name: name, posX: x, posY: y,
+        html: meta.html,
+        attributes: _.cloneDeep(meta.attributes),
+        property: _.cloneDeep(meta.property)
+      };
     },
 
     getStateFile: function(builderState, states) {
@@ -36,6 +49,7 @@
       stateFile = {
         type: builderState.name,
         attributes: builderState.attributes,
+        property: builderState.property,
         rows: this.getStateHierarchy(states)
       };
 
@@ -53,26 +67,19 @@
         }
 
         row = rows[state.posX];
+        column = row[state.posY] = {};
 
-        if (!row[state.posY]) {
-          row[state.posY] = {};
-        }
-
-        column = row[state.posY];
         column.name = state.name;
         column.html = state.html;
         column.attributes = state.attributes;
+        column.property = state.property;
       });
 
       return rows;
     },
 
-    getComponentFile: function(builderState, states) {
-      var context = {}, components = [], endTag;
-
-      if (!builderState || !states) {
-        return;
-      }
+    getComponentNames: function(states) {
+      var components = [];
 
       states
         .map(function(state) {
@@ -85,24 +92,44 @@
           }
         });
 
+      return components;
+    },
+
+    getBuilderFile: function(builderState, states) {
+      var context = {}, endTag, startTag, template, templatePath;
+
+      if (!builderState || !states) {
+        return;
+      }
+
       context.baseUrl = '';
+      context.rows = this.getStateHierarchy(states);
+      context.components = this.getComponentNames(states);
+      context.builderName = builderState.attributes.name;
+
       context.builderEndTag = endTag = '</' + builderState.name + '>';
       context.builderStartTag = builderState.html.replace(endTag, '');
-      context.rows = this.getStateHierarchy(states);
-      context.components = components;
-      context.componentName = builderState.attributes.name;
 
-      return Promise.resolve(this.componentTemplate)
+      if (this.isPage) {
+        templatePath = 'templates/page.jst';
+      } else {
+        templatePath = 'templates/component.jst';
+      }
+
+      template = this.templateCache[builderState.name];
+
+      return Promise.resolve(template)
         .then(function(template) {
           if (!template) {
-            return $.get('elements/component.jst');
+            return $.get(templatePath);
           }
 
           return template;
         })
         .then(function(template) {
           if (!_.isFunction(template)) {
-            template = this.componentTemplate = _.template(template);
+            template = _.template(template);
+            this.templateCache[builderState.name] = template;
           }
 
           return template(context);

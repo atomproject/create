@@ -106,6 +106,7 @@
   -webkit-transform: translateY(100%);
       -ms-transform: translateY(100%);
           transform: translateY(100%);
+          outline: 0;
 }
 /* line 27, D:\filter\less\date-time\default.less */
 :host ::content .picker__frame {
