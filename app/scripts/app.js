@@ -6,6 +6,7 @@
   // and give it some initial binding values
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
   var app = document.querySelector('#app');
+  var pathname = window.location.pathname.replace('/fusion', '');
 
   // Sets app default base URL
   app.baseUrl = '';
@@ -16,21 +17,21 @@
     app.baseUrl = '/fusion';
   }
 
-  if (window.location.pathname === '/page') {
+  if (pathname === '/page') {
     app.builderType = 't-page';
     app.isPage = true;
     app.builderUrl = 'page-manifest.json';
     app.canvasName = 'Untitled Page';
     app.tab="page";
     app.route ='canvas';
-  } else if (window.location.pathname === '/form') {
+  } else if (pathname === '/form') {
     app.builderType ='t-form';
     app.isPage = false;
     app.builderUrl = 'form-manifest.json';
     app.canvasName = 'Untitled Form';
     app.tab="form";
     app.route ='canvas';
-  } else if (window.location.pathname === '/') {
+  } else if (pathname === '/') {
     app.tab="form";
     app.route ='browser';
   }
