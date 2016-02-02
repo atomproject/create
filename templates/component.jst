@@ -1,0 +1,32 @@
+<!-- TODO: add baseUrl in the context -->
+<link rel="import" href="<%= baseUrl %>/bower_components/polymer/polymer.html">
+<link rel="import" href="<%= baseUrl %>/bower_components/t-form/t-form.html">
+<%
+  components.forEach(function(name) {
+  %><link rel="import" href="<%= baseUrl %>/bower_components/<%= name %>/<%= name %>.html"><%
+  });
+%>
+
+<dom-module id="<%= componentName %>">
+  <template>
+    <%= builderStartTag %>
+      <div class="form flex">
+        <%
+          rows.forEach(function(row) {
+            %><div class="horizontal flex layout grouped"><%
+              row.forEach(function(column) {
+                %><div class="flex fieldset"><%= column.html %></div><%
+              });
+            %></div><%
+          });
+        %>
+      </div>
+    <%= builderEndTag %>
+  </template>
+
+  <script>
+    Polymer({
+      is: "<%= componentName %>"
+    });
+  </script>
+</dom-module>

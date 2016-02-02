@@ -1,0 +1,587 @@
+{
+    "t-autosuggest": {
+        "attributes": {
+            "required": "",
+            "label": "sasasasa"
+        },
+        "property": {
+            "name": "Autosuggest",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "Untitled Autosuggest"
+                        },
+                        "dataUrl": {
+                            "name": "Autosuggest Api",
+                            "type": "string",
+                            "value": "http://qa-mystiquecode.tavisca.com/api/content/autosuggest/"
+                        },
+                        "tokenParam": {
+                            "name": "Token parameter",
+                            "type": "string",
+                            "value": "formattedAddress"
+                        },
+                        "queryParams": {
+                            "name": "Query Parameters",
+                            "type": "string",
+                            "value": "cid=nxtb2bsite"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "required": {
+                            "name": "Mandatory Field",
+                            "type": "Boolean",
+                            "value": true
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-button": {
+        "attributes": {
+            "class": "primary",
+            "raised": "",
+            "label": "label"
+        },
+        "property": {
+            "name": "Button",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "label"
+                        },
+                        "ico": {
+                            "name": "Icon",
+                            "type": "iconset"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "onlyIcon": {
+                            "name": "Icon Only",
+                            "type": "Boolean",
+                            "value": false
+                        },
+                        "raised": {
+                            "name": "Raised",
+                            "type": "Boolean",
+                            "value": true
+                        },
+                        "iconLeft": {
+                            "name": "Left Align Icon",
+                            "type": "Boolean",
+                            "value": false
+                        },
+                        "noink": {
+                            "name": "Remove Ink Effect",
+                            "type": "Boolean",
+                            "value": false
+                        },
+                        "toggles": {
+                            "name": "Toggle",
+                            "type": "Boolean",
+                            "value": false
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-calendar": {
+        "attributes": {
+            "id": "one",
+            "required": "",
+            "label": "Select date"
+        },
+        "property": {
+            "name": "Calendar",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "Select a date"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "required": {
+                            "name": "Mandatory Field",
+                            "type": "Boolean",
+                            "value": true
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-checkbox-group": {
+        "attributes": {
+            "label": "Title",
+            "data": "[\"First Choice\",\"Second Choice\",\"Third Choice\"]"
+        },
+        "property": {
+            "name": "Checkbox List",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "Untitled Checkbox List"
+                        },
+                        "data": {
+                            "name": "Choices",
+                            "type": "list",
+                            "value": [
+                                "First Choice",
+                                "Second Choice",
+                                "Third Choice"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "required": {
+                            "name": "Mandatory Field",
+                            "type": "Boolean",
+                            "value": true
+                        },
+                        "inline": {
+                            "name": "Horizontal List",
+                            "type": "Boolean",
+                            "value": false
+                        },
+                        "checkboxRight": {
+                            "name": "Right Align Checkboxes",
+                            "type": "Boolean",
+                            "value": false
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-colorpicker": {
+        "attributes": {},
+        "property": {
+            "name": "Color Picker",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "Pick a color"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "required": {
+                            "name": "Mandatory Field",
+                            "type": "Boolean",
+                            "value": true
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-dropdown": {
+        "attributes": {},
+        "property": {
+            "name": "DropDown",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "Select value from items"
+                        },
+                        "data": {
+                            "name": "Choices",
+                            "type": "list",
+                            "value": [
+                                "First Choice",
+                                "Second Choice",
+                                "Third Choice"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "required": {
+                            "name": "Mandatory Field",
+                            "type": "Boolean",
+                            "value": true
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-error-block": {
+        "attributes": {},
+        "property": {
+            "name": "Error Block",
+            "properties": [
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "active": {
+                            "name": "Show Error",
+                            "type": "boolean",
+                            "value": true
+                        },
+                        "type": {
+                            "name": "Error Heading",
+                            "type": "string",
+                            "value": "Error"
+                        },
+                        "backHref": {
+                            "name": "Redirection URL",
+                            "type": "string",
+                            "value": "./"
+                        },
+                        "errorMessage": {
+                            "name": "Error Message",
+                            "type": "string",
+                            "value": "Your booking failed."
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-input": {
+        "attributes": {
+            "required": ""
+        },
+        "property": {
+            "name": "Input Field",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "label"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "required": {
+                            "name": "Mandatory Field",
+                            "type": "boolean",
+                            "value": true
+                        },
+                        "charCounter": {
+                            "name": "Character Counter",
+                            "type": "boolean",
+                            "value": false
+                        },
+                        "maxLength": {
+                            "name": "Max. Characters",
+                            "type": "range",
+                            "min": 0,
+                            "max": 20
+                        },
+                        "multiLine": {
+                            "name": "Allow Multi Line Input",
+                            "type": "boolean",
+                            "value": false
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-radio-group": {
+        "attributes": {},
+        "property": {
+            "name": "Radio List",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "Untitled Radio List"
+                        },
+                        "data": {
+                            "name": "Choices",
+                            "type": "list",
+                            "value": [
+                                "First Choice",
+                                "Second Choice",
+                                "Third Choice"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "required": {
+                            "name": "Mandatory Field",
+                            "type": "boolean",
+                            "value": true
+                        },
+                        "pillButton": {
+                            "name": "Style as Pill Buttons",
+                            "type": "boolean",
+                            "value": false
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-range": {
+        "attributes": {
+            "min": "10",
+            "max": "100"
+        },
+        "property": {
+            "name": "Button",
+            "properties": [
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "noLabel": {
+                            "name": "Hide Label",
+                            "type": "boolean",
+                            "value": false
+                        },
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "Range"
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-section-header": {
+        "attributes": {
+            "label": "Some header"
+        },
+        "property": {
+            "name": "Section Header",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "New Section"
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-slider": {
+        "attributes": {
+            "style": "width:100%",
+            "max": "10",
+            "step": "1",
+            "value": "3"
+        },
+        "property": {
+            "name": "Slider",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "Untitled Slider"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "editable": {
+                            "name": "Allow Text Input",
+                            "type": "boolean",
+                            "value": false
+                        },
+                        "pin": {
+                            "name": "Show Pin When Dragging",
+                            "type": "boolean",
+                            "value": false
+                        },
+                        "snaps": {
+                            "name": "Snaps to Points",
+                            "type": "boolean",
+                            "value": false
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-stepper": {
+        "attributes": {
+            "min": "0",
+            "max": "100"
+        },
+        "property": {
+            "name": "Stepper",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "singularLabel": {
+                            "name": "Singular Label",
+                            "type": "string",
+                            "value": "Adult"
+                        },
+                        "pluralLabel": {
+                            "name": "Plural Label",
+                            "type": "string",
+                            "value": "Adults"
+                        },
+                        "secondaryLabel": {
+                            "name": "Secondary Label",
+                            "type": "string",
+                            "value": "(>12 years)"
+                        },
+                        "ico": {
+                            "name": "Icon",
+                            "type": "iconset",
+                            "value": "icons:face"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "styled": {
+                            "name": "Other Style",
+                            "type": "boolean",
+                            "value": false
+                        },
+                        "min": {
+                            "name": "Min Number",
+                            "type": "range",
+                            "min": 0,
+                            "max": 99
+                        },
+                        "max": {
+                            "name": "Max Number",
+                            "type": "range",
+                            "min": 1,
+                            "max": 100
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-form": {
+        "attributes": {},
+        "property": {
+            "name": "Form",
+            "properties": [
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "labelPosition": {
+                            "name": "Label Alignment",
+                            "type": "options",
+                            "values": [
+                                "Top",
+                                "Inline"
+                            ],
+                            "value": "Top"
+                        },
+                        "actionButton": {
+                            "name": "Action Button",
+                            "type": "options",
+                            "values": [
+                                "Left",
+                                "Right",
+                                "Full"
+                            ],
+                            "value": "Left"
+                        },
+                        "submitButtonLabel": {
+                            "name": "Action Button Label",
+                            "type": "string",
+                            "value": "Submit"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "t-page": {
+        "attributes": {},
+        "property": {
+            "name": "Page",
+            "properties": [
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "background": {
+                            "name": "Background color",
+                            "type": "color",
+                            "value": "#ffffff"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

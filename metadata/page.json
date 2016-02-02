@@ -1,0 +1,367 @@
+{
+    "t-google-map": {
+        "attributes": {
+            "language": "en"
+        },
+        "property": {
+            "name": "Google Map",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "latitude": {
+                            "name": "Latitude",
+                            "type": "number",
+                            "value": 37.779
+                        },
+                        "longitude": {
+                            "name": "Longitude",
+                            "type": "number",
+                            "value": -122.3892
+                        },
+                        "mapType": {
+                            "name": "Select Map Type",
+                            "type": "options",
+                            "values": [
+                                "roadmap",
+                                "satellite",
+                                "hybrid",
+                                "terrain"
+                            ],
+                            "value": "roadmap"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "disableZoom": {
+                            "name": "Disable Zoom",
+                            "type": "Boolean",
+                            "value": false
+                        },
+                        "minZoom": {
+                            "name": "Min. Zoom Level",
+                            "type": "number",
+                            "value": 5
+                        },
+                        "maxZoom": {
+                            "name": "Max. Zoom Level",
+                            "type": "number",
+                            "value": 15
+                        },
+                        "zoom": {
+                            "name": "Default Zoom Level",
+                            "type": "number",
+                            "value": 10
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": "\r\n  "
+    },
+    "t-image": {
+        "attributes": {
+            "style": "width:100%; height:400px;",
+            "preload": ""
+        },
+        "property": {
+            "name": "Image",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "placeholder": {
+                            "name": "Placeholder Text",
+                            "type": "string",
+                            "value": "No image found"
+                        },
+                        "src": {
+                            "name": "Link to Source",
+                            "type": "string",
+                            "value": "http://lorempixel.com/800/400"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "fade": {
+                            "name": "Fading Effect",
+                            "type": "Boolean",
+                            "value": true
+                        },
+                        "sizing": {
+                            "name": "Position",
+                            "type": "options",
+                            "values": [
+                                "Cover",
+                                "Contain"
+                            ],
+                            "value": "Cover"
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-list": {
+        "attributes": {
+            "auto": ""
+        },
+        "property": {
+            "name": "List",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "dataApi": {
+                            "name": "URL for list data",
+                            "type": "string",
+                            "value": "results.json"
+                        },
+                        "filterApi": {
+                            "name": "URL for the filter",
+                            "type": "string",
+                            "value": "filter.json"
+                        },
+                        "paginatedApi": {
+                            "name": "URL for pagination",
+                            "type": "string",
+                            "value": ""
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "tokenParam": {
+                            "name": "List key",
+                            "type": "string",
+                            "value": "inventories"
+                        },
+                        "withSorting": {
+                            "name": "Show sorting controls",
+                            "type": "boolean",
+                            "value": true
+                        },
+                        "withFilter": {
+                            "name": "Show filters",
+                            "type": "boolean",
+                            "value": true
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": "\r\n            <template>\r\n                <t-result-item itinerary=\"{{item}}\"></t-result-item>\r\n            </template>        \r\n    "
+    },
+    "t-loader": {
+        "attributes": {
+            "active": ""
+        },
+        "property": {
+            "properties": [
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "active": {
+                            "name": "Is Active",
+                            "type": "boolean",
+                            "value": true
+                        },
+                        "alt": {
+                            "name": "Placeholder Text",
+                            "type": "string",
+                            "value": ""
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-table": {
+        "attributes": {
+            "id": "rtable",
+            "sortable": "",
+            "searchable": ""
+        },
+        "property": {
+            "name": "Table",
+            "properties": [
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "hasHeaderRow": {
+                            "name": "Different Header Row",
+                            "type": "boolean",
+                            "value": true
+                        },
+                        "sortable": {
+                            "name": "Sortable",
+                            "type": "boolean",
+                            "value": true
+                        },
+                        "searchable": {
+                            "name": "Searchable",
+                            "type": "boolean",
+                            "value": true
+                        },
+                        "bandedRows": {
+                            "name": "Banded Rows",
+                            "type": "boolean",
+                            "value": true
+                        },
+                        "hoverable": {
+                            "name": "Hoverable Rows",
+                            "type": "boolean",
+                            "value": false
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": "\r\n\t\t\t<t-column hide-on=\"tablet\" data-value=\"fruit\" display-value=\"Name\" column-template=\"test\"></t-column>\r\n\t\t\t<t-column hide-on=\"phone\" data-value=\"alice\" display-value=\"Role\"></t-column>\r\n\t\t\t<t-column ignore-sort=\"true\" data-value=\"bill\" display-value=\"Last\"></t-column>\r\n\t\t\t<t-column data-value=\"casey\" display-value=\"Status\"></t-column>\r\n\t\t\t\t<template id=\"test\" name=\"edit\">\r\n\t\t\t\t\t<iron-icon src=\"http://www.unixstickers.com/image/cache/data/stickers/golang/golang.sh-600x600.png\" style=\"width: 24px; height: 24px;\"> </iron-icon>\r\n\t\t\t\t\t<span>{{}}</span>\r\n\t\t\t\t</template>\t\r\n\r\n\t\t\t\t<t-body>\r\n\t\t\t\t\t[\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\r\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 }\r\n\t\t\t\t\t]\r\n\t\t\t\t</t-body>\r\n\t\t"
+    },
+    "t-tabs": {
+        "attributes": {
+            "selected": "0",
+            "noink": "true",
+            "class": "container-element"
+        },
+        "property": {
+            "name": "Tabs",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "tabs": {
+                            "name": "Tabs",
+                            "type": "list",
+                            "value": [
+                                "First",
+                                "Second"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "inverted": {
+                            "name": "Colored background",
+                            "type": "Boolean",
+                            "value": false
+                        },
+                        "alignBottom": {
+                            "name": "Bottom align tabs",
+                            "type": "Boolean",
+                            "value": false
+                        },
+                        "alignment": {
+                            "name": "Alignment",
+                            "type": "options",
+                            "values": [
+                                "left",
+                                "center",
+                                "fullbleed"
+                            ],
+                            "value": "left"
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
+    "t-google-youtube": {
+        "attributes": {
+            "height": "400px",
+            "width": "100%"
+        },
+        "property": {
+            "name": "Youtube Video",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "videoId": {
+                            "name": "Youtube Video Link",
+                            "type": "string",
+                            "value": "yRbOSdAe_JU"
+                        }
+                    }
+                },
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "height": {
+                            "name": "Height",
+                            "type": "string",
+                            "value": "400px"
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": "\r\n  "
+    },
+    "t-form": {
+        "attributes": {},
+        "property": {
+            "name": "Form",
+            "properties": [
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "labelPosition": {
+                            "name": "Label Alignment",
+                            "type": "options",
+                            "values": [
+                                "Top",
+                                "Inline"
+                            ],
+                            "value": "Top"
+                        },
+                        "actionButton": {
+                            "name": "Action Button",
+                            "type": "options",
+                            "values": [
+                                "Left",
+                                "Right",
+                                "Full"
+                            ],
+                            "value": "Left"
+                        },
+                        "submitButtonLabel": {
+                            "name": "Action Button Label",
+                            "type": "string",
+                            "value": "Submit"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "t-page": {
+        "attributes": {},
+        "property": {
+            "name": "Page",
+            "properties": [
+                {
+                    "name": "Properties",
+                    "fields": {
+                        "background": {
+                            "name": "Background color",
+                            "type": "color",
+                            "value": "#ffffff"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
