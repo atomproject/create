@@ -110,7 +110,7 @@
       context.builderEndTag = endTag = '</' + builderState.name + '>';
       context.builderStartTag = builderState.html.replace(endTag, '');
 
-      if (this.isPage) {
+      if (this.isPage(this.builderType)) {
         templatePath = 'templates/page.jst';
       } else {
         templatePath = 'templates/component.jst';

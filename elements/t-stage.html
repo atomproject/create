@@ -289,6 +289,11 @@
         container.appendChild(fieldContainer);
         this.push('_elementSateList', state);
 
+        setTimeout(function() {
+          this.componentPanelTarget = fieldset.querySelector(name);
+          this.showComponentPanel(name, state.property.properties);
+        }.bind(this));
+
         if (this.builderType === 't-form') {
           setTimeout(function() {
             this.querySelector(this.builderType).setFields();
@@ -515,10 +520,13 @@
         var states = this._elementSateList;
         var builderState = this.builderState;
         var builder = this.querySelector(this.builderType);
-        // TODO: shouldn't do thi, persist builder state properly
-        var name = builderState.attributes.name = builder.getAttribute('name');
-        var stateFile = this.getStateFile(builderState, states);
-        var filePromise = this.getBuilderFile(builderState, states);
+        var name = 't-' + builder.getAttribute('name');
+        var stateFile, filePromise;
+
+        // TODO: shouldn't do this, persist builder state properly
+        builderState.attributes.name = name;
+        stateFile = this.getStateFile(builderState, states);
+        filePromise = this.getBuilderFile(builderState, states);
 
         return filePromise.then(function(contents) {
           return {
@@ -633,8 +641,6 @@
         setTimeout(function() {
           this.componentPanel.sections = sections;
         }.bind(this));
-
-        name === this.builderType ? $panelHeader.show() : $panelHeader.hide();
       },
 
       initComponentPanel: function(builderType, panel) {

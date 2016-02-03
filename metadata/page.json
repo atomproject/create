@@ -1,7 +1,8 @@
 {
     "t-google-map": {
         "attributes": {
-            "language": "en"
+            "language": "en",
+            "style": "height: 400px;"
         },
         "property": {
             "name": "Google Map",
@@ -59,7 +60,7 @@
                 }
             ]
         },
-        "innerHTML": "\r\n  "
+        "innerHTML": ""
     },
     "t-image": {
         "attributes": {

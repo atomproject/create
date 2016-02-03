@@ -15,14 +15,15 @@
   <link rel="import" href="../../t-shared-components/theme.html">
 
   <style>
-    body {
-      margin: 0;
-      height: 100vh;
+    .map-container {
+      margin: auto;
+      width: 80%;
     }
   </style>
 </head>
 <body fullbleed>
-  <t-google-map language="en">
-  </t-google-map>
+  <div class="map-container">
+    <t-google-map language="en" style="height: 400px;"></t-google-map>
+  </div>
 </body>
 </html>

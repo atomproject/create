@@ -276,6 +276,11 @@ Example:
                 value: 'number',
                 observer: '_rangeTypeChanged'
             },
+
+            margin: {
+                type: Number,
+                value: 0 
+            }
         },
 
 
@@ -285,12 +290,12 @@ Example:
             }
         },
 
-        formatValue: function (value) {
+        formatValue: function (value, type) {
             switch (this.rangeType) {
                 case 'date':
                     return this._formatDate(value);
-                case 'number':
-                    return parseInt(value);
+                case 'number':                    
+                    return parseInt(value);                    
             }
         },
 
@@ -338,6 +343,9 @@ Example:
 
             var rangeElement = this;
 
+            this.min = parseInt(this.min);
+            this.max = Math.ceil(parseFloat(this.max));
+
             this.from = this.min;
             this.to = this.max;
 
@@ -348,9 +356,10 @@ Example:
                 start: [this.min, this.max],
                 connect: true,
                 tooltips: true,
+                margin: this.margin,
                 range: {
-                    'min': parseInt(this.min),
-                    'max': parseInt(this.max)
+                    'min': this.min,  
+                    'max': this.max  
                 }
             }, true);
 

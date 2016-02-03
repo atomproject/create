@@ -285,10 +285,13 @@ Polymer({
         }
 
         //component load condition
-        //patch ATOM-505 added picker as a condition
-        if(!this.picker && !newValue && !oldValue)
+        //patch ATOM-501 added picker as a condition
+        if(!this.picker ){
             return;
-
+        }
+        if(!newValue && !oldValue){
+            return;
+        }
         //break loop condition 
         if(newValue && oldValue && newValue == oldValue)
             return;

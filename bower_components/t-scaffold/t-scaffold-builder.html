@@ -13,12 +13,12 @@ Left Nav + View
 <link rel="import" type="css" href="fusion-header.css">
 <style is="custom-style">
    #mainDrawerPanel ::content .component-list{
-    overflow: hidden; 
+    overflow: hidden;
     color:var(--header-text-color);
   }
    #propertyDrawerPanel ::content #drawer,
   #mainDrawerPanel ::content .component-list.active{
-    overflow-y: auto; 
+    overflow-y: auto;
   }
   #content-header{
     display: none;
@@ -32,8 +32,8 @@ Left Nav + View
       border-left:1px solid #eee;
     };
   }
-  
-  
+
+
 
 </style>
 
@@ -44,12 +44,9 @@ Left Nav + View
             <span class="top flex">
               <content select="header-toolbar"></content>
             </span>
-            <div class="login-section top">
-              <t-button link label="Sign out" noink></t-button>
-            </div>
         </paper-toolbar>
     </div>
-    <div >  
+    <div >
       <paper-drawer-panel drawer-toggle-attribute="item-toggle" on-paper-responsive-change="_changeToMobile" id="mainDrawerPanel">
         <div class="items-list" drawer>
           <content select="nav-content"></content>
@@ -63,7 +60,7 @@ Left Nav + View
               <paper-header-panel>
                 <div class="paper-header" id="content-header">
                   <div class="layout horizontal center">
-                    <div class="flex">  
+                    <div class="flex">
                       <content select="search-bar"></content>
                     </div>
                     <t-button label="Browse" item-toggle></t-button>
@@ -74,21 +71,21 @@ Left Nav + View
                 </div>
               </paper-header-panel>
             </div>
-          </paper-drawer-panel>  
+          </paper-drawer-panel>
         </div>
       </paper-drawer-panel>
     </div>
-  </paper-header-panel> 
+  </paper-header-panel>
   </template>
 
 </dom-module>
 
   <script>
-      
+
     Polymer({
-      
+
       is: 't-scaffold-builder',
-      
+
       properties:{
             toggleLogin: {
                 type: Object,

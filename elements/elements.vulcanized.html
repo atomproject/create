@@ -22427,25 +22427,13 @@ The `aria-labelledby` attribute will be set to the header element, if one exists
     },
 
     attached: function() {
-      this._observer = this._observe(this);
+      // this._observer is used by iron-overlay-behavior
+      this._ariaObserver = Polymer.dom(this).observeNodes(this._updateAriaLabelledBy);
       this._updateAriaLabelledBy();
     },
 
     detached: function() {
-      if (this._observer) {
-        this._observer.disconnect();
-      }
-    },
-
-    _observe: function(node) {
-      var observer = new MutationObserver(function() {
-        this._updateAriaLabelledBy();
-      }.bind(this));
-      observer.observe(node, {
-        childList: true,
-        subtree: true
-      });
-      return observer;
+      Polymer.dom(this).unobserveNodes(this._ariaObserver);
     },
 
     _modalChanged: function() {
@@ -22489,57 +22477,52 @@ The `aria-labelledby` attribute will be set to the header element, if one exists
     },
 
     _onDialogClick: function(event) {
-      var target = event.target;
+      var target = Polymer.dom(event).rootTarget;
       while (target && target !== this) {
         if (target.hasAttribute) {
           if (target.hasAttribute('dialog-dismiss')) {
             this._updateClosingReasonConfirmed(false);
             this.close();
+            event.stopPropagation();
             break;
           } else if (target.hasAttribute('dialog-confirm')) {
             this._updateClosingReasonConfirmed(true);
             this.close();
+            event.stopPropagation();
             break;
           }
         }
-        target = target.parentNode;
+        target = Polymer.dom(target).parentNode;
       }
     },
 
     _onIronOverlayOpened: function() {
       if (this.modal) {
         document.body.addEventListener('focus', this._boundOnFocus, true);
-        this.backdropElement.addEventListener('click', this._boundOnBackdropClick);
+        document.body.addEventListener('click', this._boundOnBackdropClick, true);
       }
     },
 
     _onIronOverlayClosed: function() {
+      this._lastFocusedElement = null;
       document.body.removeEventListener('focus', this._boundOnFocus, true);
-      this.backdropElement.removeEventListener('click', this._boundOnBackdropClick);
+      document.body.removeEventListener('click', this._boundOnBackdropClick, true);
     },
 
     _onFocus: function(event) {
-      if (this.modal) {
-        var target = event.target;
-        while (target && target !== this && target !== document.body) {
-          target = target.parentNode;
-        }
-        if (target) {
-          if (target === document.body) {
-            if (this._lastFocusedElement) {
-              this._lastFocusedElement.focus();
-            } else {
-              this._focusNode.focus();
-            }
-          } else {
-            this._lastFocusedElement = event.target;
-          }
+      if (this.modal && this._manager.currentOverlay() === this) {
+        if (Polymer.dom(event).path.indexOf(this) !== -1) {
+          this._lastFocusedElement = event.target;
+        } else if (this._lastFocusedElement) {
+          this._lastFocusedElement.focus();
+        } else {
+          this._focusNode.focus();
         }
       }
     },
 
-    _onBackdropClick: function() {
-      if (this.modal) {
+    _onBackdropClick: function(event) {
+      if (this.modal && this._manager.currentOverlay() === this && Polymer.dom(event).path.indexOf(this) === -1) {
         if (this._lastFocusedElement) {
           this._lastFocusedElement.focus();
         } else {
@@ -22614,7 +22597,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   padding: 8px 8px 8px 24px;
   margin: 0;
 
-  color: var(--paper-dialog-button-color, --default-primary-color);
+  color: var(--paper-dialog-button-color, --primary-color);
 
   @apply(--layout-horizontal);
   @apply(--layout-end-justified);
@@ -25826,7 +25809,7 @@ Licensed under the MIT License.
                                     <div class="label horizontal layout center">
                                         <p>{{attribute.name}}</p>
                                         <div class="flex"></div>
-                                        <t-radio-group pill-button="" selected-item="{{attribute.index}}" data-key$="{{attribute.key}}" on-t-radio-group-changed="_radioValueChanged">
+                                        <t-radio-group pill-button="" selected-item="{{_getIndex(attribute.values, attribute.value)}}" data-key$="{{attribute.key}}" on-t-radio-group-changed="_radioValueChanged">
                                             <template is="dom-repeat" items="{{attribute.values}}" as="val">
                                                 <t-radio-button name="{{val}}">{{val}}</t-radio-button>
                                             </template>
@@ -25939,6 +25922,10 @@ Polymer({
         return values.length > 3;
     },
 
+    _getIndex: function(arr, val) {
+      return arr.indexOf(val);
+    },
+
     _isLessThanThree: function(values) {
         return values.length <= 3;
     },
@@ -26015,11 +26002,18 @@ Polymer({
     },
 
     _radioValueChanged: function(e) {
-        var key, value;
+        var key, value, index;
 
         if (e.target.selectedItem != null) {
             key = e.target.getAttribute("data-key");
-            value = e.target.selectedItem;
+            index = e.target.selectedItem;
+
+            // TODO: __HACK__ remove asap. Fix radion button group.
+            if (Object.prototype.toString.call(index) === '[object Number]') {
+                value = e.model.get('attribute.values')[index];
+            } else {
+                value = index;
+            }
 
             this.fire('path-changed', {path: key, value: value});
         }
@@ -31428,10 +31422,13 @@ Polymer({
         }
 
         //component load condition
-        //patch ATOM-505 added picker as a condition
-        if(!this.picker && !newValue && !oldValue)
+        //patch ATOM-501 added picker as a condition
+        if(!this.picker ){
             return;
-
+        }
+        if(!newValue && !oldValue){
+            return;
+        }
         //break loop condition 
         if(newValue && oldValue && newValue == oldValue)
             return;
@@ -32379,7 +32376,7 @@ Polymer({
       context.builderEndTag = endTag = '</' + builderState.name + '>';
       context.builderStartTag = builderState.html.replace(endTag, '');
 
-      if (this.isPage) {
+      if (this.isPage(this.builderType)) {
         templatePath = 'templates/page.jst';
       } else {
         templatePath = 'templates/component.jst';
@@ -32689,6 +32686,11 @@ Polymer({
         container.appendChild(fieldContainer);
         this.push('_elementSateList', state);
 
+        setTimeout(function() {
+          this.componentPanelTarget = fieldset.querySelector(name);
+          this.showComponentPanel(name, state.property.properties);
+        }.bind(this));
+
         if (this.builderType === 't-form') {
           setTimeout(function() {
             this.querySelector(this.builderType).setFields();
@@ -32915,10 +32917,13 @@ Polymer({
         var states = this._elementSateList;
         var builderState = this.builderState;
         var builder = this.querySelector(this.builderType);
-        // TODO: shouldn't do thi, persist builder state properly
-        var name = builderState.attributes.name = builder.getAttribute('name');
-        var stateFile = this.getStateFile(builderState, states);
-        var filePromise = this.getBuilderFile(builderState, states);
+        var name = 't-' + builder.getAttribute('name');
+        var stateFile, filePromise;
+
+        // TODO: shouldn't do this, persist builder state properly
+        builderState.attributes.name = name;
+        stateFile = this.getStateFile(builderState, states);
+        filePromise = this.getBuilderFile(builderState, states);
 
         return filePromise.then(function(contents) {
           return {
@@ -33033,8 +33038,6 @@ Polymer({
         setTimeout(function() {
           this.componentPanel.sections = sections;
         }.bind(this));
-
-        name === this.builderType ? $panelHeader.show() : $panelHeader.hide();
       },
 
       initComponentPanel: function(builderType, panel) {
@@ -33113,6 +33116,281 @@ Polymer({
   });
 
 </script>
+
+
+<dom-module id="iron-a11y-announcer" assetpath="../bower_components/iron-a11y-announcer/">
+  <style>
+    :host {
+      display: inline-block;
+      position: fixed;
+      clip: rect(0px,0px,0px,0px);
+    }
+  </style>
+
+  <template>
+    <div aria-live$="[[mode]]">[[_text]]</div>
+  </template>
+
+  <script>
+
+    (function() {
+      'use strict';
+
+      Polymer.IronA11yAnnouncer = Polymer({
+        is: 'iron-a11y-announcer',
+
+        properties: {
+
+          /**
+           * The value of mode is used to set the `aria-live` attribute
+           * for the element that will be announced. Valid values are: `off`,
+           * `polite` and `assertive`.
+           */
+          mode: {
+            type: String,
+            value: 'polite'
+          },
+
+          _text: {
+            type: String,
+            value: ''
+          }
+        },
+
+        created: function() {
+          if (!Polymer.IronA11yAnnouncer.instance) {
+            Polymer.IronA11yAnnouncer.instance = this;
+          }
+
+          document.body.addEventListener('iron-announce', this._onIronAnnounce.bind(this));
+        },
+
+        /**
+         * Cause a text string to be announced by screen readers.
+         *
+         * @param {string} text The text that should be announced.
+         */
+        announce: function(text) {
+          this._text = '';
+          this.async(function() {
+            this._text = text;
+          }, 100);
+        },
+
+        _onIronAnnounce: function(event) {
+          if (event.detail && event.detail.text) {
+            this.announce(event.detail.text);
+          }
+        }
+      });
+
+      Polymer.IronA11yAnnouncer.instance = null;
+
+      Polymer.IronA11yAnnouncer.requestAvailability = function() {
+        if (!Polymer.IronA11yAnnouncer.instance) {
+          Polymer.IronA11yAnnouncer.instance = document.createElement('iron-a11y-announcer');
+        }
+
+        document.body.appendChild(Polymer.IronA11yAnnouncer.instance);
+      };
+    })();
+
+  </script>
+</dom-module>
+
+
+<dom-module id="paper-toast" assetpath="../bower_components/paper-toast/">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: fixed;
+        background-color: var(--paper-toast-background-color, #323232);
+        color: var(--paper-toast-color, #f1f1f1);
+        min-height: 48px;
+        min-width: 288px;
+        padding: 16px 24px;
+        box-sizing: border-box;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        border-radius: 2px;
+        left: 0;
+        bottom: 0;
+        margin: 12px;
+        font-size: 14px;
+        cursor: default;
+        -webkit-transition: visibility 0.3s, -webkit-transform 0.3s, opacity 0.3s;
+        transition: visibility 0.3s, transform 0.3s, opacity 0.3s;
+        visibility: hidden;
+        opacity: 0;
+        -webkit-transform: translateY(100px);
+        transform: translateY(100px);
+        @apply(--paper-font-common-base);
+      }
+
+      :host(.capsule) {
+        border-radius: 24px;
+      }
+
+      :host(.fit-bottom) {
+        width: 100%;
+        min-width: 0;
+        border-radius: 0;
+        margin: 0;
+      }
+
+      :host(.paper-toast-open) {
+        visibility: visible;
+        opacity: 1;
+        -webkit-transform: translateY(0px);
+        transform: translateY(0px);
+      }
+    </style>
+
+    <span id="label">{{text}}</span>
+    <content></content>
+  </template>
+
+  <script>
+    (function() {
+      // Keeps track of the toast currently opened.
+      var currentToast = null;
+
+      Polymer({
+        is: 'paper-toast',
+
+        behaviors: [
+          Polymer.IronOverlayBehavior
+        ],
+
+        properties: {
+          /**
+           * The duration in milliseconds to show the toast.
+           * Set to `0`, a negative number, or `Infinity`, to disable the
+           * toast auto-closing.
+           */
+          duration: {
+            type: Number,
+            value: 3000
+          },
+
+          /**
+           * The text to display in the toast.
+           */
+          text: {
+            type: String,
+            value: ''
+          },
+
+          /**
+           * Overridden from `IronOverlayBehavior`.
+           * Set to false to enable closing of the toast by clicking outside it.
+           */
+          noCancelOnOutsideClick: {
+            type: Boolean,
+            value: true
+          },
+        },
+
+        /**
+         * Read-only. Deprecated. Use `opened` from `IronOverlayBehavior`.
+         * @property visible
+         * @deprecated
+         */
+        get visible() {
+          console.warn('`visible` is deprecated, use `opened` instead');
+          return this.opened;
+        },
+
+        /**
+         * Read-only. Can auto-close if duration is a positive finite number.
+         * @property _canAutoClose
+         */
+        get _canAutoClose() {
+          return this.duration > 0 && this.duration !== Infinity;
+        },
+
+        created: function() {
+          this._autoClose = null;
+          Polymer.IronA11yAnnouncer.requestAvailability();
+        },
+
+        /**
+         * Show the toast. Same as `open()` from `IronOverlayBehavior`.
+         */
+        show: function() {
+          this.open();
+        },
+
+        /**
+         * Hide the toast. Same as `close()` from `IronOverlayBehavior`.
+         */
+        hide: function() {
+          this.close();
+        },
+
+        /**
+         * Overridden from `IronOverlayBehavior`.
+         * Called when the value of `opened` changes.
+         */
+        _openedChanged: function() {
+          if (this._autoClose !== null) {
+            this.cancelAsync(this._autoClose);
+            this._autoClose = null;
+          }
+          if (this.opened) {
+            if (currentToast && currentToast !== this) {
+              currentToast.close();
+            }
+            currentToast = this;
+            this.fire('iron-announce', {
+              text: this.text
+            });
+            if (this._canAutoClose) {
+              this._autoClose = this.async(this.close, this.duration);
+            }
+          } else if (currentToast === this) {
+            currentToast = null;
+          }
+          Polymer.IronOverlayBehaviorImpl._openedChanged.apply(this, arguments);
+        },
+
+        /**
+         * Overridden from `IronOverlayBehavior`.
+         */
+        _renderOpened: function() {
+          this.classList.add('paper-toast-open');
+        },
+
+        /**
+         * Overridden from `IronOverlayBehavior`.
+         */
+        _renderClosed: function() {
+          this.classList.remove('paper-toast-open');
+        },
+
+        /**
+         * Overridden from `IronOverlayBehavior`.
+         * iron-fit-behavior will set the inline style position: static, which
+         * causes the toast to be rendered incorrectly when opened by default.
+         */
+        _onIronResize: function() {
+          Polymer.IronOverlayBehaviorImpl._onIronResize.apply(this, arguments);
+          if (this.opened) {
+            // Make sure there is no inline style for position.
+            this.style.position = '';
+          }
+        }
+
+        /**
+         * Fired when `paper-toast` is opened.
+         *
+         * @event 'iron-announce'
+         * @param {{text: string}} detail Contains text that will be announced.
+         */
+      });
+    })();
+  </script>
+</dom-module>
 <style is="custom-style">
   
 :root {
@@ -37742,12 +38020,12 @@ footer.layout{
 
 <style is="custom-style">
    #mainDrawerPanel ::content .component-list{
-    overflow: hidden; 
+    overflow: hidden;
     color:var(--header-text-color);
   }
    #propertyDrawerPanel ::content #drawer,
   #mainDrawerPanel ::content .component-list.active{
-    overflow-y: auto; 
+    overflow-y: auto;
   }
   #content-header{
     display: none;
@@ -37761,8 +38039,8 @@ footer.layout{
       border-left:1px solid #eee;
     };
   }
-  
-  
+
+
 
 </style>
 
@@ -37795,12 +38073,9 @@ footer.layout{
             <span class="top flex">
               <content select="header-toolbar"></content>
             </span>
-            <div class="login-section top">
-              <t-button link="" label="Sign out" noink=""></t-button>
-            </div>
         </paper-toolbar>
     </div>
-    <div>  
+    <div>
       <paper-drawer-panel drawer-toggle-attribute="item-toggle" on-paper-responsive-change="_changeToMobile" id="mainDrawerPanel">
         <div class="items-list" drawer="">
           <content select="nav-content"></content>
@@ -37814,7 +38089,7 @@ footer.layout{
               <paper-header-panel>
                 <div class="paper-header" id="content-header">
                   <div class="layout horizontal center">
-                    <div class="flex">  
+                    <div class="flex">
                       <content select="search-bar"></content>
                     </div>
                     <t-button label="Browse" item-toggle=""></t-button>
@@ -37825,21 +38100,21 @@ footer.layout{
                 </div>
               </paper-header-panel>
             </div>
-          </paper-drawer-panel>  
+          </paper-drawer-panel>
         </div>
       </paper-drawer-panel>
     </div>
-  </paper-header-panel> 
+  </paper-header-panel>
   </template>
 
 </dom-module>
 
   <script>
-      
+
     Polymer({
-      
+
       is: 't-scaffold-builder',
-      
+
       properties:{
             toggleLogin: {
                 type: Object,
@@ -44336,6 +44611,11 @@ function closure ( target, options ){
                 value: 'number',
                 observer: '_rangeTypeChanged'
             },
+
+            margin: {
+                type: Number,
+                value: 0 
+            }
         },
 
 
@@ -44345,12 +44625,12 @@ function closure ( target, options ){
             }
         },
 
-        formatValue: function (value) {
+        formatValue: function (value, type) {
             switch (this.rangeType) {
                 case 'date':
                     return this._formatDate(value);
-                case 'number':
-                    return parseInt(value);
+                case 'number':                    
+                    return parseInt(value);                    
             }
         },
 
@@ -44398,6 +44678,9 @@ function closure ( target, options ){
 
             var rangeElement = this;
 
+            this.min = parseInt(this.min);
+            this.max = Math.ceil(parseFloat(this.max));
+
             this.from = this.min;
             this.to = this.max;
 
@@ -44408,9 +44691,10 @@ function closure ( target, options ){
                 start: [this.min, this.max],
                 connect: true,
                 tooltips: true,
+                margin: this.margin,
                 range: {
-                    'min': parseInt(this.min),
-                    'max': parseInt(this.max)
+                    'min': this.min,  
+                    'max': this.max  
                 }
             }, true);
 
