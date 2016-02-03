@@ -6,7 +6,7 @@
   // and give it some initial binding values
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
   var app = document.querySelector('#app');
-  var pathname = window.location.pathname.replace('/fusion', '');
+  var pathname = window.location.pathname.replace('/create', '');
 
   // Sets app default base URL
   app.baseUrl = '';
@@ -14,7 +14,7 @@
 
 
   if (window.location.port === '') {
-    app.baseUrl = '/fusion';
+    app.baseUrl = '/create';
   }
 
   if (pathname === '/page') {
