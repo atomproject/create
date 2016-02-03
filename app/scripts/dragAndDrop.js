@@ -78,6 +78,10 @@ var dragAndDropSetup = function () {
     $('.component-list').toggleClass('active');
   });
 
+  $('t-stage').on('builder-name-changed', function(ev) {
+    $('.headerText').text(ev.originalEvent.detail);
+  });
+
   $('.headerText').on('keydown', function (e) {
     if (e.which === 13) {
       $(this).blur();
