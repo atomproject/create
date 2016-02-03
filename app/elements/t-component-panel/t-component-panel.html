@@ -294,6 +294,10 @@ Polymer({
         var key = e.target.getAttribute("data-key");
         var value = e.target.value;
 
+        if (attribute = e.model.get('attribute')) {
+          attribute.value = value;
+        }
+
         this.fire('path-changed', {path: key, value: value});
     },
 

@@ -44,6 +44,10 @@
     return elements;
   };
 
+  app._getIcon = function(icon) {
+    return 'fusion:' + (icon || 'Button');
+  }
+
   app._getPropertySource = function(builderType){
     return 'bower_components/'+app.builderType+'/property.json';
   };

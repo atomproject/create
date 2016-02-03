@@ -97,11 +97,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <nav-content class="layout vertical fit">
               <!-- TODO: why are there two elements with same id `componentSearch` -->
               <t-autosuggest id="componentSearch" token-param="DisplayName" data-url="forms/demo/api/Component/find" label="Quick add" no-label-float></t-autosuggest>
-              <div class="component-list flex">
+              <div class="component-list flex active">
                 <paper-item class="horizontal layout">
                   <div class="flex">Elements</div>
                 </paper-item>
-                <paper-item on-click="toggleAccordion" class="menu-item horizontal layout">
+                <paper-item on-click="toggleAccordion" class="menu-item horizontal layout active">
                   <div class="flex">All Elements</div>
                   <iron-icon icon="icons:chevron-right"></iron-icon>
                 </paper-item>
@@ -109,7 +109,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   <template is="dom-repeat" items="[[menu.categories]]" as="category">
                     <template is="dom-repeat" items="[[_getElementsInCategory(category)]]" as="component">
                       <div class="component-link item" data-component$="[[component.name]]">
-                        <t-button tabindex="0" data-component$="[[component.name]]" data-category$="[[category.name]]" ico="fusion:[[component.icon]]" icon-left class="control" label="[[component.displayName]]"></t-button>
+                        <t-button tabindex="0" data-component$="[[component.name]]" data-category$="[[category.name]]" ico="{{_getIcon(component.icon)}}" icon-left class="control" label="[[component.displayName]]"></t-button>
                       </div>
                     </template>
                   </template>
@@ -142,8 +142,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <nav-list>
               <div class="layout horizontal property-panel-Header">
                 <input type="file" id="uploadInput" style="display: none;">
-                <t-button label="Upload" id="upload" class="flex"></t-button>
-                <t-button label="Download" id="download" class="flex"></t-button>
+                <t-button label="" id="upload" class="flex" ico="icons:cloud-upload"></t-button>
+                <t-button label="" id="download" class="flex" ico="icons:cloud-download"></t-button>
               </div>
               <t-component-panel></t-component-panel>
             </nav-list>
