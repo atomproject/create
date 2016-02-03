@@ -87,10 +87,8 @@
   // See https://github.com/Polymer/polymer/issues/1381
   window.addEventListener('WebComponentsReady', function() {
     var panel = $('t-component-panel')[0];
-    var header = $('.property-panel-Header')[0];
     var stage = $('t-stage')[0];
 
     stage.componentPanel = panel;
-    stage.componentPanelHeader = header;
   });
 })(document);

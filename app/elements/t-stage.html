@@ -90,7 +90,6 @@
       },
 
       draggedPosX: null,
-      componentPanelHeader: null,
       builderState: null,
 
       isPage: function(builderType) {
@@ -626,11 +625,10 @@
         var type = this.builderType;
 
         this.componentPanelTarget = this.querySelector(type);
-        this.showComponentPanel(type, this.metadata[type].property.properties);
+        this.showComponentPanel(type, this.builderState.property.properties);
       },
 
       showComponentPanel: function(name, properties) {
-        var $panelHeader = $(this.componentPanelHeader);
         var sections = this.componentPanel.getSections(properties);
 
         // something wierd is happening here, you have to reset the
