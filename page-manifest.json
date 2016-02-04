@@ -29,6 +29,11 @@
         "icon": "Map",
         "displayName": "Tabs"
     }, {
+        "name": "t-section-header",
+        "category": "form",
+        "icon": "Section_Header",
+        "displayName": "Section Header"
+    }, {
         "name": "t-google-youtube",
         "category": "page",
         "icon": "Video",

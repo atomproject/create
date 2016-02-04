@@ -90,7 +90,6 @@
       },
 
       draggedPosX: null,
-      componentPanelHeader: null,
       builderState: null,
 
       isPage: function(builderType) {
@@ -571,6 +570,21 @@
           builder.set(key, value);
         }.bind(this));
 
+        // show the the component panel for builder
+        this.showComponentPanel(name, stateFile.property.properties);
+
+        // this needs to be called whenever the content inside t-form changes
+        if (this.builderType === 't-form') {
+          setTimeout(function() {
+            this.querySelector(this.builderType).setFields();
+          }.bind(this), 0)
+        }
+
+        // emit event to show header text
+        if (attributes.heading) {
+          this.fire('builder-name-changed', attributes.heading);
+        }
+
         // re-create elements in the builder
         stateFile.rows.forEach(function(row, posX) {
           fieldContainer = this.getWrapper();
@@ -626,11 +640,10 @@
         var type = this.builderType;
 
         this.componentPanelTarget = this.querySelector(type);
-        this.showComponentPanel(type, this.metadata[type].property.properties);
+        this.showComponentPanel(type, this.builderState.property.properties);
       },
 
       showComponentPanel: function(name, properties) {
-        var $panelHeader = $(this.componentPanelHeader);
         var sections = this.componentPanel.getSections(properties);
 
         // something wierd is happening here, you have to reset the

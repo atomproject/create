@@ -262,7 +262,7 @@ Polymer({
     },
 
     _radioValueChanged: function(e) {
-        var key, value, index;
+        var key, value, index, attribute;
 
         if (e.target.selectedItem != null) {
             key = e.target.getAttribute("data-key");
@@ -273,6 +273,10 @@ Polymer({
                 value = e.model.get('attribute.values')[index];
             } else {
                 value = index;
+            }
+
+            if (attribute = e.model.get('attribute')) {
+              attribute.value = value;
             }
 
             this.fire('path-changed', {path: key, value: value});
@@ -290,6 +294,10 @@ Polymer({
         var key = e.target.getAttribute("data-key");
         var value = e.target.value;
 
+        if (attribute = e.model.get('attribute')) {
+          attribute.value = value;
+        }
+
         this.fire('path-changed', {path: key, value: value});
     },
 
@@ -303,18 +311,15 @@ Polymer({
     dataChanged: function(change) {
         var path = change.target.dataKey;
         var value = change.target.data;
+        var attribute;
 
         value = value.map(function(item) {
             return item.value;
         });
 
-        this.sections.forEach(function(section) {
-          section.attributes.forEach(function(attribute) {
-            if (attribute.key === path) {
-              attribute.value = value;
-            }
-          });
-        });
+        if (attribute = change.model.get('attribute')) {
+          attribute.value = value;
+        }
 
         this.fire('path-changed', {path: path, value: value});
     },

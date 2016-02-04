@@ -278,6 +278,27 @@
         },
         "innerHTML": ""
     },
+    "t-section-header": {
+        "attributes": {
+            "label": "Some header"
+        },
+        "property": {
+            "name": "Section Header",
+            "properties": [
+                {
+                    "name": "Data",
+                    "fields": {
+                        "label": {
+                            "name": "Label",
+                            "type": "string",
+                            "value": "New Section"
+                        }
+                    }
+                }
+            ]
+        },
+        "innerHTML": ""
+    },
     "t-google-youtube": {
         "attributes": {
             "height": "400px",

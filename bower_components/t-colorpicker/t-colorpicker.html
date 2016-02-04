@@ -6,7 +6,7 @@
 <link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="../paper-material/paper-material.html">
 `t-colorpicker` is a polymer component which lets the user choose a color. The color picker is built on top of spectrum.js
- 
+
  Follow this url for further assitance http://github.com/bgrins/spectrum
   Note:Show Input and Initial
   If you specify both the showInput and showInitial options, the CSS keeps things in order by wrapping the buttons to the bottom row, and shrinking the input. Note: this is all customizable via CSS.
@@ -36,7 +36,7 @@ Example:
     is: 't-colorpicker',
 
     properties: {
-    
+
     /**
      * Name property
     */
@@ -45,7 +45,7 @@ Example:
       value: '',
       reflectToAttribute: true
     },
-    
+
       /**
       *label:  Text
       */
@@ -63,7 +63,7 @@ Example:
         reflectToAttribute:true,
         value:false
       },
-    
+
       /**
        * The initial color will be set with the color option. If you don't pass in a color, Spectrum will use the value attribute on the input.
   The color parsing is based on the TinyColor plugin. This should parse any color string you throw at it.
@@ -71,6 +71,7 @@ Example:
       color: {
         type:String,
         value:'#000000',
+        notify: true,
         observer:'_hasColor'
       },
 
@@ -88,7 +89,7 @@ Example:
        */
       showInput: {
         type:Boolean,
-        value:true  
+        value:true
       },
 
 
@@ -97,7 +98,7 @@ Example:
        */
       showInitial: {
         type:Boolean,
-        value:true  
+        value:true
       },
 
 
@@ -253,7 +254,7 @@ Example:
 
       /**
        * You can set the format that is displayed in the text box. This will also change the format that is displayed in the titles from the palette swatches.
-       "hex","hex3","hsl","rgb","name", and none 
+       "hex","hex3","hsl","rgb","name", and none
        */
       preferredFormat: {
         type:String,
@@ -311,7 +312,7 @@ Example:
       }
       this._initiate();
     },
-    //to initiate the color picker...    
+    //to initiate the color picker...
     _initiate: function(){
 
       var component = this;
@@ -366,7 +367,7 @@ Example:
 
           change: function(color) {
               //this.fire('color-selected');
-              
+
           },
 
           move: function(color) {
@@ -380,7 +381,7 @@ Example:
               $('#label').hide();
             }*/
           }
-          
+
       };
       //console.log($(this.$.color))
       $(this.$.color).spectrum(pickerSettings)
@@ -421,7 +422,7 @@ Example:
     /**
      * Function to validate if the date is selected
      */
-     
+
     validate:function(){
       return true;
     }
