@@ -20,29 +20,30 @@
         <t-input label="test" heading="test" required></t-input>
         <t-calendar label="test" heading="test" required></t-calendar>
                 <t-dropdown required label="Select one">
-              
+
               <paper-item>This is first</paper-item>
               <paper-item>Second</paper-item>
               <paper-item>Third</paper-item>
               <paper-item>Fourth</paper-item>
 
-            </t-dropdown>   
-    </t-form>   
+            </t-dropdown>
+    </t-form>
 -->
 <dom-module id="t-form">
     <style is="custom-style">
     :host {
         padding: 15px 0;
     }
-    
+
     :host ::content #submit {
         margin: 10px 0;
     }
-    
+
     #actionContainer{
         position: relative;
+        flex: 0 0 auto;
     }
-    
+
     #actionContainer #loader{
         position: absolute;
         width:100%;
@@ -61,7 +62,7 @@
        /* padding: 5px; Commented to fix air app */
         margin-left: 0;
     }
-    /* 
+    /*
     :host([error-block]) ::content .error {
         display: none!important;
     } */
@@ -323,7 +324,7 @@ Polymer({
                 this.$.submit.classList.remove('flex');
                 this.$.actionContainer.classList.add('justified');
                 break;
-            
+
             case 'Center':
                 this.$.submit.classList.remove('flex');
                 this.$.actionContainer.classList.add('center-justified');

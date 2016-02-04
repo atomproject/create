@@ -31874,15 +31874,16 @@ Polymer({
     :host {
         padding: 15px 0;
     }
-    
+
     :host ::content #submit {
         margin: 10px 0;
     }
-    
+
     #actionContainer{
         position: relative;
+        flex: 0 0 auto;
     }
-    
+
     #actionContainer #loader{
         position: absolute;
         width:100%;
@@ -31901,7 +31902,7 @@ Polymer({
        /* padding: 5px; Commented to fix air app */
         margin-left: 0;
     }
-    /* 
+    /*
     :host([error-block]) ::content .error {
         display: none!important;
     } */
@@ -32163,7 +32164,7 @@ Polymer({
                 this.$.submit.classList.remove('flex');
                 this.$.actionContainer.classList.add('justified');
                 break;
-            
+
             case 'Center':
                 this.$.submit.classList.remove('flex');
                 this.$.actionContainer.classList.add('center-justified');
