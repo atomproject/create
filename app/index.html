@@ -112,7 +112,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <div class="element-group">
                   <template is="dom-repeat" items="{{menu.elements}}" as="component" filter="{{filterComponents(searchTerm)}}">
                     <div class="component-link item" data-component$="[[component.name]]">
-                      <t-button tabindex="0" data-component$="[[component.name]]" data-category$="[[category.name]]" ico="{{_getIcon(component.icon)}}" icon-left class="control" label="[[component.displayName]]"></t-button>
+                      <t-button tabindex="0" icon-left class="control"
+                        label="[[component.displayName]]"
+                        data-component$="[[component.name]]"
+                        data-category$="{{component.category}}"
+                        ico="{{_getIcon(component.icon)}}">
+                      </t-button>
                     </div>
                   </template>
                 </div>
@@ -124,7 +129,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   <div class="element-group">
                     <template is="dom-repeat" items="[[_getElementsInCategory(category)]]" as="component" filter="{{filterComponents(searchTerm, category.name)}}">
                       <div class="component-link item" data-component$="[[component.name]]">
-                        <t-button tabindex="0" data-component$="[[component.name]]" data-category$="[[category.name]]" ico="fusion:[[component.icon]]" icon-left class="control" label="[[component.displayName]]"></t-button>
+                        <t-button tabindex="0" icon-left class="control"
+                          data-component$="[[component.name]]"
+                          data-category$="[[category.name]]"
+                          ico="fusion:[[component.icon]]"
+                          label="[[component.displayName]]">
+                        </t-button>
                       </div>
                     </template>
                   </div>
