@@ -45,7 +45,7 @@
   };
 
   app._getIcon = function(icon) {
-    return 'fusion:' + (icon || 'Button');
+    return icon ? 'fusion:' + icon : 'fusion-b:atom-logo';
   }
 
   app._getPropertySource = function(builderType){
