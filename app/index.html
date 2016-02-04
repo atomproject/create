@@ -48,6 +48,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script src="scripts/jquery.nestedSortable.js"></script>
   <script src="scripts/jszip.min.js"></script>
   <script src="scripts/file-saver.js"></script>
+  <script src="scripts/blob.js"></script>
   <script src="scripts/lodash.custom.js"></script>
   <!-- endbuild -->
 
@@ -83,6 +84,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     .component-list paper-item {
       font-family: var(--primary-font-family);
+    }
+
+    .property-panel-Header paper-icon-button[icon] {
+      color: var(--default-primary-color);
     }
   </style>
 </head>
@@ -140,10 +145,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </div>
             </header-toolbar>
             <nav-list>
-              <div class="layout horizontal property-panel-Header">
+              <div class="layout horizontal center around-justified property-panel-Header">
                 <input type="file" id="uploadInput" style="display: none;">
-                <t-button label="" id="upload" class="flex" ico="icons:cloud-upload"></t-button>
-                <t-button label="" id="download" class="flex" ico="icons:cloud-download"></t-button>
+                <paper-icon-button icon="fusion-a:upload" id="uploadJson"></paper-icon-button>
+                <paper-menu-button>
+                  <paper-icon-button icon="fusion-a:download" class="dropdown-trigger"></paper-icon-button>
+                  <paper-menu class="dropdown-content">
+                    <paper-item id="downloadJson">JSON</paper-item>
+                    <paper-item id="downloadZip">ZIP</paper-item>
+                  </paper-menu>
+                </paper-menu-button>
               </div>
               <t-component-panel></t-component-panel>
             </nav-list>

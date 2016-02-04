@@ -75,7 +75,9 @@
     "t-google-map": "atomelements/t-google-map#master",
     "t-list": "atomelements/t-list#master",
     "t-error-block": "atomelements/t-error-block#master",
-    "paper-toast": "PolymerElements/paper-toast#~1.1.3"
+    "paper-toast": "PolymerElements/paper-toast#~1.1.3",
+    "iron-iconset-svg": "polymerElements/iron-iconset-svg#~1.0.9",
+    "paper-menu-button": "polymerElements/paper-menu-button#~1.0.4"
   },
   "resolutions": {
     "paper-dialog-scrollable": "1.0.1",
@@ -95,9 +97,6 @@
     "t-checkbox": "master",
     "t-colorpicker": "master",
     "t-slider": "master",
-    "t-autosuggest": "master",
-    "t-dropdown": "master",
-    "t-radio-group": "master",
     "iron-ajax": "~1.1.1",
     "paper-icon-button": "~1.0.6",
     "paper-button": "1.0.3",
@@ -107,7 +106,7 @@
     "t-notify": "master",
     "t-checkbox-group": "master",
     "t-range": "master",
-    "t-error-block": "master",
-    "t-loader": "master"
+    "t-loader": "master",
+    "iron-iconset-svg": "~1.0.9"
   }
 }

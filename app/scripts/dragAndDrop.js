@@ -10,7 +10,7 @@ var dragAndDropSetup = function () {
   });
 
   // trigger the click on the input element with `type="file"`
-  $('#upload').on('click', function () {
+  $('#uploadJson').on('click', function () {
     document.querySelector('#uploadInput').click();
   });
 
@@ -44,7 +44,7 @@ var dragAndDropSetup = function () {
   });
 
   // create the zip file and and download it
-  $('#download').on('click', function () {
+  $('#downloadZip').on('click', function () {
     var zip = new JSZip();
     var stage = document.querySelector('t-stage');
 
@@ -62,6 +62,19 @@ var dragAndDropSetup = function () {
         content = zip.generate({ type: 'blob' });
         saveAs(content, files.name.replace('.html', '.zip'));
       });
+  });
+
+  $('#downloadJson').on('click', function () {
+    var stage = document.querySelector('t-stage');
+    var stateFile, content;
+
+    if (!stage) {
+      return;
+    }
+
+    stateFile = stage.getStateFile(stage.builderState, stage._elementSateList);
+    content = new Blob([stateFile], {type: "text/plain;charset=utf-8"});
+    saveAs(content, "state.json");
   });
 
   // append form elements to form on click
