@@ -319,7 +319,9 @@ t-stage h2.drag-text {
 
 
 /*Start fix*/
-
+.headerToolbar {
+    width: 100%;
+}
 .headerText {
     display: inline;
     font-weight: 100;
@@ -330,7 +332,6 @@ t-stage h2.drag-text {
     white-space: nowrap;
     overflow: hidden;
     min-width: 100px;
-    max-width: 80vw;
 }
 
 .headerText.inactive {
