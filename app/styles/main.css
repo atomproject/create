@@ -478,3 +478,20 @@ section[data-route="browser"] .bottom {
     }
 }
 /* css from t-scaffold-fusion element */
+
+#componentSearch input {
+  border: 0;
+  border-bottom: 1px solid #eee;
+}
+
+input[type="search"] {
+  font-size: 16px;
+  padding: 12px;
+  box-sizing: content-box;
+  border: 0;
+  border: 1px solid #eee;
+  font-family: inherit;
+  color: #777777;
+  outline: none;
+  width: calc(100% - 25px);
+}

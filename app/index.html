@@ -100,8 +100,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <section data-route="canvas" style="height:100%">
           <t-scaffold scaffold-type="builder" style="height:100%">
             <nav-content class="layout vertical fit">
-              <!-- TODO: why are there two elements with same id `componentSearch` -->
-              <t-autosuggest id="componentSearch" token-param="DisplayName" data-url="forms/demo/api/Component/find" label="Quick add" no-label-float></t-autosuggest>
+              <input type="search" value="{{searchTerm::input}}" placeholder="Quick Add">
               <div class="component-list flex active">
                 <paper-item class="horizontal layout">
                   <div class="flex">Elements</div>
@@ -111,21 +110,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   <iron-icon icon="icons:chevron-right"></iron-icon>
                 </paper-item>
                 <div class="element-group">
-                  <template is="dom-repeat" items="[[menu.categories]]" as="category">
-                    <template is="dom-repeat" items="[[_getElementsInCategory(category)]]" as="component">
-                      <div class="component-link item" data-component$="[[component.name]]">
-                        <t-button tabindex="0" data-component$="[[component.name]]" data-category$="[[category.name]]" ico="{{_getIcon(component.icon)}}" icon-left class="control" label="[[component.displayName]]"></t-button>
-                      </div>
-                    </template>
+                  <template is="dom-repeat" items="{{menu.elements}}" as="component" filter="{{filterComponents(searchTerm)}}">
+                    <div class="component-link item" data-component$="[[component.name]]">
+                      <t-button tabindex="0" data-component$="[[component.name]]" data-category$="[[category.name]]" ico="{{_getIcon(component.icon)}}" icon-left class="control" label="[[component.displayName]]"></t-button>
+                    </div>
                   </template>
                 </div>
                 <template is="dom-repeat" items="[[menu.categories]]" as="category">
-                  <paper-item on-click="toggleAccordion" class="menu-item horizontal layout">
+                  <paper-item on-click="toggleAccordion" class="menu-item horizontal layout" data-category="{{category.name}}">
                     <div class="flex">[[category.displayName]]</div>
                     <iron-icon icon="icons:chevron-right"></iron-icon>
                   </paper-item>
                   <div class="element-group">
-                    <template is="dom-repeat" items="[[_getElementsInCategory(category)]]" as="component">
+                    <template is="dom-repeat" items="[[_getElementsInCategory(category)]]" as="component" filter="{{filterComponents(searchTerm, category.name)}}">
                       <div class="component-link item" data-component$="[[component.name]]">
                         <t-button tabindex="0" data-component$="[[component.name]]" data-category$="[[category.name]]" ico="fusion:[[component.icon]]" icon-left class="control" label="[[component.displayName]]"></t-button>
                       </div>
@@ -135,7 +132,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </div>
             </nav-content>
             <search-bar>
-              <t-autosuggest id="componentSearch" token-param="DisplayName" data-url="forms/demo/api/Component/find" label="Quick add" no-label-float></t-autosuggest>
+              <input type="search" value="{{searchTerm::input}}" placeholder="Quick Add">
             </search-bar>
             <header-toolbar class="headerToolbar">
               <div class="layout horizontal center top">

@@ -53,6 +53,29 @@
     return elements;
   };
 
+  app.filterComponents = function(searchTerm, category) {
+    var filtered;
+
+    if (!searchTerm) {
+      return null;
+    }
+
+    if (!category) {
+      filtered = app.menu.elements;
+    } else {
+      filtered = app.menu.elements.filter(function(el) {
+        return el.category === category;
+      });
+    }
+
+    searchTerm = searchTerm.toLowerCase();
+
+    return function(el) {
+      var name = el.name.toLowerCase();
+      return el.name.indexOf(searchTerm) !== -1;
+    };
+  };
+
   app._getIcon = function(icon) {
     return icon ? 'fusion:' + icon : 'fusion-b:atom-logo';
   }
