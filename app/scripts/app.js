@@ -71,8 +71,8 @@
     searchTerm = searchTerm.toLowerCase();
 
     return function(el) {
-      var name = el.name.toLowerCase();
-      return el.name.indexOf(searchTerm) !== -1;
+      var name = el.displayName.toLowerCase();
+      return name.indexOf(searchTerm) !== -1;
     };
   };
 
