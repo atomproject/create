@@ -135,7 +135,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <t-button tabindex="0" icon-left class="control"
                           data-component$="[[component.name]]"
                           data-category$="[[category.name]]"
-                          ico="fusion:[[component.icon]]"
+                          ico="{{_getIcon(component.icon)}}"
                           label="[[component.displayName]]">
                         </t-button>
                       </div>
@@ -173,7 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <iron-ajax url="[[builderUrl]]" content-type="application/json" handle-as="json" id="manifestAjax" on-response="_onElementsReceived"></iron-ajax>
         </section>
         <section data-route="browser" style="height:100%">
-          <paper-header-panel class="list-panel" main>
+          <paper-header-panel class="list-panel" main mode="seamed">
             <div class="paper-header">
               <paper-toolbar bottom-justify="center" class="header-bar">
                 <span class="top flex">

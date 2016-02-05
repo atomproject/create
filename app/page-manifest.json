@@ -26,7 +26,6 @@
     }, {
         "name": "t-tabs",
         "category": "page",
-        "icon": "Map",
         "displayName": "Tabs"
     }, {
         "name": "t-section-header",

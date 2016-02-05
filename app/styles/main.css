@@ -490,8 +490,13 @@ input[type="search"] {
   box-sizing: content-box;
   border: 0;
   border: 1px solid #eee;
+  border-top: 0;
   font-family: inherit;
   color: #777777;
   outline: none;
   width: calc(100% - 25px);
+}
+
+search-bar input[type="search"] {
+  border-bottom: 0;
 }
