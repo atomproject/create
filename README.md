@@ -1,84 +1,82 @@
-## Polymer Starter Kit
+## Hosting your own version
 
-This project is forked from [Polymer Starter Kit](https://github.com/PolymerElements/polymer-starter-kit).
+If you want to host or run the builders with your own set of elements then you
+should follow below steps.
 
+1. Fork the project (only necessary if you want to host your own public version)
+2. Clone the project (clone the forked project if you have a fork)
+3. Follow the [installation][2] and [development workflow][3] related steps
 
-## Install dependencies
+### Adding Elements
 
-#### Quick-start (for experienced users)
+Once you have a working development environment setup you are ready to add
+new elements to the builder. Follow the below steps to add new elements.
 
-With Node.js installed, run the following one liner from the root of your Polymer Starter Kit download:
+#### Requirements
+Before you proceed with any of the below steps you should make sure that your element
+satisfies following conditions.
+For more information on the element structure read this [document][5].
 
-```sh
-npm install -g gulp bower && npm install && bower install
-```
+1. `property.json`: Used to build the property panel. More [here][4]
+2. `demo/index.html`: Used for grabbing the code added when you drag an element in the canvas. More [here][6]
+3. The element should actually contain a _component file by its name_.
 
-#### Prerequisites (for everyone)
+#### Installation
+Install the element using `bower`. For example `bower install --save AtomElements/t-button`.
+Read the bower [docs][1] for more options on installing packages and dependencies.
 
-The full starter kit requires the following major dependencies:
+#### Import
+Once you install the element you have to import it in the application.
+Importing is done by adding a `link ` tag in `app/elements.html` file.
+Have a look at other imports in the file for an example.
 
-- Node.js, used to run JavaScript tools from the command line.
-- npm, the node package manager, installed with Node.js and used to install Node.js packages.
-- gulp, a Node.js-based build tool.
-- bower, a Node.js-based package manager used to install front-end packages (like Polymer).
+#### Metadata
+You will also have to add an entry for the new element in either `form-manifetst.json` or `page-manifest.json` files located in `app` folder.
+These files are used to generate the navigation panel you see in a builder on left hand side.
+The files are of `json` format and you have to add a new object in `elements` array per new element added, you can also
+add a new category. You will notice properties like `displayName`, `icon`, `name` etc in the file, following is a
+description of each allowed property and its meaning.
 
-**To install dependencies:**
+1. `displayName` (required): The name that will be displayed for an element in the navigation panel
+2. `icon` (optional): Icon to be shown for the element (we don't currently support custom icons, [available icons][7])
+3. `category` (required): The element will be categorized under this category
+4.: `name`: (required): This should be the name of the element
 
-1)  Check your Node.js version.
-
-```sh
-node --version
-```
-
-The version should be at or above 0.12.x.
-
-2)  If you don't have Node.js installed, or you have a lower version, go to [nodejs.org](https://nodejs.org) and click on the big green Install button.
-
-3)  Install `gulp` and `bower` globally.
-
-```sh
-npm install -g gulp bower
-```
-
-This lets you run `gulp` and `bower` from the command line.
-
-4)  Install the starter kit's local `npm` and `bower` dependencies.
-
-```sh
-cd polymer-starter-kit && npm install && bower install
-```
-
-This installs the element sets (Paper, Iron, Platinum) and tools the starter kit requires to build and serve apps.
-
-## Development workflow
-
-#### Serve / watch
-
-```sh
-gulp serve
-```
-
-This outputs an IP address you can use to locally test and another that can be used on devices connected to your network.
-
-#### Build & Vulcanize
-
-```sh
-gulp
-```
-
-Build and optimize the current project, ready for deployment. This includes linting as well as vulcanization, image, script, stylesheet and HTML optimization and minification.
+#### Deploy
+The task bundled in this project only supports deploying to [gh-pages][8]. You also need to have
+forked this project. To deploy simply run `gulp build-deploy-gh-pages`. Once the task
+completes successfully you should be able to see your own version at `http://<your_user_name>.github.io/create/`.
 
 
-##  Hosting your own version
+#### List of supported icons
 
-If you want to work on this project or host your own version with different set
-of elements then you should fork this project. If you want to work the project
-the all you need to do is clone the forked project and follow the installation
-and development workflow related notes above. If you want to host your own
-version of the project then you should follow the below steps.
+* Autosuggest
+* Button
+* Calendar
+* Checkbox
+* Color_Palette
+* download
+* Dropdown
+* Flight
+* Image
+* Image_Gallery
+* Input_Field
+* Loader
+* map
+* Map
+* Progress_bar
+* Radio_List
+* Scaffold
+* Section_Header
+* Slider
+* Table
+* upload
+* Video
 
-1. Install and save the component you want to add using `bower`
-2. Add the new component to `form-manifest.json` or `page-manifest.json` wherever appropriate.
-
-And that's it your component should be displayed in the navigation panel
-of either of the builders.
+[1]: https://github.com/bower/bower#installing-packages-and-dependencies
+[2]: https://github.com/PolymerElements/polymer-starter-kit#install-dependencies
+[3]: https://github.com/PolymerElements/polymer-starter-kit#development-workflow
+[4]: https://github.com/atomproject/docs/blob/master/how-property-panel-works.md
+[5]: https://github.com/atomproject/docs/blob/master/creating-an-element.md
+[6]: demo_index
+[7]: /list-of-supported-icons/
