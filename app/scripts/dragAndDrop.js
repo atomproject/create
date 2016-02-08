@@ -43,6 +43,7 @@ var dragAndDropSetup = function () {
     reader.readAsText(stateFile);
   });
 
+
   // create the zip file and and download it
   $('#downloadZip').on('click', function () {
     var zip = new JSZip();
@@ -75,6 +76,12 @@ var dragAndDropSetup = function () {
     stateFile = stage.getStateFile(stage.builderState, stage._elementSateList);
     content = new Blob([stateFile], {type: "text/plain;charset=utf-8"});
     saveAs(content, "state.json");
+  });
+
+  $('#panelSettings').on('click', function() {
+    var stage = document.querySelector('t-stage');
+
+    stage.showPanelForBuilder();
   });
 
   // append form elements to form on click

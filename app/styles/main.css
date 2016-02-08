@@ -282,14 +282,20 @@ div.content {
 
 div.property-panel-Header {
     border-bottom: 1px solid #eee;
+    padding: 5px;
 }
 
-div.property-panel-Header t-button:first-child {
-    border-right: 1px solid #eee;
+div.property-panel-Header paper-menu-button {
+  padding: 0;
 }
 
-div.property-panel-Header t-button {
-    color: #07c5f2;
+div.property-panel-Header paper-menu-button,
+div.property-panel-Header paper-icon-button {
+  flex: 0 0 auto;
+}
+
+.settings-separator  {
+  flex: 1 1 auto;
 }
 
 t-stage h2.drag-text {
