@@ -406,6 +406,7 @@
         setTimeout(function() {
           fieldContainer.remove();
         });
+        this.showPanelForBuilder();
         console.log(this._elementSateList);
       },
 
@@ -619,13 +620,20 @@
       /* section: component panel */
       showPanelForElement: function(el) {
         var name = el.getAttribute('data-name');
-        var category = el.getAttribute('data-category');
-        var pos = this.getElementPosition(el);
-        var state = this._elementSateList.find(function(item) {
+        var pos, state, target;
+
+        target = el.querySelector(name);
+
+        if (target === this.componentPanelTarget) {
+          return;
+        }
+
+        pos = this.getElementPosition(el);
+        state = this._elementSateList.find(function(item) {
           return item.posX === pos.x && item.posY === pos.y;
         });
 
-        this.componentPanelTarget = el.querySelector(name);
+        this.componentPanelTarget = target;
         this.showComponentPanel(name, state.property.properties);
       },
 
@@ -638,8 +646,13 @@
 
       showPanelForBuilder: function() {
         var type = this.builderType;
+        var builder = this.querySelector(type);
 
-        this.componentPanelTarget = this.querySelector(type);
+        if (builder === this.componentPanelTarget) {
+          return;
+        }
+
+        this.componentPanelTarget = builder;
         this.showComponentPanel(type, this.builderState.property.properties);
       },
 
@@ -659,8 +672,6 @@
       initComponentPanel: function(builderType, panel) {
         setTimeout(function() {
           var builder = this.querySelector(builderType);
-
-          this.componentPanelTarget = builder;
 
           if (!this.builderState) {
             this.builderState = this.getNewElementState(builderType);
