@@ -79,4 +79,4 @@ completes successfully you should be able to see your own version at `http://<yo
 [4]: https://github.com/atomproject/docs/blob/master/how-property-panel-works.md
 [5]: https://github.com/atomproject/docs/blob/master/creating-an-element.md
 [6]: demo_index
-[7]: /list-of-supported-icons/
+[7]: #list-of-supported-icons
