@@ -25,7 +25,7 @@
     },
 
     serializeAttributes: function(attrValuePairs) {
-      attributes = Object.keys(attrValuePairs || {});
+      var attributes = Object.keys(attrValuePairs || {});
 
       return attributes.map(function(attr) {
         var attrVal = attrValuePairs[attr];
@@ -78,5 +78,5 @@
       //better than `typeof`
       return toString.call(value) === '[object Boolean]';
     },
-  }
+  };
 </script>

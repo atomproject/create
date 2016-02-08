@@ -2,9 +2,7 @@
 
 // TODO: extract innerHTML also
 
-let path = require('path');
 let read = require('fs').readFileSync;
-let write = require('fs').writeFileSync;
 let cheerio = require('cheerio');
 let through = require('through2');
 let PluginError = require('gulp-util').PluginError;
@@ -48,7 +46,7 @@ module.exports = function() {
       });
 
       [{name: 't-form'}, {name: 't-page'}].forEach(function(builder) {
-        let name = builder.name
+        let name = builder.name;
         let propertyFilePath = `bower_components/${name}/property.json`;
         let property = JSON.parse(read(propertyFilePath, 'utf-8'));
 

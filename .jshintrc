@@ -12,7 +12,8 @@
     "quotmark": "single",
     "undef": true,
     "unused": true,
-    "newcap": false,
+    "esnext": true,
+    "maxlen": 80,
     "globals": {
         "$": false,
         "wrap": true,
@@ -20,6 +21,10 @@
         "Polymer": true,
         "Platform": true,
         "page": true,
-        "app": true
+        "app": true,
+        "_": true,
+        "Promise": true,
+        "saveAs": true,
+        "JSZip": true
     }
 }

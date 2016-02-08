@@ -22,10 +22,10 @@
     app.isPage = true;
     app.builderUrl = 'page-manifest.json';
     app.canvasName = 'Untitled Page';
-    app.tab="page";
+    app.tab='page';
     app.route ='canvas';
 
-    window.onbeforeunload = function(e) {
+    window.onbeforeunload = function() {
       return 'Please make sure that you have downloaded your page';
     };
   } else if (pathname === '/form') {
@@ -33,15 +33,15 @@
     app.isPage = false;
     app.builderUrl = 'form-manifest.json';
     app.canvasName = 'Untitled Form';
-    app.tab="form";
+    app.tab='form';
     app.route ='canvas';
 
 
-    window.onbeforeunload = function(e) {
+    window.onbeforeunload = function() {
       return 'Please make sure that you have downloaded your form';
     };
   } else if (pathname === '/') {
-    app.tab="form";
+    app.tab='form';
     app.route ='browser';
   }
 
@@ -78,14 +78,14 @@
 
   app._getIcon = function(icon) {
     return icon ? 'fusion:' + icon : 'fusion-b:atom-logo';
-  }
+  };
 
-  app._getPropertySource = function(builderType){
+  app._getPropertySource = function(){
     return 'bower_components/'+app.builderType+'/property.json';
   };
 
   //toggle accordion for menu
-  app.toggleAccordion = function(e, item, element) {
+  app.toggleAccordion = function(e) {
     var currentElement = e.currentTarget;
     var activeItem = document.querySelector('.menu-item.active');
 

@@ -9,7 +9,7 @@ var dragAndDropSetup = function () {
     revert: 'invalid'
   });
 
-  // trigger the click on the input element with `type="file"`
+  // trigger the click on the input element with `type='file'`
   $('#uploadJson').on('click', function () {
     document.querySelector('#uploadInput').click();
   });
@@ -74,8 +74,8 @@ var dragAndDropSetup = function () {
     }
 
     stateFile = stage.getStateFile(stage.builderState, stage._elementSateList);
-    content = new Blob([stateFile], {type: "text/plain;charset=utf-8"});
-    saveAs(content, "state.json");
+    content = new Blob([stateFile], {type: 'text/plain;charset=utf-8'});
+    saveAs(content, 'state.json');
   });
 
   $('#panelSettings').on('click', function() {
@@ -137,9 +137,9 @@ var dragAndDropSetup = function () {
 
     if (heading.length === 0) {
       if ($this.hasClass('form-header')) {
-        $this.text("Untitled Form");
+        $this.text('Untitled Form');
       } else {
-        $this.text("Untitled Page");
+        $this.text('Untitled Page');
       }
     } else {
       stage.updateBuilderState('heading', heading);
@@ -169,7 +169,7 @@ var dragAndDropSetup = function () {
   //   attachControlToForm(component.selectedItem.Category);
 
   //   //clear autoggest and remove focus from there after attaching
-  //   component.$.autoSuggest.value = "";
+  //   component.$.autoSuggest.value = '';
   //   component.$.autoSuggest.blur();
   //   event.stopPropagation();
   // });

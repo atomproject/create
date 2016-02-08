@@ -26,9 +26,9 @@
           posX: x, posY: y,
           name: meta.name, html: meta.html,
           attributes: meta.attributes, property: meta.property
-        }
+        };
       } else {
-        meta = this.metadata[name]
+        meta = this.metadata[name];
       }
 
       return {
@@ -96,7 +96,7 @@
     },
 
     getBuilderFile: function(builderState, states) {
-      var context = {}, endTag, startTag, template, templatePath;
+      var context = {}, endTag, template, templatePath;
 
       if (!builderState || !states) {
         return;
@@ -135,5 +135,5 @@
           return template(context);
         }.bind(this));
     }
-  }
+  };
 </script>

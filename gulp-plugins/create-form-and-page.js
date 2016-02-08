@@ -1,6 +1,5 @@
 'use strict';
 
-let path = require('path');
 let through = require('through2');
 let PluginError = require('gulp-util').PluginError;
 let File = require('gulp-util').File;
