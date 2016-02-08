@@ -7,7 +7,7 @@ should follow below steps.
 2. Clone the project (clone the forked project if you have a fork)
 3. Follow the [installation][2] and [development workflow][3] related steps
 
-### Adding Elements
+### Adding Elements <sub>(optional)</sub>
 
 Once you have a working development environment setup you are ready to add
 new elements to the builder. Follow the below steps to add new elements.
