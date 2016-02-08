@@ -22,6 +22,7 @@ Left Nav + View
   }
   #content-header{
     display: none;
+    border-bottom: 1px solid #eee;
   }
   :host.responsive #content-header{
     display: block;
@@ -38,7 +39,7 @@ Left Nav + View
 </style>
 
   <template>
-  <paper-header-panel class="flex">
+  <paper-header-panel class="flex" mode="seamed">
     <div class="paper-header">
         <paper-toolbar bottom-justify="center" class="header-bar">
             <span class="top flex">
@@ -57,7 +58,7 @@ Left Nav + View
               <content select="nav-list"></content>
             </div>
             <div main>
-              <paper-header-panel>
+              <paper-header-panel mode="seamed">
                 <div class="paper-header" id="content-header">
                   <div class="layout horizontal center">
                     <div class="flex">
