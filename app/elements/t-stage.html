@@ -20,7 +20,7 @@
           <span class="dextop">Click on an element or drag it here to start building your form.</span>
           <span class="mobile">Browse elements using the button above to start building your form.</span>
         </h2>
-        <ul title="Click to edit form properties." class="form flex sortable empty connectedSortable field-container">
+        <ul title="Click to edit form properties." class="form flex sortable connectedSortable field-container">
         </ul>
       </t-form>
     </template>
@@ -30,7 +30,7 @@
           <span class="dextop">Click on an element or drag it here to start building your page.</span>
           <span class="mobile">Browse elements using the button above to start building your page.</span>
         </h2>
-        <ul class="form flex sortable empty connectedSortable field-container">
+        <ul class="form flex sortable connectedSortable field-container">
         </ul>
       </t-page>
     </template>
@@ -400,6 +400,10 @@
           } else if (state.posX >= posX) {
             --state.posX;
           }
+        }
+
+        if (!this._elementSateList.length) {
+          $(this.builderType).addClass('empty');
         }
 
         // something gets screwed up if we remove the fieldContainer now
