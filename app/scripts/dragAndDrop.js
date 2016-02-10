@@ -64,8 +64,13 @@ var dragAndDropSetup = function () {
       .then(function(files) {
         var content;
 
-        zip.file(files.name, files.contents);
-        zip.file(files.stateFileName, files.stateFile);
+        zip.file(files.name, files.builderFile);
+        zip.file('state.json', files.stateFile);
+        zip.file('bower.json', files.bowerFile);
+
+        if (files.demoFile) {
+          zip.folder('demo').file('index.html', files.demoFile);
+        }
 
         content = zip.generate({ type: 'blob' });
         saveAs(content, files.name.replace('.html', '.zip'));

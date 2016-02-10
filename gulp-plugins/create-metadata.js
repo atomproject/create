@@ -20,12 +20,28 @@ module.exports = function() {
     if (file.isBuffer()) {
       let json = JSON.parse(file.contents);
       let metadata = {};
+      let elements = json.elements.map(el => {
+        el.demoFilePath = `bower_components/${el.name}/demo/index.html`;
+        el.propertyFilePath = `bower_components/${el.name}/property.json`;
 
-      json.elements.forEach(el => {
-        let demoFilePath = `bower_components/${el.name}/demo/index.html`;
-        let propertyFilePath = `bower_components/${el.name}/property.json`;
-        let $ = cheerio.load(read(demoFilePath, 'utf-8'));
-        let property = JSON.parse(read(propertyFilePath, 'utf-8'));
+        return el;
+      });
+
+      elements.push({
+        name: 't-form',
+        demoFilePath: 'app/elements/t-stage.html',
+        propertyFilePath: 'bower_components/t-form/property.json'
+      });
+
+      elements.push({
+        name: 't-page',
+        demoFilePath: 'app/elements/t-stage.html',
+        propertyFilePath: 'bower_components/t-page/property.json'
+      });
+
+      elements.forEach(el => {
+        let $ = cheerio.load(read(el.demoFilePath, 'utf-8'));
+        let property = JSON.parse(read(el.propertyFilePath, 'utf-8'));
         let parsedElement = $(el.name)[0];
         let innerHTML = $(el.name).html() || '';
         let elementMetadata = { attributes: {}, property: property };
@@ -45,13 +61,9 @@ module.exports = function() {
         metadata[el.name] = elementMetadata;
       });
 
-      [{name: 't-form'}, {name: 't-page'}].forEach(function(builder) {
-        let name = builder.name;
-        let propertyFilePath = `bower_components/${name}/property.json`;
-        let property = JSON.parse(read(propertyFilePath, 'utf-8'));
-
-        metadata[name] = { attributes: {}, property: property };
-      });
+      // we don't want innerHTML for builders
+      metadata['t-form'].innerHTML = '';
+      metadata['t-page'].innerHTML = '';
 
       file.path = file.path.replace('-manifest', '');
       file.contents = new Buffer(JSON.stringify(metadata, null, 4));

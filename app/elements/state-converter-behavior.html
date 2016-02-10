@@ -99,28 +99,38 @@
       return components;
     },
 
-    getBuilderFile: function(builderState, states) {
-      var context = {}, endTag, template, templatePath;
+    getBowerFile: function(builderState, states) {
+      var context = {};
 
       if (!builderState || !states) {
         return;
       }
 
-      context.baseUrl = '';
-      context.rows = this.getStateHierarchy(states);
-      context.components = this.getComponentNames(states);
-      context.builderName = builderState.attributes.name;
+      context.dependencies = this.getComponentNames(states);
+      context.dependencies.push(builderState.name);
+      context.componentName = builderState.attributes.name;
 
-      context.builderEndTag = endTag = '</' + builderState.name + '>';
-      context.builderStartTag = builderState.html.replace(endTag, '');
+      return this.getFile('templates/bower.jst', context);
+    },
 
-      if (this.isPage(this.builderType)) {
-        templatePath = 'templates/page.jst';
-      } else {
-        templatePath = 'templates/component.jst';
+    getDemoFile: function(builderState) {
+      var context = {};
+
+      if (!builderState) {
+        return;
       }
 
-      template = this.templateCache[builderState.name];
+      context.componentName = builderState.attributes.name;
+
+      if (!builderState.isPage) {
+        return this.getFile('templates/demo.jst', context);
+      }
+
+      return Promise.resolve();
+    },
+
+    getFile: function(templatePath, context) {
+      var template = this.templateCache[templatePath];
 
       return Promise.resolve(template)
         .then(function(template) {
@@ -133,11 +143,35 @@
         .then(function(template) {
           if (!_.isFunction(template)) {
             template = _.template(template);
-            this.templateCache[builderState.name] = template;
+            this.templateCache[templatePath] = template;
           }
 
           return template(context);
         }.bind(this));
+    },
+
+    getBuilderFile: function(builderState, states) {
+      var context = {}, endTag, templatePath;
+
+      if (!builderState || !states) {
+        return;
+      }
+
+      context.rows = this.getStateHierarchy(states);
+      context.dependencies = this.getComponentNames(states);
+      context.componentName = builderState.attributes.name;
+
+      context.builderEndTag = endTag = '</' + builderState.name + '>';
+      context.builderStartTag = builderState.html.replace(endTag, '');
+
+      if (builderState.isPage) {
+        context.pageName = context.componentName.replace('t-', '');
+        templatePath = 'templates/page.jst';
+      } else {
+        templatePath = 'templates/component.jst';
+      }
+
+      return this.getFile(templatePath, context);
     }
   };
 </script>

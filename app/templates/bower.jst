@@ -1,0 +1,30 @@
+{
+  "name": "<%= componentName %>",
+  "version": "1.0.0",
+  "description": "Form component",
+  "main": "<%= componentName %>.html",
+  "keywords": [
+    "Web Component",
+    "Polymer"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+  <%
+    dependencies.forEach(function(name) {
+    // TODO: atomelements cannot be hardcoded here
+    %>"<%= name %>": "atomelements/<%= name %>#master",<%
+    });
+    %>"t-shared-components": "atomelements/t-shared-components#master",<%
+    %>"polymer": "polymer/polymer"<%
+  %>
+  },
+  "devDependencies": {
+    "webcomponentsjs": "~0.7.19"
+  }
+}
