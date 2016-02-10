@@ -98,32 +98,7 @@ after the list became visible again. e.g.
         font-family: var(--primary-font-family, 'Open sans');
     }
     
-    .modal {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 10;
-        background: #fff;
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    .modal .header {
-        height: 80px;
-        background-color: black;
-        color: white;
-    }
-    
-    .sorting {
-        background-color: red;
-    }
-    
-    .padding-horizontal-10 {
-        padding: 0 10px;
-    }
-    
-    .padding-10 {
+    .section-small {
         padding: 10px ;
     }    
     .sorting .sorting-btn {
@@ -171,7 +146,7 @@ after the list became visible again. e.g.
         background-color: #f5f5f5;
     }
     
-    .params a iron-icon {
+    .params iron-icon {
         -webkit-transition: 0.3s all ease;
         -moz-transition: 0.3s all ease;
         -ms-transition: 0.3s all ease;
@@ -191,18 +166,13 @@ after the list became visible again. e.g.
         margin-top: -5px;
     }
     
-    .params a.active iron-icon {
+    .params .active iron-icon {
         display: -ms-inline-flexbox;
         display: -webkit-inline-flex;
         display: inline-flex;
-        -webkit-transform: rotate(90deg);
-        -moz-transform: rotate(90deg);
-        -ms-transform: rotate(90deg);
-        -o-transform: rotate(90deg);
-        transform: rotate(90deg);
     }
     
-    .params a.active.desc iron-icon {
+    .params .active.desc iron-icon {
         -webkit-transform: rotate(-90deg);
         -moz-transform: rotate(-90deg);
         -ms-transform: rotate(-90deg);
@@ -210,10 +180,6 @@ after the list became visible again. e.g.
         transform: rotate(-90deg);
     }
     
-    .params a.active {
-        color: #000000;
-        background: #ffffff;
-    }
     #ajaxLoaderContainer{
         padding: 10px 0;
      } 
@@ -223,35 +189,15 @@ after the list became visible again. e.g.
     }
 
     .link {
-        color:blue;
+        color: var(--link-color,#0098ff);
     }
     </style>
-    <template>
-        <div class="error-message padding-10" hidden$="[[!_noResultsMatched]]">
-            <div hidden$="[[!_noResultFound]]">
-                <div>[[noResultsFoundMessage]]</div>
-                <div><a class="link" on-click="_redirectToPage" >modify search</a></div>
-            </div>
-            <div hidden$="[[!_noResultsFiltered]]">
-                <div>[[noResultsFilteredMessage]]</div>
-                <div><a class="link" on-click="_openModal" >modify filter</a> or <a class="link" on-click="_redirectToPage" >modify search</a></div>
-            </div>
-        </div>
+    <template>        
         <div id="listContainer" >
-            <template is="dom-if" if="[[withFilter]]">
-                <div class=" layout horizontal center filter-block" hidden$="[[_noResultsMatched]]">
-                    <span class="total-results">
-                        {{_getFilteredRatio(data.pagingInfo)}}
-                    </span>
-                    <span class="flex"></span>
-                    <span>{{_filterCount}}</span>
-                    <iron-icon icon="filter-list" on-click="_openModal"></iron-icon>
-                </div>
-                <div class="modal layout vertical" id="filterModal" hidden>
-                    <t-filter opened id="filter" show-twelve-hour-clock="[[showTwelveHourClock]]" auto="[[auto]]" class="flex" style="overflow:auto" filter-api="[[filterApi]]" filter-api-params="[[filterApiParams]]" include-filters="[[includeFilters]]" on-filter-change="_applyFilters" on-filter-close="_closeModal"></t-filter>
-                </div>
-            </template>
-            <div class="sorting paper-header" hidden$="[[_noResultsMatched]]">
+            <div hidden="[[!withFilter]]">                
+                <t-filter opened id="filter" show-twelve-hour-clock="[[showTwelveHourClock]]" auto="[[auto]]" class="flex" style="overflow:auto" filter-api="[[filterApi]]" filter-api-params="[[filterApiParams]]" include-filters="[[includeFilters]]" on-filter-change="_applyFilters" on-filter-close="_closeModal" on-filter-open="_onFilterOpen" results-paging-info="[[data.pagingInfo]]"></t-filter>
+            </div>
+            <div class="sorting paper-header" id="sortCntr">
                 <template is="dom-if" if$="[[withSorting]]">
                     <div class=" layout horizontal sorting-btn">
                         <template is="dom-repeat" items="{{sortParams}}" has-scroller="false">
@@ -262,7 +208,21 @@ after the list became visible again. e.g.
                     </div>
                 </template>
             </div>
-            <div class="error-message padding-horizontal-10" hidden$="[[_noResultsMatched]]">[[note]]</div>
+            <div class="error-message section-small" hidden$="[[!_noResultsMatched]]">
+                <div hidden$="[[!_noResultFound]]">
+                    <div>[[noResultsFoundMessage]]</div>
+                    <div><a class="link" on-click="_redirectToPage" >modify search</a></div>
+                </div>
+                <div hidden$="[[!_noResultsFiltered]]">
+                    <div>[[noResultsFilteredMessage]]</div>
+                    <div><a class="link" on-click="_showFilters" >modify filter</a> or <a class="link" on-click="_redirectToPage" >modify search</a></div>
+                </div>
+                <div  hidden$="[[!_noResultsFilteredForSearchTerm]]">
+                    <div>[[_noResultsFilteredForSearchTermMessage]]</div>
+                    <div>Modify the search term or <a class="link" on-click="_resetSearchFilter" >reset.</a></div>
+                </div>
+            </div>
+            <!-- <div class="error-message " hidden$="[[_noResultsMatched]]">[[note]]</div> -->
             <div class="absolute horizontal layout center-justified" hidden$="{{_contentLoaded}}">
                 <t-loader id="contentLoader" active></t-loader>
             </div>
@@ -340,6 +300,11 @@ after the list became visible again. e.g.
                     value: false
                 },
 
+                _noResultsFilteredForSearchTerm: {
+                    type: Boolean,
+                    value: false
+                },
+
                 _noResultsMatched: {
                     type: Boolean,
                     value: false
@@ -349,6 +314,13 @@ after the list became visible again. e.g.
                     type: String,
                     value: 'We could not find any flights for the filters you have applied.'
                 },
+
+                noResultsFilteredForSearchTermMessage:{
+                    type: String,
+                    value: 'We could not find any itineraries containing \'SEARCHTERM\’'
+                },
+
+
 
                 _filtersApplied: Boolean,
 
@@ -492,11 +464,6 @@ after the list became visible again. e.g.
                     value: false
                 },
 
-                _filterCount: {
-                    type: String,
-                    value: ""
-                },
-
                 _defaultSorting: {
                     type: String,
                     value: ""
@@ -563,8 +530,7 @@ after the list became visible again. e.g.
                 }
             },
 
-            _closeModal: function (event) {
-                this.$$('#filterModal').hidden = true;
+            _closeModal: function (event) {                
                 Polymer.IronDropdownScrollManager.removeScrollLock(this);
             },
 
@@ -608,11 +574,10 @@ after the list became visible again. e.g.
             _applyFilters: function (event) {
 
                 this._contentLoaded = false;
-                this._skip = 0;
-                this._setFilterCount(event.detail.count);
+                this._skip = 0;                
                 this._list = [];
                 this._filtersApplied = false;
-                if (event.detail.filters != undefined && !event.detail.filters && !event.detail.filters.length == 0)
+                if (event.detail.filters && event.detail.filters.length)
                     this._isFiltered = true;
                 else
                     this._isFiltered = false;
@@ -629,24 +594,14 @@ after the list became visible again. e.g.
                     this._isFiltering = false;
                     this.$.dataCall.url = this.dataApi + "&" + this._defaultSorting + this.sortBy;
                     this.$.dataCall.generateRequest();
-                }
-                this.$$('#filterModal').hidden = true;
+                }                
+
+                this._noResultsMatched = false;
+                this.$.filter._showHeader();
+                this.$.sortCntr.hidden = false;
+                
                 Polymer.IronDropdownScrollManager.removeScrollLock(this);
-            },
-
-            _setFilterCount: function (count) {
-                switch (count) {
-                    case 0:
-                        this._filterCount = "";
-                        break;
-                    case 1:
-                        this._filterCount = count + " filter applied";
-                        break;
-                    default:
-                        this._filterCount = count + " filters applied";
-
-                }
-            },
+            },            
 
             _sortBy: function (e) {
 
@@ -707,9 +662,22 @@ after the list became visible again. e.g.
                     list = this.data[this.tokenParam];
                 }
                 if (!this.data.status.isSuccessful || list === null || list.length === 0) {
-                    this.noResultFound = true;
-                    if (this._filtersApplied && this._list.length === 0)
-                        this._noResultsFiltered = true;
+                    this.noResultFound = true; //public api
+                    if (this._filtersApplied && this._list.length === 0){
+                        var hasSearchFilter = false;
+                        var recentFilter = this.$.filter.appliedFilters[this.$.filter.appliedFilters.length - 1];
+                        
+                        if(recentFilter.type == 'Search' && recentFilter.value){
+                            hasSearchFilter = true;
+                        }
+                        
+                        if(hasSearchFilter){
+                            this._noResultsFilteredForSearchTerm = true;
+                            this._noResultsFilteredForSearchTermMessage = this.noResultsFilteredForSearchTermMessage.replace('SEARCHTERM', this.$.filter.searchVal);
+                        }
+                        else                            
+                            this._noResultsFiltered = true;
+                    }
                     else {
                         if (this._list.length === 0)
                             this._noResultFound = true;
@@ -718,16 +686,35 @@ after the list became visible again. e.g.
                 else {
                     this._noResultFound = false;
                     this._noResultsFiltered = false;
+                    this._noResultsFilteredForSearchTerm = false;
                 }
-                this._noResultsMatched = this._noResultsFiltered || this._noResultFound;
+
+                this._noResultsMatched = this._noResultsFiltered || this._noResultFound || this._noResultsFilteredForSearchTerm;
+                if(this._noResultsMatched && !this._noResultsFilteredForSearchTerm){
+                    this.$.filter._hideHeader();
+                    this.$.sortCntr.hidden = true;
+                } else if(this._noResultsFilteredForSearchTerm){
+                    this.$.sortCntr.hidden = true;
+                } else{
+                    this.$.filter._showHeader();
+                    this.$.sortCntr.hidden = false;
+                }
                 this._contentLoaded = true;
                 this.fire('list-population');
                 this._scrollFired = false;
             },
 
-            _openModal: function () {
-                this.$$('#filterModal').hidden = false;
+            _onFilterOpen: function () {                
                 Polymer.IronDropdownScrollManager.pushScrollLock(this);
+            },
+
+            _showFilters: function(){                
+                this.$.filter._openModal();             
+                this._onFilterOpen();
+            },
+
+            _resetSearchFilter: function(){
+                this.$.filter._removeSearchFilter();
             },
 
             _getNextDataSet: function () {
@@ -753,15 +740,6 @@ after the list became visible again. e.g.
 
             _getPaginationApi: function () {
                 return this.dataApi + "&$skip=" + this._skip;
-            },
-
-            _getFilteredRatio: function (pagingInfo) {
-                if (pagingInfo != undefined)
-                    return pagingInfo.filteredCount + "/" + pagingInfo.total + " results";
-            },
-
-            _hideList: function (noResultFound) {
-                return this._noResultFound || this._noResultsFiltered;
             },
 
             _getSortingClass: function (item) {

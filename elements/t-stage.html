@@ -40,7 +40,7 @@
         <div class="overlap">
           <div class="hover-panel">
               <iron-icon class="unmerge" title="Unmerge this item" icon="communication:call-split"></iron-icon>
-              <iron-icon class="duplicate" title="Clone this item" icon="content-copy"></iron-icon>
+              <iron-icon class="duplicate" title="Duplicate this item" icon="content-copy"></iron-icon>
               <iron-icon class="close" title="Remove this item" icon="close"></iron-icon>
           </div>
         </div>
@@ -92,6 +92,14 @@
       draggedPosX: null,
       builderState: null,
 
+      ready: function() {
+        window.onbeforeunload = function() {
+          if (this.builderType && this._elementSateList.length) {
+            return 'All changes will be lost! Are you sure want to leave this page?';
+          }
+        }.bind(this);
+      },
+
       isPage: function(builderType) {
         return builderType === 't-page';
       },
@@ -102,9 +110,7 @@
           '.unmerge' : 'unmerge',
           '.duplicate' : 'duplicate',
           '.close' : 'remove',
-          '.fieldset' : 'showPanelForElement',
-          '.overlap': 'showPanelForFirstElement',
-          'li.field-container': 'showPanelForFirstElement',
+          '.overlap': 'showPanelForClickedElement',
           '*': 'showPanelForBuilder'
         };
         var keys = Object.keys(handlers), i, selector;
@@ -112,7 +118,7 @@
         for (i = 0; i < keys.length; i++) {
           selector = keys[i];
           if ($(e.target).is(selector)) {
-            this[handlers[selector]](e.target);
+            this[handlers[selector]](e.target, e.detail);
             return;
           }
         }
@@ -181,6 +187,7 @@
             branchClass: 'grouped',
             hoveringClass: 'placeholder-highlight',
             listType: 'ul',
+            isAllowed: this.validateDrop.bind(this),
             sort: this.fieldContainerDragged.bind(this),
             relocate: this.fieldContainerRelocated.bind(this)
           });
@@ -203,6 +210,26 @@
 
         //TODO: BUG. `getMetadata` function depends on `builderType`
         this.getMetadata().then(this.add.bind(this, name, category));
+      },
+
+      validateDrop: function($placeholder, $placeholderParent, $currentItem) {
+        var parentFieldsets, currentFieldsets;
+
+        if (!$placeholderParent || !$placeholderParent.length) {
+          $placeholder.removeClass('dragNotAllowed');
+          return true;
+        }
+
+        parentFieldsets = $placeholderParent.children('.fieldset').length;
+        currentFieldsets = $currentItem.children('.fieldset').length;
+
+        if (parentFieldsets + currentFieldsets > 4) {
+          $placeholder.addClass('dragNotAllowed');
+          return false;
+        }
+
+        $placeholder.removeClass('dragNotAllowed');
+        return true;
       },
 
       fieldContainerDragged: function (e, ui) {
@@ -293,6 +320,15 @@
         this.push('_elementSateList', state);
 
         setTimeout(function() {
+          $(fieldContainer)
+            .children('.overlap')
+            .addClass('active');
+
+          $(this.componentPanelTarget)
+            .closest('li.field-container')
+            .children('.overlap')
+            .removeClass('active');
+
           this.componentPanelTarget = fieldset.querySelector(name);
           this.showComponentPanel(name, state.property.properties);
         }.bind(this));
@@ -310,6 +346,7 @@
         var fieldsets = fieldContainer.querySelectorAll('.fieldset');
         var fieldContainers = this.querySelectorAll('li.field-container') || [];
         var container = this.querySelector('ul.field-container');
+        var insertAt = fieldContainer.nextSibling;
         var posX;
 
         fieldContainers = Array.prototype.slice.call(fieldContainers);
@@ -335,7 +372,7 @@
           fieldset.remove();
           fieldset = this.getFieldset(name, category, html);
           (newFieldContainer = this.getWrapper()).appendChild(fieldset);
-          container.insertBefore(newFieldContainer, fieldContainer.nextSibling);
+          container.insertBefore(newFieldContainer, insertAt);
 
           state.posX = posX + posY;
           state.posY = 0;
@@ -350,6 +387,7 @@
         var fieldsets = fieldContainer.querySelectorAll('.fieldset');
         var fieldContainers = this.querySelectorAll('li.field-container') || [];
         var container = this.querySelector('ul.field-container');
+        var insertAt = fieldContainer.nextSibling;
         var posX, newFieldContainer;
 
         fieldContainers = Array.prototype.slice.call(fieldContainers);
@@ -380,7 +418,7 @@
           newFieldContainer.classList.add('grouped');
         }
 
-        container.insertBefore(newFieldContainer, fieldContainer.nextSibling);
+        container.insertBefore(newFieldContainer, insertAt);
         Polymer.updateStyles();
         console.log(this._elementSateList);
       },
@@ -413,7 +451,16 @@
         // TODO: what the hell is happening below?
         setTimeout(function() {
           fieldContainer.remove();
-        });
+          // apparantly you have to call this every time you add or remove
+          // an element, t-form needs to update its internal state
+          // TODO: find some simpler solution to this
+          if (this.builderType === 't-form') {
+            setTimeout(function() {
+              this.querySelector(this.builderType).setFields();
+            }.bind(this), 0);
+          }
+        }.bind(this));
+
         this.showPanelForBuilder();
         console.log(this._elementSateList);
       },
@@ -531,6 +578,10 @@
         var name = 't-' + builder.getAttribute('name');
         var stateFile, filePromise;
 
+        if (!this._elementSateList.length) {
+          return Promise.reject('No elements to download');
+        }
+
         // TODO: shouldn't do this, persist builder state properly
         builderState.attributes.name = name;
         stateFile = this.getStateFile(builderState, states);
@@ -620,6 +671,10 @@
         if (stateFile.rows.length > 0) {
           $(this.builderType, this).removeClass('empty');
         }
+
+        if (!this._elementSateList.length) {
+          throw new Error('No elements found in the state file');
+        }
       },
       /* section: end */
 
@@ -639,14 +694,35 @@
           return item.posX === pos.x && item.posY === pos.y;
         });
 
+
+        $(this.componentPanelTarget)
+          .closest('li.field-container')
+          .children('.overlap')
+          .removeClass('active');
+
+
+        $(target)
+          .closest('li.field-container')
+          .children('.overlap')
+          .addClass('active');
+
         this.componentPanelTarget = target;
         this.showComponentPanel(name, state.property.properties);
       },
 
-      showPanelForFirstElement: function(el) {
-        el = $(el).closest('.field-container').children('.fieldset')[0];
-        if (el) {
-          this.showPanelForElement(el);
+      showPanelForClickedElement: function(overlap, detail) {
+        var $overlap = $(overlap);
+        var fieldsets = $overlap.siblings('.fieldset');
+        var index, clickedElement, fieldsetWidth;
+
+        fieldsetWidth = ($overlap.width() / fieldsets.length);
+        index = (detail.x - $overlap.offset().left) / fieldsetWidth;
+        index = Math.floor(index);
+
+        if (!Number.isFinite(index)) return;
+
+        if (clickedElement = fieldsets[index]) {
+          this.showPanelForElement(clickedElement);
         }
       },
 
@@ -657,6 +733,11 @@
         if (builder === this.componentPanelTarget) {
           return;
         }
+
+        $(this.componentPanelTarget)
+          .closest('li.field-container')
+          .children('.overlap')
+          .removeClass('active');
 
         this.componentPanelTarget = builder;
         this.showComponentPanel(type, this.builderState.property.properties);

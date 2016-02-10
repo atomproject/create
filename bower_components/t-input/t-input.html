@@ -50,7 +50,7 @@ style this element.
 
 </style>		
 			<template is="dom-if" if="[[!multiLine]]">
-				<t-master-input id="input" label="{{label}}" type="{{type}}" validate-on-blur="{{validateOnBlur}}" auto-validate$="{{autoValidate}}"  disabled$="{{disabled}}"  no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}" maxlength="{{maxLength}}" pattern="{{pattern}}" error-message="{{errorMessage}}" prevent-invalid-input$="{{preventInvalidInput}}" required$="{{required}}" value="{{value}}" on-value-change="_invalid"></t-master-input>
+				<t-master-input id="input" label="{{label}}" type="{{type}}" validate-on-blur="{{validateOnBlur}}" auto-validate$="{{autoValidate}}"  disabled$="{{disabled}}"  no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}" maxlength="{{maxLength}}" pattern="{{pattern}}" error-message="{{errorMessage}}" prevent-invalid-input$="{{preventInvalidInput}}" required$="{{required}}" value="{{value}}" on-value-change="_invalid" autocapitalize$="[[autocapitalize]]" autocorrect$="[[autocorrect]]" autocomplete$="[[autocomplete]]"></t-master-input>
 			</template>
 			<template is="dom-if" if="[[multiLine]]">
 				<t-textarea id="input" label="{{label}}" disabled$="{{disabled}}" validate-on-blur="{{validateOnBlur}}"  no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}"  maxlength="{{maxLength}}" value="{{value}}" error-message="{{errorMessage}}" rows$="{{rows}}" max-rows$="{{maxRows}}" required$="{{required}}" ></t-textarea>
@@ -227,7 +227,35 @@ Polymer({
 			type:String,
 			notify:true,
 			reflectToAttribute: true
-		}
+		},
+
+		 // HTMLInputElement attributes for binding if needed
+	      /**
+	       * If you're using PaperInputBehavior to implement your own paper-input-like
+	       * element, bind this to the `<input is="iron-input">`'s `autocomplete` property.
+	       */
+	      autocomplete: {
+	        type: String,
+	        value: 'off'
+	      },
+
+			// Nonstandard attributes for binding if needed
+	      /**
+	       * If you're using PaperInputBehavior to implement your own paper-input-like
+	       * element, bind this to the `<input is="iron-input">`'s `autocapitalize` property.
+	       */
+	      autocapitalize: {
+	        type: String,
+	        value: 'none'
+	      },
+	      /**
+	       * If you're using PaperInputBehavior to implement your own paper-input-like
+	       * element, bind this to the `<input is="iron-input">`'s `autocorrect` property.
+	       */
+	      autocorrect: {
+	        type: String,
+	        value: 'off'
+	      }
 
 	}, 
 

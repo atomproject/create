@@ -46,6 +46,10 @@
         return;
       }
 
+      if (!states.length) {
+        throw new Error('No elements to download');
+      }
+
       stateFile = {
         type: builderState.name,
         attributes: builderState.attributes,

@@ -200,7 +200,7 @@ var AutoComplete = (function () {
                                         if(inputValue.length >= component.minimumCharacters)
                                         {
                                             component.$.spinner.hidden = false;
-                                            request = ajax(request, custParams, inputValue, input, result, component.subType, component.queryParams);
+                                            request = ajax(request, custParams, inputValue.trim(), input, result, component.subType, component.queryParams);
                                         }
                                     }
                                     else{
