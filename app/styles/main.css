@@ -96,7 +96,8 @@ paper-drawer-panel .component-link:nth-child(odd) {
     position: relative;
 }
 
-.overlap:hover .close {
+.overlap:hover .close,
+.overlap.active .close {
     display: inline-block;
 }
 
@@ -107,11 +108,13 @@ paper-drawer-panel .component-link:nth-child(odd) {
     right: 0;
 }
 
-.overlap:hover .duplicate {
+.overlap:hover .duplicate,
+.overlap.active .duplicate {
     display: inline-block;
 }
 
-.grouped > .overlap:hover .unmerge {
+.grouped > .overlap:hover .unmerge,
+.grouped > .overlap.active .unmerge {
     display: inline-block;
 }
 
@@ -319,8 +322,9 @@ t-stage h2.drag-text {
     width: 100%;
 }
 
-.overlap:hover {
-    border: solid 1px #bbb;
+.overlap:hover,
+.overlap.active {
+    border: dotted 1px #bbb;
 }
 
 
@@ -505,4 +509,8 @@ input[type="search"] {
 
 search-bar input[type="search"] {
   border-bottom: 0;
+}
+
+.dragNotAllowed {
+  background-color: rgba(227, 109, 109, 0.3);
 }

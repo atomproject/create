@@ -19,24 +19,31 @@ var dragAndDropSetup = function () {
     var stage = document.querySelector('t-stage');
     var files = this.files;
     var reader = new FileReader();
+    var statusText = 'Builder restored to the state.json successfully.';
     var stateFile;
 
     files = Array.prototype.slice.call(files);
     stateFile = files.find(function(file) {
-      return file.name === 'state.json';
+      return file.name.match(/^[^\.]+\.json/i);
     });
 
     if (!stateFile) {
-      app.$.toast.text = 'Not state.json file. You can only upload state.json file.';
+      app.$.toast.text = 'Not a json file. You can only upload a json file.';
       app.$.toast.open();
       return;
     }
 
     reader.addEventListener('load', function(ev) {
+      // TODO: you shouldn't have to call this
       stage.reset();
-      // TODO: what happens if the file uploaded file is not a valid state file?
-      stage.recreateBuilder(ev.target.result);
-      app.$.toast.text = 'Builder restored to the state.json successfully.';
+
+      try {
+        stage.recreateBuilder(ev.target.result);
+      } catch (exception) {
+        statusText = 'The syntax of state file is not valid.';
+      }
+
+      app.$.toast.text = statusText;
       app.$.toast.open();
     });
 
@@ -62,20 +69,32 @@ var dragAndDropSetup = function () {
 
         content = zip.generate({ type: 'blob' });
         saveAs(content, files.name.replace('.html', '.zip'));
+      })
+      .catch(function(reason) {
+        app.$.toast.text = reason.toString();
+        app.$.toast.open();
       });
   });
 
   $('#downloadJson').on('click', function () {
     var stage = document.querySelector('t-stage');
-    var stateFile, content;
+    var stateFile, content, builderState, states;
 
     if (!stage) {
       return;
     }
 
-    stateFile = stage.getStateFile(stage.builderState, stage._elementSateList);
-    content = new Blob([stateFile], {type: 'text/plain;charset=utf-8'});
-    saveAs(content, 'state.json');
+    builderState = stage.builderState;
+    states = stage._elementSateList;
+
+    try {
+      stateFile = stage.getStateFile(builderState, states);
+      content = new Blob([stateFile], {type: 'text/plain;charset=utf-8'});
+      saveAs(content, 'state.json');
+    } catch (exception) {
+      app.$.toast.text = exception.toString();
+      app.$.toast.open();
+    }
   });
 
   $('#panelSettings').on('click', function() {
@@ -132,7 +151,7 @@ var dragAndDropSetup = function () {
   $('.headerText').on('blur', function () {
     var stage = document.querySelector('t-stage');
     var heading = $(this).text().trim();
-    var name = heading.toLowerCase().replace(/\s+/, '-');
+    var name = heading.toLowerCase().replace(/\s+/g, '-');
     var $this = $(this);
 
     if (heading.length === 0) {

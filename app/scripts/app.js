@@ -24,10 +24,6 @@
     app.canvasName = 'Untitled Page';
     app.tab='page';
     app.route ='canvas';
-
-    window.onbeforeunload = function() {
-      return 'Please make sure that you have downloaded your page';
-    };
   } else if (pathname === '/form') {
     app.builderType ='t-form';
     app.isPage = false;
@@ -36,10 +32,6 @@
     app.tab='form';
     app.route ='canvas';
 
-
-    window.onbeforeunload = function() {
-      return 'Please make sure that you have downloaded your form';
-    };
   } else if (pathname === '/') {
     app.tab='form';
     app.route ='browser';
@@ -58,6 +50,11 @@
 
     if (!searchTerm) {
       return null;
+    }
+
+    if (!$('.component-list').hasClass('active')) {
+      $('.component-list').addClass('active');
+      $('#allElements').addClass('active');
     }
 
     if (!category) {

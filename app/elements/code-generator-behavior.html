@@ -6,7 +6,7 @@
       var startTag, endTag, code;
 
       if (!name) {
-        return;
+        throw new Error('getComponentCode requires at least name');
       }
 
       endTag = '</' + name + '>';
