@@ -25,12 +25,12 @@
       </t-form>
     </template>
     <template is="dom-if" if="{{isPage(builderType)}}">
-      <t-page title="Click to Edit. Drag to Reorder." class="page canvas empty vertical layout flex">
+      <t-page class="page canvas empty vertical layout flex">
         <h2 class="drag-text">
           <span class="dextop">Click on an element or drag it here to start building your page.</span>
           <span class="mobile">Browse elements using the button above to start building your page.</span>
         </h2>
-        <ul class="form flex sortable connectedSortable field-container">
+        <ul title="Click to Edit. Drag to Reorder." class="form flex sortable connectedSortable field-container">
         </ul>
       </t-page>
     </template>
@@ -95,7 +95,7 @@
       ready: function() {
         window.onbeforeunload = function() {
           if (this.builderType && this._elementSateList.length) {
-            return 'All changes will be lost! Are you sure want to leave this page?';
+            return 'All changes will be lost!';
           }
         }.bind(this);
       },
@@ -576,7 +576,7 @@
         var builderState = this.builderState;
         var builder = this.querySelector(this.builderType);
         var name = 't-' + builder.getAttribute('name');
-        var stateFile, filePromise;
+        var stateFile, promise;
 
         if (!this._elementSateList.length) {
           return Promise.reject('No elements to download');
@@ -584,15 +584,22 @@
 
         // TODO: shouldn't do this, persist builder state properly
         builderState.attributes.name = name;
+        builderState.isPage = this.isPage(this.builderType);
         stateFile = this.getStateFile(builderState, states);
-        filePromise = this.getBuilderFile(builderState, states);
 
-        return filePromise.then(function(contents) {
+        promise = Promise.all([
+          this.getBuilderFile(builderState, states),
+          this.getBowerFile(builderState, states),
+          this.getDemoFile(builderState)
+        ]);
+
+        return promise.then(function(files) {
           return {
             name: name + '.html',
-            contents: contents,
-            stateFileName: 'state.json',
-            stateFile: stateFile
+            builderFile: files[0],
+            stateFile: stateFile,
+            bowerFile: files[1],
+            demoFile: files[2]
           };
         });
       },

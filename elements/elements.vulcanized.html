@@ -32417,28 +32417,38 @@ Polymer({
       return components;
     },
 
-    getBuilderFile: function(builderState, states) {
-      var context = {}, endTag, template, templatePath;
+    getBowerFile: function(builderState, states) {
+      var context = {};
 
       if (!builderState || !states) {
         return;
       }
 
-      context.baseUrl = '';
-      context.rows = this.getStateHierarchy(states);
-      context.components = this.getComponentNames(states);
-      context.builderName = builderState.attributes.name;
+      context.dependencies = this.getComponentNames(states);
+      context.dependencies.push(builderState.name);
+      context.componentName = builderState.attributes.name;
 
-      context.builderEndTag = endTag = '</' + builderState.name + '>';
-      context.builderStartTag = builderState.html.replace(endTag, '');
+      return this.getFile('templates/bower.jst', context);
+    },
 
-      if (this.isPage(this.builderType)) {
-        templatePath = 'templates/page.jst';
-      } else {
-        templatePath = 'templates/component.jst';
+    getDemoFile: function(builderState) {
+      var context = {};
+
+      if (!builderState) {
+        return;
       }
 
-      template = this.templateCache[builderState.name];
+      context.componentName = builderState.attributes.name;
+
+      if (!builderState.isPage) {
+        return this.getFile('templates/demo.jst', context);
+      }
+
+      return Promise.resolve();
+    },
+
+    getFile: function(templatePath, context) {
+      var template = this.templateCache[templatePath];
 
       return Promise.resolve(template)
         .then(function(template) {
@@ -32451,11 +32461,35 @@ Polymer({
         .then(function(template) {
           if (!_.isFunction(template)) {
             template = _.template(template);
-            this.templateCache[builderState.name] = template;
+            this.templateCache[templatePath] = template;
           }
 
           return template(context);
         }.bind(this));
+    },
+
+    getBuilderFile: function(builderState, states) {
+      var context = {}, endTag, templatePath;
+
+      if (!builderState || !states) {
+        return;
+      }
+
+      context.rows = this.getStateHierarchy(states);
+      context.dependencies = this.getComponentNames(states);
+      context.componentName = builderState.attributes.name;
+
+      context.builderEndTag = endTag = '</' + builderState.name + '>';
+      context.builderStartTag = builderState.html.replace(endTag, '');
+
+      if (builderState.isPage) {
+        context.pageName = context.componentName.replace('t-', '');
+        templatePath = 'templates/page.jst';
+      } else {
+        templatePath = 'templates/component.jst';
+      }
+
+      return this.getFile(templatePath, context);
     }
   };
 </script>
@@ -32478,12 +32512,12 @@ Polymer({
       </t-form>
     </template>
     <template is="dom-if" if="{{isPage(builderType)}}">
-      <t-page title="Click to Edit. Drag to Reorder." class="page canvas empty vertical layout flex">
+      <t-page class="page canvas empty vertical layout flex">
         <h2 class="drag-text">
           <span class="dextop">Click on an element or drag it here to start building your page.</span>
           <span class="mobile">Browse elements using the button above to start building your page.</span>
         </h2>
-        <ul class="form flex sortable connectedSortable field-container">
+        <ul title="Click to Edit. Drag to Reorder." class="form flex sortable connectedSortable field-container">
         </ul>
       </t-page>
     </template>
@@ -32548,7 +32582,7 @@ Polymer({
       ready: function() {
         window.onbeforeunload = function() {
           if (this.builderType && this._elementSateList.length) {
-            return 'All changes will be lost! Are you sure want to leave this page?';
+            return 'All changes will be lost!';
           }
         }.bind(this);
       },
@@ -33029,7 +33063,7 @@ Polymer({
         var builderState = this.builderState;
         var builder = this.querySelector(this.builderType);
         var name = 't-' + builder.getAttribute('name');
-        var stateFile, filePromise;
+        var stateFile, promise;
 
         if (!this._elementSateList.length) {
           return Promise.reject('No elements to download');
@@ -33037,15 +33071,22 @@ Polymer({
 
         // TODO: shouldn't do this, persist builder state properly
         builderState.attributes.name = name;
+        builderState.isPage = this.isPage(this.builderType);
         stateFile = this.getStateFile(builderState, states);
-        filePromise = this.getBuilderFile(builderState, states);
 
-        return filePromise.then(function(contents) {
+        promise = Promise.all([
+          this.getBuilderFile(builderState, states),
+          this.getBowerFile(builderState, states),
+          this.getDemoFile(builderState)
+        ]);
+
+        return promise.then(function(files) {
           return {
             name: name + '.html',
-            contents: contents,
-            stateFileName: 'state.json',
-            stateFile: stateFile
+            builderFile: files[0],
+            stateFile: stateFile,
+            bowerFile: files[1],
+            demoFile: files[2]
           };
         });
       },

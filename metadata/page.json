@@ -332,7 +332,9 @@
         "innerHTML": "\r\n  "
     },
     "t-form": {
-        "attributes": {},
+        "attributes": {
+            "class": "canvas empty vertical layout flex"
+        },
         "property": {
             "name": "Form",
             "properties": [
@@ -366,10 +368,13 @@
                     }
                 }
             ]
-        }
+        },
+        "innerHTML": ""
     },
     "t-page": {
-        "attributes": {},
+        "attributes": {
+            "class": "page canvas empty vertical layout flex"
+        },
         "property": {
             "name": "Page",
             "properties": [
@@ -384,6 +389,7 @@
                     }
                 }
             ]
-        }
+        },
+        "innerHTML": ""
     }
 }
