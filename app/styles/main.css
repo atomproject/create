@@ -43,7 +43,7 @@ body {
     overflow: hidden;
 }
 
-#propertyDrawerPanel t-button paper-material {
+#propertyDrawerPanel t-button paper-button {
     padding: 11px 12px;
     box-sizing: border-box;
 }
@@ -166,24 +166,26 @@ ul {
     border-radius: 0;
 }
 
-.component-list t-button paper-material {
+.component-list t-button paper-button {
     height: auto;
-    -ms-flex-direction: column;
-    -webkit-flex-direction: column;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
     padding: 18px 0 !important;
     font-size: 13px;
 }
 
-.component-link paper-material #text-icon {
+.component-link paper-button #text-icon {
     width: 52px;
     height: 52px;
     margin-bottom: 10px;
 }
 
-.component-list t-button[ico][icon-left] paper-material #text-button {
+.component-list t-button[ico][icon-left] paper-button #text-button {
     line-height: 1;
     margin-left: 0;
+    order: 2;
 }
 
 /*css for menu*/
@@ -201,6 +203,12 @@ ul {
     text-align:center;
     font-size:14px;
 }
+
+/* TODO: Hack. Assumes internal working of paper-item. Fix it. */
+.component-list paper-item[focused]:before {
+  background: rgba(0, 0, 0, 0);
+}
+
 .component-list .menu-item {
     cursor: pointer;
     text-align:left;
@@ -454,6 +462,7 @@ paper-spinner #spinnerContainer > div {
 }
 
 /* css from t-scaffold-fusion element */
+/* TODO: Hack. Assumes internal working of components. Fix it. */
 section[data-route="browser"] .header-bar {
     height: 114px;
     border-bottom: 1px solid #eee;
@@ -466,6 +475,15 @@ section[data-route="browser"] .header-bar > div#bottomBar paper-tabs {
     background: #f5f5f5;
     padding: 0;
     font-size: 14px;
+}
+
+section[data-route="browser"] .header-bar > div#bottomBar paper-tab {
+  font-family: inherit;
+}
+
+section[data-route="browser"] .header-bar > div#bottomBar #selectionBar {
+  background-color: #07c5f2;
+  height: 1px;
 }
 
 section[data-route="browser"] .header-bar > div#bottomBar paper-tab:focus .tab-content.paper-tab,

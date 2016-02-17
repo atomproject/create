@@ -56,27 +56,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <!-- endbuild -->
 
   <style is="custom-style">
+    /* TODO: Hack. Added here to increase specificity. */
     section[data-route="browser"] .header-bar {
         background: #fff;
         color: #555555;
         padding: 0 20px;
-    }
-
-    section[data-route="browser"] .header-bar t-button {
-        color:var(--light-primary-color);
-    }
-
-    section[data-route="browser"] .header-bar > div {
-        padding: 0;
-    }
-
-    section[data-route="browser"] .header-bar > div#topBar{
-        height: 64px;
-    }
-
-    section[data-route="browser"] .header-bar > div#bottomBar paper-tabs #selectionBar{
-        background-color: var(--default-primary-color);
-        height: 1px;
     }
 
     @media (max-width: 639px){
