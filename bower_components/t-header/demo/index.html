@@ -1,26 +1,50 @@
 <html>
+
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1"> 
-  	<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-	<link rel="import" href="../t-header.html">
-	<link rel="import" href="../t-flight-header.html">
-	<style>
-		body{
-			margin: 0;
-		}
-	</style>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../t-header.html">
+    <link rel="import" href="../t-flight-header.html">
+    <link rel="import" href="../t-hotel-search-recap.html">
+    <style>
+    body,
+    h2 {
+        margin: 0;
+    }
+    </style>
 </head>
+
 <body>
-	<t-header>
-	<t-flight-header></t-flight-header>
-	</t-header>
-
-	<t-header normal-heading>
-	</t-header>
+    <t-header>
+        <t-flight-header></t-flight-header>
+    </t-header>
+    <t-header normal-heading>
+    </t-header>
+    <t-header right-icon="arrow-forward">
+        <t-hotel-search-recap class="withoutHotelName">
+        </t-hotel-search-recap>
+    </t-header>
+    <t-header right-icon="arrow-forward">
+        <t-hotel-search-recap hotel-name="Hyatt Whatever">
+        </t-hotel-search-recap>
+    </t-header>
 </body>
+
+<script>
+    document.addEventListener('right-button-click', function(e) {
+        e.srcElement.rightIcon = e.srcElement.rightIcon == "arrow-back" ? "arrow-forward" : "arrow-back";
+    });
+
+    var item = document.querySelector('.withoutHotelName');
+    item.location = 'Las Vegas';
+    item.checkIn = new Date('1/1/2016');
+    item.checkOut = new Date('1/3/2016');
+    item.adultCount = 2;
+    item.childCount = 1;
+    item.searchPageUrl = 'url-to-search-page';
+</script>
+
 </html>
-
-

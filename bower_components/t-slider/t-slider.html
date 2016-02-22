@@ -75,7 +75,7 @@ To change the slider disabled secondary progress bar color:
     <label>{{label}}</label>
     <div id="sliderContainer" class$="[[_getClassNames(disabled, pin, snaps, immediateValue, min, expand, dragging, transiting, editable)]]">
       <div class="bar-container">
-        <paper-progress id="sliderBar" aria-hidden="true" min="[[min]]" max="[[max]]" value="[[immediateValue]]" secondary-progress="[[secondaryProgress]]"
+        <paper-progress id="sliderBar" disabled="{{disabled}}" aria-hidden="true" min="[[min]]" max="[[max]]" value="[[immediateValue]]" secondary-progress="[[secondaryProgress]]"
           on-down="_bardown" on-up="_resetKnob" on-track="_onTrack"></paper-progress>
       </div>
 

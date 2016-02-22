@@ -119,6 +119,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   order:2;
 }
 
+/* TODO: Hack. Use iron behaviors to remove ripples */
+paper-ripple {
+  color: rgba(0, 0, 0, 0) !important;
+}
+
 @media (max-width: 600px) {
   #radioLabel {
     font-size: var(--standard-input-field-text-size);

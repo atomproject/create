@@ -1,6 +1,7 @@
 from __future__ import print_function
 import sys
 import os
+import io
 import getopt
 import re
 import string
@@ -64,7 +65,7 @@ class BeautifierOptions:
         self.indent_size = 4
         self.indent_char = ' '
         self.indent_with_tabs = False
-        self.eol = '\n'
+        self.eol = 'auto'
         self.preserve_newlines = True
         self.max_preserve_newlines = 10
         self.space_in_paren = False
@@ -127,10 +128,12 @@ class BeautifierFlags:
         self.declaration_statement = False
         self.declaration_assignment = False
         self.multiline_frame = False
+        self.inline_frame = False
         self.if_block = False
         self.else_block = False
         self.do_block = False
         self.do_while = False
+        self.import_block = False
         self.in_case = False
         self.in_case_statement = False
         self.case_body = False
@@ -186,19 +189,22 @@ class Acorn:
         # Matches a whole line break (where CRLF is considered a single
         # line break). Used to count lines.
 
+        # in javascript, these two differ
+        # in python they are the same, different methods are called on them
         self.lineBreak = re.compile(self.six.u("\r\n|[\n\r\u2028\u2029]"))
+        self.allLineBreaks = self.lineBreak
 
 
     # Test whether a given character code starts an identifier.
     def isIdentifierStart(self, code):
         if code < 65:
-            return code == 36
+            return code in [36, 64] # permit $ (36) and @ (64). @ is used in ES7 decorators.
         if code < 91:
-            return True
+            return True # 65 through 91 are uppercase letters
         if code < 97:
-            return code == 95
+            return code == 95 # permit _ (95)
         if code < 123:
-            return True
+            return True # 97 through 123 are lowercase letters
         return code >= 0xaa and self.nonASCIIidentifierStart.match(self.six.unichr(code)) != None
 
     # Test whether a given character is part of an identifier.
@@ -226,6 +232,7 @@ class Token:
         self.wanted_newline = newlines > 0
         self.whitespace_before = whitespace_before
         self.parent = None
+        self.opened = None
         self.directives = None
 
 
@@ -238,12 +245,23 @@ def beautify(string, opts = default_options() ):
     return b.beautify(string, opts)
 
 def beautify_file(file_name, opts = default_options() ):
+    input_string = ''
     if file_name == '-': # stdin
-        stream = sys.stdin
-    else:
-        stream = open(file_name)
+        try:
+            if sys.stdin.isatty():
+                raise
 
-    return beautify(''.join(stream.readlines()), opts)
+            stream = sys.stdin
+            input_string = ''.join(stream.readlines())
+        except Exception as ex:
+            print("Must pipe input or define at least one file.", file=sys.stderr)
+            usage(sys.stderr)
+            raise
+    else:
+        stream = io.open(file_name, 'rt', newline='')
+        input_string = ''.join(stream.readlines())
+
+    return beautify(input_string, opts)
 
 
 def usage(stream=sys.stdout):
@@ -259,23 +277,24 @@ Usage: jsbeautifier.py [options] <infile>
 
 Input options:
 
- -i,  --stdin                      read input from stdin
+ -i,  --stdin                      Read input from stdin
 
 Output options:
 
- -s,  --indent-size=NUMBER         indentation size. (default 4).
- -c,  --indent-char=CHAR           character to indent with. (default space).
- -e,  --eol=STRING                 character(s) to use as line terminators. (default newline - "\\n")
+ -s,  --indent-size=NUMBER         Indentation size. (default 4).
+ -c,  --indent-char=CHAR           Character to indent with. (default space).
+ -e,  --eol=STRING                 Character(s) to use as line terminators.
+                                   (default first newline in file, otherwise "\\n")
  -t,  --indent-with-tabs           Indent with tabs, overrides -s and -c
- -d,  --disable-preserve-newlines  do not preserve existing line breaks.
- -P,  --space-in-paren             add padding spaces within paren, ie. f( a, b )
+ -d,  --disable-preserve-newlines  Do not preserve existing line breaks.
+ -P,  --space-in-paren             Add padding spaces within paren, ie. f( a, b )
  -E,  --space-in-empty-paren       Add a single space inside empty paren, ie. f( )
- -j,  --jslint-happy               more jslint-compatible output
- -a,  --space_after_anon_function  add a space before an anonymous function's parens, ie. function ()
- -b,  --brace-style=collapse       brace style (collapse, expand, end-expand)
- -k,  --keep-array-indentation     keep array indentation.
- -r,  --replace                    write output in-place, replacing input
- -o,  --outfile=FILE               specify a file to output to (default stdout)
+ -j,  --jslint-happy               More jslint-compatible output
+ -a,  --space_after_anon_function  Add a space before an anonymous function's parens, ie. function ()
+ -b,  --brace-style=collapse       Brace style (collapse-preserve-inline, collapse, expand, end-expand)
+ -k,  --keep-array-indentation     Keep array indentation.
+ -r,  --replace                    Write output in-place, replacing input
+ -o,  --outfile=FILE               Specify a file to output to (default stdout)
  -f,  --keep-function-indentation  Do not re-indent function bodies defined in var lines.
  -x,  --unescape-strings           Decode printable chars encoded in \\xNN notation.
  -X,  --e4x                        Pass E4X xml literals through untouched
@@ -289,9 +308,9 @@ Rarely needed options:
                                    installed. May be useful with some obfuscated
                                    script but poses a potential security issue.
 
- -l,  --indent-level=NUMBER        initial indentation level. (default 0).
+ -l,  --indent-level=NUMBER        Initial indentation level. (default 0).
 
- -h,  --help, --usage              prints this help statement.
+ -h,  --help, --usage              Prints this help statement.
  -v, --version                     Show the version
 
 """, file=stream)
@@ -311,8 +330,8 @@ class Beautifier:
     def __init__(self, opts = default_options() ):
 
         self.opts = copy.copy(opts)
-        self.blank_state()
         self.acorn = Acorn()
+        self.blank_state()
 
     def blank_state(self, js_source_text = None):
 
@@ -331,6 +350,11 @@ class Beautifier:
         if self.opts.indent_with_tabs:
             self.opts.indent_char = "\t"
             self.opts.indent_size = 1
+
+        if self.opts.eol == 'auto':
+            self.opts.eol = '\n'
+            if self.acorn.lineBreak.search(js_source_text or ''):
+                self.opts.eol = self.acorn.lineBreak.search(js_source_text).group()
 
         self.opts.eol = self.opts.eol.replace('\\r', '\r').replace('\\n', '\n')
 
@@ -360,8 +384,8 @@ class Beautifier:
         if opts != None:
             self.opts = copy.copy(opts)
 
-        if self.opts.brace_style not in ['expand', 'collapse', 'end-expand', 'none']:
-            raise(Exception('opts.brace_style must be "expand", "collapse", "end-expand", or "none".'))
+        if self.opts.brace_style not in ['expand', 'collapse', 'collapse-preserve-inline', 'end-expand', 'none']:
+            raise(Exception('opts.brace_style must be "expand", "collapse", "collapse-preserve-inline", "end-expand", or "none".'))
 
         s = self.blank_state(s)
 
@@ -454,6 +478,7 @@ class Beautifier:
         return mode in [MODE.Expression, MODE.ForInitializer, MODE.Conditional]
 
 
+    _newline_restricted_tokens = ['break','contiue','return', 'throw']
     def allow_wrap_or_preserved_newline(self, current_token, force_linewrap = False):
         # never wrap the first token of a line.
         if self.output.just_added_newline():
@@ -462,6 +487,10 @@ class Beautifier:
         if (self.opts.preserve_newlines and current_token.wanted_newline) or force_linewrap:
             self.print_newline(preserve_statement_flags = True)
         elif self.opts.wrap_line_length > 0:
+            if self.last_type == 'TK_RESERVED' and self.flags.last_text in self._newline_restricted_tokens:
+                # These tokens should never have a newline inserted between
+                # them and the following expression.
+                return
             proposed_line_length = self.output.current_line.get_character_count() + len(current_token.text)
             if self.output.space_before_token:
                 proposed_line_length += 1
@@ -496,7 +525,16 @@ class Beautifier:
 
         if self.opts.comma_first and self.last_type == 'TK_COMMA' and self.output.just_added_newline():
             if self.output.previous_line.last() == ',':
-                self.output.previous_line.pop()
+                # if the comma was already at the start of the line,
+                # pull back onto that line and reprint the indentation
+                popped = self.output.previous_line.pop()
+                if  self.output.previous_line.is_empty():
+                     self.output.previous_line.push(popped)
+                     self.output.trim(True)
+                     self.output.current_line.pop()
+                     self.output.trim()
+
+                # add the comma in front of the next token
                 self.print_token_line_indentation(current_token)
                 self.output.add_token(',')
                 self.output.space_before_token = True
@@ -544,7 +582,7 @@ class Beautifier:
         if (
             (self.last_type == 'TK_RESERVED' and self.flags.last_text in ['var', 'let', 'const'] and current_token.type == 'TK_WORD') \
                 or (self.last_type == 'TK_RESERVED' and self.flags.last_text== 'do') \
-                or (self.last_type == 'TK_RESERVED' and self.flags.last_text== 'return' and not current_token.wanted_newline) \
+                or (self.last_type == 'TK_RESERVED' and self.flags.last_text in ['return', 'throw'] and not current_token.wanted_newline) \
                 or (self.last_type == 'TK_RESERVED' and self.flags.last_text == 'else' and not (current_token.type == 'TK_RESERVED' and current_token.text == 'if' )) \
                 or (self.last_type == 'TK_END_EXPR' and (self.previous_flags.mode == MODE.ForInitializer or self.previous_flags.mode == MODE.Conditional)) \
                 or (self.last_type == 'TK_WORD' and self.flags.mode == MODE.BlockStatement \
@@ -646,6 +684,15 @@ class Beautifier:
             if not self.start_of_object_property():
                 self.allow_wrap_or_preserved_newline(current_token)
 
+
+        # Support preserving wrapped arrow function expressions
+        # a.b('c',
+        #     () => d.e
+        # )
+        if current_token.text == '(' and self.last_type not in ['TK_WORD', 'TK_RESERVED']:
+            self.allow_wrap_or_preserved_newline(current_token)
+
+
         self.set_mode(next_mode)
         self.print_token(current_token)
 
@@ -694,14 +741,24 @@ class Beautifier:
         next_token = self.get_token(1)
         second_token = self.get_token(2)
         if second_token != None and \
-            ((second_token.text == ':' and next_token.type in ['TK_STRING', 'TK_WORD', 'TK_RESERVED']) \
+            ((second_token.text in [':', ','] and next_token.type in ['TK_STRING', 'TK_WORD', 'TK_RESERVED']) \
                 or (next_token.text in ['get', 'set'] and second_token.type in ['TK_WORD', 'TK_RESERVED'])):
             # We don't support TypeScript,but we didn't break it for a very long time.
             # We'll try to keep not breaking it.
             if not self.last_last_text in ['class','interface']:
-                self.set_mode(MODE.ObjectLiteral);
+                self.set_mode(MODE.ObjectLiteral)
             else:
                 self.set_mode(MODE.BlockStatement)
+        elif self.last_type == 'TK_OPERATOR' and self.flags.last_text == '=>':
+            # arrow function: (param1, paramN) => { statements }
+            self.set_mode(MODE.BlockStatement)
+        elif self.last_type in ['TK_EQUALS', 'TK_START_EXPR', 'TK_COMMA', 'TK_OPERATOR'] or \
+            (self.last_type == 'TK_RESERVED' and self.flags.last_text in ['return', 'throw', 'import']):
+            # Detecting shorthand function syntax is difficult by scanning forward,
+            #     so check the surrounding context.
+            # If the block is being returned, imported, passed as arg,
+            #     assigned with = or assigned in a nested object, treat as an ObjectLiteral.
+            self.set_mode(MODE.ObjectLiteral)
         else:
             self.set_mode(MODE.BlockStatement)
 
@@ -719,18 +776,39 @@ class Beautifier:
             else:
                 self.print_newline(preserve_statement_flags = True)
         else: # collapse
-            if self.last_type not in ['TK_OPERATOR', 'TK_START_EXPR']:
+            if self.opts.brace_style == 'collapse-preserve-inline':
+                # search forward for newline wanted inside this block
+                index = 0
+                check_token = None
+                self.flags.inline_frame = True
+                do_loop = True
+                while (do_loop):
+                    index += 1
+                    check_token = self.get_token(index)
+                    if check_token.wanted_newline:
+                        self.flags.inline_frame = False
+
+                    do_loop = (check_token.type != 'TK_EOF' and
+                          not (check_token.type == 'TK_END_BLOCK' and check_token.opened == current_token))
+
+
+
+            if self.is_array(self.previous_flags.mode) and (self.last_type == 'TK_START_EXPR' or self.last_type == 'TK_COMMA'):
+                # if we're preserving inline,
+                # allow newline between comma and next brace.
+                if self.flags.inline_frame:
+                    self.allow_wrap_or_preserved_newline(current_token)
+                    self.flags.inline_frame = True
+                    self.previous_flags.multiline_frame = self.previous_flags.multiline_frame or self.flags.multiline_frame
+                    self.flags.multiline_frame = False
+                elif self.last_type == 'TK_COMMA':
+                    self.output.space_before_token = True
+
+            elif self.last_type not in ['TK_OPERATOR', 'TK_START_EXPR']:
                 if self.last_type == 'TK_START_BLOCK':
                     self.print_newline()
                 else:
                     self.output.space_before_token = True
-            else:
-                # if TK_OPERATOR or TK_START_EXPR
-                if self.is_array(self.previous_flags.mode) and self.flags.last_text == ',':
-                    if self.last_last_text == '}':
-                        self.output.space_before_token = True
-                    else:
-                        self.print_newline()
 
         self.print_token(current_token)
         self.indent()
@@ -748,7 +826,9 @@ class Beautifier:
         else:
             # skip {}
             if not empty_braces:
-                if self.is_array(self.flags.mode) and self.opts.keep_array_indentation:
+                if self.flags.inline_frame:
+                    self.output.space_before_token = True
+                elif self.is_array(self.flags.mode) and self.opts.keep_array_indentation:
                     self.opts.keep_array_indentation = False
                     self.print_newline()
                     self.opts.keep_array_indentation = True
@@ -760,14 +840,15 @@ class Beautifier:
 
 
     def handle_word(self, current_token):
-        if current_token.type == 'TK_RESERVED' and self.flags.mode != MODE.ObjectLiteral and \
-            current_token.text in ['set', 'get']:
-            current_token.type = 'TK_WORD'
-
-        if current_token.type == 'TK_RESERVED' and self.flags.mode == MODE.ObjectLiteral:
-            next_token = self.get_token(1)
-            if next_token.text == ':':
+        if current_token.type == 'TK_RESERVED':
+            if current_token.text in ['set', 'get'] and self.flags.mode != MODE.ObjectLiteral:
                 current_token.type = 'TK_WORD'
+            elif current_token.text in ['as', 'from'] and not self.flags.import_block:
+                current_token.type = 'TK_WORD'
+            elif self.flags.mode == MODE.ObjectLiteral:
+                next_token = self.get_token(1)
+                if next_token.text == ':':
+                    current_token.type = 'TK_WORD'
 
         if self.start_of_statement(current_token):
             # The conditional starts the statement if appropriate.
@@ -851,7 +932,7 @@ class Beautifier:
         prefix = 'NONE'
 
         if self.last_type == 'TK_END_BLOCK':
-            if not (current_token.type == 'TK_RESERVED' and current_token.text in ['else', 'catch', 'finally']):
+            if not (current_token.type == 'TK_RESERVED' and current_token.text in ['else', 'catch', 'finally', 'from']):
                 prefix = 'NEWLINE'
             else:
                 if self.opts.brace_style in ['expand', 'end-expand'] or \
@@ -871,7 +952,10 @@ class Beautifier:
             (self.flags.last_text == '*' and self.last_last_text == 'function'):
             prefix = 'SPACE'
         elif self.last_type == 'TK_START_BLOCK':
-            prefix = 'NEWLINE'
+            if self.flags.inline_frame:
+                prefix = 'SPACE'
+            else:
+                prefix = 'NEWLINE'
         elif self.last_type == 'TK_END_EXPR':
             self.output.space_before_token = True
             prefix = 'NEWLINE'
@@ -883,7 +967,7 @@ class Beautifier:
                 prefix = 'NEWLINE'
 
         if current_token.type == 'TK_RESERVED' and current_token.text in ['else', 'catch', 'finally']:
-            if self.last_type != 'TK_END_BLOCK' \
+            if (not (self.last_type == 'TK_END_BLOCK' and self.previous_flags.mode == MODE.BlockStatement)) \
                or self.opts.brace_style == 'expand' \
                or self.opts.brace_style == 'end-expand' \
                or (self.opts.brace_style == 'none' and current_token.wanted_newline):
@@ -920,11 +1004,15 @@ class Beautifier:
         self.print_token(current_token)
         self.flags.last_word = current_token.text
 
-        if current_token.type == 'TK_RESERVED' and current_token.text == 'do':
-            self.flags.do_block = True
-
-        if current_token.type == 'TK_RESERVED' and current_token.text == 'if':
-            self.flags.if_block = True
+        if current_token.type == 'TK_RESERVED':
+            if current_token.text == 'do':
+                self.flags.do_block = True
+            elif current_token.text == 'if':
+                self.flags.if_block = True
+            elif current_token.text == 'import':
+                self.flags.import_block = True
+            elif current_token.text == 'from' and self.flags.import_block:
+                self.flags.import_block = False
 
 
     def handle_semicolon(self, current_token):
@@ -935,6 +1023,9 @@ class Beautifier:
         while self.flags.mode == MODE.Statement and not self.flags.if_block and not self.flags.do_block:
             self.restore_mode()
 
+        if self.flags.import_block:
+            self.flags.import_block = False
+
         self.print_token(current_token)
 
 
@@ -943,7 +1034,7 @@ class Beautifier:
             # The conditional starts the statement if appropriate.
             # One difference - strings want at least a space before
             self.output.space_before_token = True
-        elif self.last_type == 'TK_RESERVED' or self.last_type == 'TK_WORD':
+        elif self.last_type == 'TK_RESERVED' or self.last_type == 'TK_WORD' or self.flags.inline_frame:
             self.output.space_before_token = True
         elif self.last_type in ['TK_COMMA', 'TK_START_EXPR', 'TK_EQUALS', 'TK_OPERATOR']:
             if not self.start_of_object_property():
@@ -969,40 +1060,34 @@ class Beautifier:
 
 
     def handle_comma(self, current_token):
+        self.print_token(current_token)
+        self.output.space_before_token = True
+
         if self.flags.declaration_statement:
             if self.is_expression(self.flags.parent.mode):
                 # do not break on comma, for ( var a = 1, b = 2
                 self.flags.declaration_assignment = False
 
-            self.print_token(current_token)
-
             if self.flags.declaration_assignment:
                 self.flags.declaration_assignment = False
                 self.print_newline(preserve_statement_flags = True)
-            else:
-                self.output.space_before_token = True
+            elif self.opts.comma_first:
                 # for comma-first, we want to allow a newline before the comma
                 # to turn into a newline after the comma, which we will fixup later
-                if self.opts.comma_first:
-                    self.allow_wrap_or_preserved_newline(current_token)
-            return
+                self.allow_wrap_or_preserved_newline(current_token)
 
-        self.print_token(current_token)
-
-        if self.flags.mode == MODE.ObjectLiteral \
+        elif self.flags.mode == MODE.ObjectLiteral \
             or (self.flags.mode == MODE.Statement and self.flags.parent.mode ==  MODE.ObjectLiteral):
             if self.flags.mode == MODE.Statement:
                 self.restore_mode()
 
-            self.print_newline()
-        else:
+            if not self.flags.inline_frame:
+                self.print_newline()
+        elif self.opts.comma_first:
             # EXPR or DO_BLOCK
-            self.output.space_before_token = True
-
             # for comma-first, we want to allow a newline before the comma
             # to turn into a newline after the comma, which we will fixup later
-            if self.opts.comma_first:
-                self.allow_wrap_or_preserved_newline(current_token)
+            self.allow_wrap_or_preserved_newline(current_token)
 
 
     def handle_operator(self, current_token):
@@ -1075,7 +1160,8 @@ class Beautifier:
                 if current_token.text in ['-', '+'] and self.flags.last_text in ['--', '++']:
                     space_after = True
 
-            if self.flags.mode == MODE.BlockStatement and self.flags.last_text in ['{', ';']:
+            if (((self.flags.mode == MODE.BlockStatement and not self.flags.inline_frame) or self.flags.mode == MODE.Statement)
+                    and self.flags.last_text in ['{', ';']):
                 # { foo: --i }
                 # foo(): --bar
                 self.print_newline()
@@ -1127,7 +1213,7 @@ class Beautifier:
             self.output.space_before_token = True
             return
 
-        lines = self.acorn.lineBreak.split(current_token.text)
+        lines = self.acorn.allLineBreaks.split(current_token.text)
         javadoc = False
         starless = False
         last_indent = current_token.whitespace_before
@@ -1376,13 +1462,14 @@ class Tokenizer:
 
     whitespace = ["\n", "\r", "\t", " "]
     digit = re.compile('[0-9]')
+    digit_bin = re.compile('[01]')
+    digit_oct = re.compile('[01234567]')
     digit_hex = re.compile('[0123456789abcdefABCDEF]')
-    punct = ('+ - * / % & ++ -- = += -= *= /= %= == === != !== > < >= <= >> << >>> >>>= >>= <<= && &= | || ! ~ , : ? ^ ^= |= :: =>' \
-              + ' <?= <? ?> <%= <% %>').split(' ')
+    punct = ('+ - * / % & ++ -- = += -= *= /= %= == === != !== > < >= <= >> << >>> >>>= >>= <<= && &= | || ! ~ , : ? ^ ^= |= :: => **').split(' ')
 
     # Words which always should start on a new line
     line_starters = 'continue,try,throw,return,var,let,const,if,switch,case,default,for,while,break,function,import,export'.split(',')
-    reserved_words = line_starters + ['do', 'in', 'else', 'get', 'set', 'new', 'catch', 'finally', 'typeof', 'yield', 'async', 'await']
+    reserved_words = line_starters + ['do', 'in', 'else', 'get', 'set', 'new', 'catch', 'finally', 'typeof', 'yield', 'async', 'await', 'from', 'as']
 
     def __init__ (self, input, opts, indent_string):
         self.input = input
@@ -1438,6 +1525,7 @@ class Tokenizer:
                     (next.text == ')' and open.text == '(') or \
                     (next.text == '}' and open.text == '{'))):
                 next.parent = open.parent
+                next.opened = open
                 open = open_stack.pop()
 
             self.tokens.append(next)
@@ -1493,18 +1581,26 @@ class Tokenizer:
         if len(whitespace_on_this_line) != 0:
             self.whitespace_before_token = ''.join(whitespace_on_this_line)
 
-        if self.digit.match(c):
+        if self.digit.match(c) or (c == '.' and self.digit.match(self.input[self.parser_pos])):
             allow_decimal = True
             allow_e = True
             local_digit = self.digit
 
-            if c == '0' and self.parser_pos < len(self.input) and re.match('[Xx]', self.input[self.parser_pos]):
-                # switch to hex number, no decimal or e, just hex digits
+            if c == '0' and self.parser_pos < len(self.input) and re.match('[XxOoBb]', self.input[self.parser_pos]):
+                # switch to hex/oct/bin number, no decimal or e, just hex/oct/bin digits
                 allow_decimal = False
                 allow_e = False
+                if re.match('[Bb]', self.input[self.parser_pos]):
+                    local_digit = self.digit_bin
+                elif re.match('[Oo]', self.input[self.parser_pos]):
+                    local_digit = self.digit_oct
+                else:
+                    local_digit = self.digit_hex
                 c += self.input[self.parser_pos]
                 self.parser_pos += 1
-                local_digit = self.digit_hex
+            elif c == '.':
+                # Already have a decimal for this literal, don't allow another
+                allow_decimal = False
             else:
                 # we know this first loop will run.  It keeps the logic simpler.
                 c = ''
@@ -1519,8 +1615,7 @@ class Tokenizer:
                     c += self.input[self.parser_pos]
                     self.parser_pos += 1
                     allow_decimal = False
-
-                if allow_e and self.parser_pos < len(self.input) and re.match('[Ee]', self.input[self.parser_pos]):
+                elif allow_e and self.parser_pos < len(self.input) and re.match('[Ee]', self.input[self.parser_pos]):
                     c += self.input[self.parser_pos]
                     self.parser_pos += 1
 
@@ -1579,7 +1674,7 @@ class Tokenizer:
                     comment_match = self.directives_end_ignore_pattern.match(self.input, self.parser_pos)
                     comment += comment_match.group(0)
                     self.parser_pos += len(comment_match.group(0))
-                comment = re.sub(self.acorn.lineBreak, '\n', comment)
+                comment = re.sub(self.acorn.allLineBreaks, '\n', comment)
                 return comment, 'TK_BLOCK_COMMENT', directives
 
             if self.input[self.parser_pos] == '/': # peek // comment
@@ -1592,7 +1687,7 @@ class Tokenizer:
         if c == '`' or c == "'" or c == '"' or \
             ( \
                 (c == '/') or \
-                (self.opts.e4x and c == "<" and re.match('^<([-a-zA-Z:0-9_.]+|{[^{}]*}|!\[CDATA\[[\s\S]*?\]\])(\s+[-a-zA-Z:0-9_.]+\s*=\s*(\'[^\']*\'|"[^"]*"|{.*?}))*\s*(/?)\s*>', self.input[self.parser_pos - 1:])) \
+                (self.opts.e4x and c == "<" and re.match('^<([-a-zA-Z:0-9_.]+|{.+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{.+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*(\'[^\']*\'|"[^"]*"|{.+?}))*\s*(/?)\s*>', self.input[self.parser_pos - 1:])) \
             ) and ( \
                 (last_token.type == 'TK_RESERVED' and last_token.text in ['return', 'case', 'throw', 'else', 'do', 'typeof', 'yield']) or \
                 (last_token.type == 'TK_END_EXPR' and last_token.text == ')' and \
@@ -1625,7 +1720,7 @@ class Tokenizer:
 
             elif self.opts.e4x and sep == '<':
                 # handle e4x xml literals
-                xmlRegExp = re.compile('<(\/?)([-a-zA-Z:0-9_.]+|{[^{}]*}|!\[CDATA\[[\s\S]*?\]\])(\s+[-a-zA-Z:0-9_.]+\s*=\s*(\'[^\']*\'|"[^"]*"|{.*?}))*\s*(/?)\s*>')
+                xmlRegExp = re.compile('<(\/?)([-a-zA-Z:0-9_.]+|{.+?}|!\[CDATA\[[\s\S]*?\]\])(\s+{.+?}|\s+[-a-zA-Z:0-9_.]+|\s+[-a-zA-Z:0-9_.]+\s*=\s*(\'[^\']*\'|"[^"]*"|{.+?}))*\s*(/?)\s*>')
                 xmlStr = self.input[self.parser_pos - 1:]
                 match = xmlRegExp.match(xmlStr)
                 if match:
@@ -1652,47 +1747,62 @@ class Tokenizer:
                         xmlLength = len(xmlStr)
 
                     self.parser_pos += xmlLength - 1
-                    xmlStr = re.sub(self.acorn.lineBreak, '\n', xmlStr[:xmlLength])
+                    xmlStr = re.sub(self.acorn.allLineBreaks, '\n', xmlStr[:xmlLength])
                     return xmlStr, 'TK_STRING'
 
             else:
                 # handle string
-                while self.parser_pos < len(self.input) and \
-                        (esc or (self.input[self.parser_pos] != sep and
-                            (sep == '`' or not self.acorn.newline.match(self.input[self.parser_pos])))):
-                    resulting_string += self.input[self.parser_pos]
-                    # Handle \r\n linebreaks after escapes or in template strings
-                    if self.input[self.parser_pos] == '\r' and self.parser_pos + 1 < len(self.input) and self.input[self.parser_pos + 1] == '\n':
+                def parse_string(self, resulting_string, delimiter, allow_unescaped_newlines = False, start_sub = None):
+                    esc = False
+                    esc1 = 0
+                    esc2 = 0
+                    while self.parser_pos < len(self.input) and \
+                            (esc or (self.input[self.parser_pos] != delimiter and
+                                (allow_unescaped_newlines or not self.acorn.newline.match(self.input[self.parser_pos])))):
+                        resulting_string += self.input[self.parser_pos]
+                        # Handle \r\n linebreaks after escapes or in template strings
+                        if self.input[self.parser_pos] == '\r' and self.parser_pos + 1 < len(self.input) and self.input[self.parser_pos + 1] == '\n':
+                            self.parser_pos += 1
+                            resulting_string += '\n'
+
+                        if esc1 and esc1 >= esc2:
+                            try:
+                                esc1 = int(resulting_string[-esc2:], 16)
+                            except Exception:
+                                esc1 = False
+                            if esc1 and esc1 >= 0x20 and esc1 <= 0x7e:
+                                esc1 = chr(esc1)
+                                resulting_string = resulting_string[:-2 - esc2]
+                                if esc1 == delimiter or esc1 == '\\':
+                                        resulting_string += '\\'
+                                resulting_string += esc1
+                            esc1 = 0
+                        if esc1:
+                            esc1 += 1
+                        elif not esc:
+                            esc = self.input[self.parser_pos] == '\\'
+                        else:
+                            esc = False
+                            if self.opts.unescape_strings:
+                                if self.input[self.parser_pos] == 'x':
+                                    esc1 += 1
+                                    esc2 = 2
+                                elif self.input[self.parser_pos] == 'u':
+                                    esc1 += 1
+                                    esc2 = 4
                         self.parser_pos += 1
-                        resulting_string += '\n'
 
-                    if esc1 and esc1 >= esc2:
-                        try:
-                            esc1 = int(resulting_string[-esc2:], 16)
-                        except Exception:
-                            esc1 = False
-                        if esc1 and esc1 >= 0x20 and esc1 <= 0x7e:
-                            esc1 = chr(esc1)
-                            resulting_string = resulting_string[:-2 - esc2]
-                            if esc1 == sep or esc1 == '\\':
-                                    resulting_string += '\\'
-                            resulting_string += esc1
-                        esc1 = 0
-                    if esc1:
-                        esc1 += 1
-                    elif not esc:
-                        esc = self.input[self.parser_pos] == '\\'
-                    else:
-                        esc = False
-                        if self.opts.unescape_strings:
-                            if self.input[self.parser_pos] == 'x':
-                                esc1 += 1
-                                esc2 = 2
-                            elif self.input[self.parser_pos] == 'u':
-                                esc1 += 1
-                                esc2 = 4
-                    self.parser_pos += 1
+                        if start_sub and resulting_string.endswith(start_sub):
+                            if delimiter == '`':
+                                resulting_string = parse_string(self, resulting_string, '}', allow_unescaped_newlines, '`')
+                            else:
+                                resulting_string = parse_string(self, resulting_string, '`', allow_unescaped_newlines, '${')
+                    return resulting_string
 
+                if sep == '`':
+                    resulting_string = parse_string(self, resulting_string, '`', True, '${')
+                else:
+                    resulting_string = parse_string(self, resulting_string, sep)
 
             if self.parser_pos < len(self.input) and self.input[self.parser_pos] == sep:
                 resulting_string += sep
@@ -1704,7 +1814,7 @@ class Tokenizer:
                     while self.parser_pos < len(self.input) and self.acorn.isIdentifierStart(ord(self.input[self.parser_pos])):
                         resulting_string += self.input[self.parser_pos]
                         self.parser_pos += 1
-            resulting_string = re.sub(self.acorn.lineBreak, '\n', resulting_string)
+            resulting_string = re.sub(self.acorn.allLineBreaks, '\n', resulting_string)
 
             return resulting_string, 'TK_STRING'
 
@@ -1746,7 +1856,7 @@ class Tokenizer:
             if template_match:
                 c = template_match.group(0)
                 self.parser_pos += len(c) - 1
-                c = re.sub(self.acorn.lineBreak, '\n', c)
+                c = re.sub(self.acorn.allLineBreaks, '\n', c)
                 return c, 'TK_STRING'
 
 
@@ -1785,7 +1895,7 @@ class Tokenizer:
 
 def isFileDifferent(filepath, expected):
     try:
-        return (''.join(open(filepath).readlines()) != expected)
+        return (''.join(io.open(filepath, 'rt', newline='').readlines()) != expected)
     except:
         return True
 
@@ -1863,26 +1973,33 @@ def main():
 
 
     if not file:
-        print("Must define at least one file.", file=sys.stderr)
-        return usage(sys.stderr)
-    else:
-        try:
-            if outfile == 'stdout' and replace and not file == '-':
-                outfile = file
+        file = '-'
 
-            pretty = beautify_file(file, js_options)
+    try:
+        if outfile == 'stdout' and replace and not file == '-':
+            outfile = file
 
-            if outfile == 'stdout':
-                sys.stdout.write(pretty)
-            else:
-                if isFileDifferent(outfile, pretty):
-                    mkdir_p(os.path.dirname(outfile))
-                    with open(outfile, 'w') as f:
-                        f.write(pretty)
+        pretty = beautify_file(file, js_options)
 
-        except Exception as ex:
-            print(ex, file=sys.stderr)
-            return 1
+        if outfile == 'stdout':
+            # python automatically converts newlines in text to "\r\n" when on windows
+            # switch to binary to prevent this
+            if sys.platform == "win32":
+                import msvcrt
+                msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
+
+            sys.stdout.write(pretty)
+        else:
+            if isFileDifferent(outfile, pretty):
+                mkdir_p(os.path.dirname(outfile))
+                # python automatically converts newlines in text to "\r\n" when on windows
+                # set newline to empty to prevent this
+                with io.open(outfile, 'wt', newline='') as f:
+                    f.write(pretty)
+
+    except Exception as ex:
+        print(ex, file=sys.stderr)
+        return 1
 
     # Success
     return 0

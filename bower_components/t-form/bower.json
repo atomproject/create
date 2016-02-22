@@ -1,6 +1,6 @@
 {
   "name": "t-form",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "authors": [
     "Rahul Pilkhwal <rahul.pilkhwal@tavisca.com>",
     "Shailesh Kumar Srivastava <ssrivastava@tavisca.com>",
@@ -25,27 +25,24 @@
     "tests"
   ],
   "dependencies": {
-    "iron-ajax": "PolymerElements/iron-ajax#1.0.0",
-    "paper-item": "PolymerElements/paper-item#1.0.2",
-    "t-autosuggest": "atomelements/t-autosuggest#master",
-    "t-button": "atomelements/t-button#master",
-    "t-calendar": "atomelements/t-calendar#master",
-    "t-checkbox-group": "atomelements/t-checkbox-group#master",
-    "t-colorpicker": "atomelements/t-colorpicker#master",
-    "t-dropdown": "atomelements/t-dropdown#master",
-    "t-input": "atomelements/t-input#master",
-    "t-notify": "atomelements/t-notify#master",
-    "t-radio-group": "atomelements/t-radio-group#master",
-    "t-slider": "atomelements/t-slider#master",
-    "t-stepper": "atomelements/t-stepper#master",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.0.0",
+    "paper-item": "PolymerElements/paper-item#^1.0.2",
+    "t-autosuggest": "atomelements/t-autosuggest#^1.0.0",
+    "t-button": "atomelements/t-button#^1.0.0",
+    "t-calendar": "atomelements/t-calendar#^1.0.0",
+    "t-checkbox-group": "atomelements/t-checkbox-group#^1.0.0",
+    "t-colorpicker": "atomelements/t-colorpicker#^1.0.0",
+    "t-dropdown": "atomelements/t-dropdown#^1.0.0",
+    "t-input": "atomelements/t-input#^1.0.0",
+    "t-notify": "atomelements/t-notify#^1.0.0",
+    "t-radio-group": "atomelements/t-radio-group#^1.0.0",
+    "t-slider": "atomelements/t-slider#^1.0.0",
+    "t-stepper": "atomelements/t-stepper#^1.0.0",
     "polymer": "Polymer/polymer#^1.0.0"
   },
   "devDependencies": {
     "web-component-tester": "*",
-    "webcomponentsjs": "~0.7.14",
-    "iron-component-page": "PolymerElements/iron-component-page#~1.0.6"
-  },
-  "resolutions": {
-    "paper-behaviors": "~1.0.10"
+    "webcomponentsjs": "^0.7.14",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.6"
   }
 }

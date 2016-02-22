@@ -2,7 +2,7 @@
     "t-autosuggest": {
         "attributes": {
             "required": "",
-            "label": "sasasasa"
+            "label": "Untitled Autosuggest"
         },
         "property": {
             "name": "Autosuggest",
@@ -372,9 +372,7 @@
         "innerHTML": ""
     },
     "t-section-header": {
-        "attributes": {
-            "label": "Some header"
-        },
+        "attributes": {},
         "property": {
             "name": "Section Header",
             "properties": [

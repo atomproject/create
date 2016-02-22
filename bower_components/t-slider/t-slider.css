@@ -19,26 +19,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   font-family: var(--primary-font-family, 'Open Sans');
 }
+
 :host([label]) label{
     color: var(--form-label-color);
     font-size: var(--form-label-size);
     display: block;
     margin-bottom: var(--form-label-margin);
 }
-:host(:not([disabled])) #sliderBar::shadow #activeProgress {
-  background-color: var(--t-slider-active-color, --google-blue-700);
-}
 
-:host(:not([disabled])) #sliderBar::shadow #secondaryProgress {
-  background-color: var(--t-slider-secondary-color, --google-blue-300);
-}
-
-:host([disabled]) #sliderBar::shadow #activeProgress {
-  background-color: var(--t-slider-disabled-active-color, --google-grey-500);
-}
-
-:host([disabled]) #sliderBar::shadow #secondaryProgress {
-  background-color: var(--t-slider-disabled-secondary-color, --google-grey-300);
+/*
+TODO: apply transition css,
+using variables --paper-progress-transition-duration doesn't work
+*/;
+#sliderBar {
+  --paper-progress-active-color: var(--t-slider-active-color, --google-blue-700);
+  --paper-progress-secondary-color: var(--t-slider-secondary-color, --google-blue-300);
+  --paper-progress-disabled-active-color: var(--t-slider-disabled-active-color, --google-grey-500);
+  --paper-progress-disabled-secondary-color: var(--t-slider-disabled-secondary-color, --google-grey-300);
+  --paper-progress-height: 2px;
 }
 
 :host(:focus) {
@@ -119,11 +117,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   height: 2px;
   border-radius: 50%;
   background-color: black;
-}
-
-.transiting #sliderBar::shadow #activeProgress {
-  transition: -webkit-transform 0.08s ease;
-  transition: transform 0.08s ease;
 }
 
 #sliderKnob {

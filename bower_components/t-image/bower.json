@@ -1,6 +1,6 @@
 {
   "name": "t-image",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "authors": [
     "Rahul Pilkhwal <rahul.pilkhwal@tavisca.com>",
     "Shailesh Kumar Srivastava <ssrivastava@tavisca.com>",
@@ -30,8 +30,8 @@
   },
   "devDependencies": {
     "web-component-tester": "*",
-    "webcomponentsjs": "~0.7.14",
-    "iron-component-page": "PolymerElements/iron-component-page#~1.0.6",
-    "t-shared-components": "atomelements/t-shared-components#~0.0.0"
+    "webcomponentsjs": "^0.7.14",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.6",
+    "t-shared-components": "atomelements/t-shared-components#^1.0.0"
   }
 }

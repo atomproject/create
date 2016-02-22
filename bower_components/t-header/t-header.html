@@ -3,27 +3,51 @@
 <link rel="import" href="../iron-icons/editor-icons.html" />
 <link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html" />
 <link rel="import" href="../t-button/t-button.html" />
+<!--
+    `<t-header>` is a polymer component that generates a header for mobile with a back button on left and right icon on right.
+    Both the icon can be modified with `icon` and `rightIcon` property.
+    You can take action on events fired on right button click `right-button-click`.
 
+    Set normal-heading to true and mention a label if you are just targeting normal heading.
+
+
+    Basic usage
+    `
+    <t-header url="@Url.Action("Index", "Details", Runtime.GetQueryParams(new List<KeyValuePair>()))" normal-heading label="Passenger Details"></t-header>
+    `
+    Advanced usage where we are passing content inside
+    `<t-header url="@Url.Action("Index", "Home", Runtime.GetQueryParams(new List<KeyValuePair>()))">
+                <t-flight-header
+                    id="flightHeader"
+                    is-one-way="[[isOneWay]]"
+                    url="@Url.Action("Index", "Home", Runtime.GetQueryParams(new List<KeyValuePair>()))"
+                    from-place="{{criteria.legs.0.departureLocation.code}}"
+                    to-place="{{criteria.legs.0.arrivalLocation.code}}"
+                    departure-date="{{criteria.legs.0.travelDate.date}}"
+                    passenger-Data="[[criteria.passengers]]"
+                    return-date="[[returnDate]]"></t-flight-header>
+            </t-header>`
+-->
 
 <dom-module id="t-header">
     <template>
     <style>
     :host{
-    	display: block;
+        display: block;
         position: relative;
     }
     .body {
-		display: block;
-		font-family: var(--header-font-family, --primary-font-family);
-		color: var(--light-color, #fff);
-/* 		padding: 0 10px;  */
-		text-align: center;
-		background: var(--base-color-1, #147be1);
-		height: var(-t-header-size,55px);
-		text-align: left;
+        font-family: var(--header-font-family, --primary-font-family);
+        color: var(--light-color, #fff);
+/*      padding: 0 10px;  */
+        background: var(--base-color-1, #147be1);
+        height: var(-t-header-size,55px);
     }
     :host([normal-heading]) a{
         z-index: 1;
+    }
+    .header__mainRow{
+        overflow: hidden;
     }
     :host([normal-heading]) .header__mainRow{
         position: absolute;
@@ -39,17 +63,22 @@
         font-weight: 300;
     }
     iron-icon{
-    	background: transparent;
-    	min-width: 0;
-    	color:  var(--light-color, #fff);
-    	height: 30px;
-    	width: 30px;
+        background: transparent;
+        min-width: 0;
+        color:  var(--light-color, #fff);
+        height: 30px;
+        width: 30px;
         padding: 10px 5px;
+    }
+    :host ::content p#detail{
+      -ms-flex-pack: start;
+      -webkit-justify-content: flex-start;
+      justify-content: flex-start;
     }
     </style>
         <div class="layout horizontal center body">
-            <a  on-click="_checkUrl">
-                <iron-icon icon="arrow-back"></iron-icon>
+            <a on-click="_checkUrl">
+                <iron-icon icon="[[icon]]"></iron-icon>
             </a>
             <div class="layout horizontal center flex header__mainRow">
                 <template is="dom-if" if="{{!normalHeading}}">
@@ -59,6 +88,11 @@
                     <h1>{{label}}</h1>
                 </template>
             </div>
+            <template is="dom-if" if="{{_hasRightIcon}}">
+                <a on-click="_rightButtonClick">
+                    <iron-icon icon="{{rightIcon}}"></iron-icon>
+                </a>
+            </template>
         </div>
     </template>
 </dom-module>
@@ -69,18 +103,40 @@ Polymer({
 
     properties: {
 
+        /*The Label only works when the normal heading is set to true*/
         label:{
             type:String,
             reflectToAttribute:true,
             value:'Normal Heading'
         },
 
+        /*The left icon URL from set of iron icons. It has a default arrow back value.*/
+        icon:{
+            type:String,
+            value:'arrow-back'
+        },
+
+        /*The URL of the page to redirect to on left button click. Keep it empty to have no redirect action on left button click.*/
         url:{
             type:String,
             reflectToAttribute:true,
             value:''
         },
 
+        /*The Icon on the right.. Not works when the normal heading is set to true.*/
+        rightIcon:{
+            type:String,
+            reflectToAttribute:true,
+            value:''
+        },
+
+        /*to check whether the icon is there or not. This is required for the template if condition cause couldnt do it with 'if' function.*/
+        _hasRightIcon:{
+            type:Boolean,
+            computed:'_checkRightIcon(normalHeading,rightIcon)'
+        },
+
+        /*Normal heading is the boolean value to only put an icon and the header text.*/
         normalHeading:{
             type:Boolean,
             reflectToAttribute:true,
@@ -89,10 +145,25 @@ Polymer({
 
     },
 
+    /*to check if theres any icon present or not.*/
+    _checkRightIcon:function(normalHeading,rightIcon){
+        if(normalHeading)
+            return false;
+        if(rightIcon.length > 0)
+            return true;
+        return false;
+    },
+
     _checkUrl:function(e){
         if(this.url !== ""){
             window.location.href = this.url;
         }
+    },
+
+    /*to fire an event for the right icon click.*/
+    _rightButtonClick:function(){
+        /*event for the right icon click.*/
+        this.fire('right-button-click');
     }
 
 }) ;

@@ -144,6 +144,11 @@
   order:2;
 }
 
+/* TODO: Hack. Use iron behaviors to remove ripples */
+paper-ripple {
+  color: rgba(0, 0, 0, 0) !important;
+}
+
 
 @media (max-width: 600px) {
   #checkboxLabel {

@@ -1,6 +1,6 @@
 {
   "name": "t-shared-components",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "authors": [
     "Rahul Pilkhwal <rahul.pilkhwal@tavisca.com>",
     "Shailesh Kumar Srivastava <ssrivastava@tavisca.com>",
@@ -25,13 +25,13 @@
     "tests"
   ],
   "dependencies": {
-    "iron-icon": "PolymerElements/iron-icon#1.0.4",
-    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#1.0.4",
-    "paper-styles": "PolymerElements/paper-styles#1.0.11",
+    "iron-icon": "PolymerElements/iron-icon#^1.0.4",
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.0.4",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.11",
     "polymer": "Polymer/polymer#^1.0.0"
   },
   "devDependencies": {
-    "webcomponentsjs": "~0.7.14",
-    "iron-component-page": "PolymerElements/iron-component-page#~1.0.6"
+    "webcomponentsjs": "^0.7.14",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.6"
   }
 }

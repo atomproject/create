@@ -1,6 +1,6 @@
 {
   "name": "t-data-feeder",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "authors": [
     "Rahul Pilkhwal <rahul.pilkhwal@tavisca.com>",
     "Shailesh Kumar Srivastava <ssrivastava@tavisca.com>",
@@ -24,17 +24,17 @@
     "test",
     "tests"
   ],
-  "dependencies": { 
-    "iron-icon": "PolymerElements/iron-icon#1.0.4",
-    "iron-icons": "PolymerElements/iron-icons#1.0.3",
-    "iron-list": "PolymerElements/iron-list#1.1.0",
-    "t-input": "atomelements/t-input#0.0.0", 
+  "dependencies": {
+    "iron-icon": "PolymerElements/iron-icon#^1.0.4",
+    "iron-icons": "PolymerElements/iron-icons#^1.0.3",
+    "iron-list": "PolymerElements/iron-list#^1.1.0",
+    "t-input": "atomelements/t-input#^1.0.0",
     "polymer": "Polymer/polymer#^1.0.0"
   },
   "devDependencies": {
     "web-component-tester": "*",
-    "webcomponentsjs": "~0.7.14",
-    "t-radio-group": "atomelements/t-radio-group#0.0.0",
-    "iron-component-page": "PolymerElements/iron-component-page#~1.0.6"
+    "webcomponentsjs": "^0.7.14",
+    "t-radio-group": "atomelements/t-radio-group#^1.0.0",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.6"
   }
 }
