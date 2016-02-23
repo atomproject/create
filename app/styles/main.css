@@ -168,11 +168,12 @@ ul {
 
 .component-list t-button paper-button {
     height: auto;
-    display: flex;
+    /* TODO: __HACK__ we have to override the css applied to shadow dom */
+    display: flex !important;
+    padding: 18px 0 !important;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 18px 0 !important;
     font-size: 13px;
 }
 
