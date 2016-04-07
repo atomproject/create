@@ -150,19 +150,6 @@
                 attributes = meta.attributes = {};
               }
 
-              (meta.property.properties || []).forEach(function(prop) {
-                var fields = prop.fields || {};
-
-                Object.keys(fields).forEach(function(field) {
-                  var attrName = field;
-                  var value = fields[field].value;
-
-                  if (value !== null && value !== undefined) {
-                    attributes[attrName] = value;
-                  }
-                });
-              });
-
               meta.html = this.getComponentCode(name, attributes, innerHTML);
             }.bind(this));
 
