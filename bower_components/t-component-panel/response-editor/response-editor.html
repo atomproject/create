@@ -1,0 +1,111 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../paper-toast/paper-toast.html">
+<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../iron-icons/editor-icons.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
+<link rel="import" href="../../t-input/t-input.html">
+<link rel="import" href="../ace-element/ace-element.html">
+
+<link rel="import" href="firebase-lib.html">
+
+<dom-module id="response-editor">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      #url {
+        display: flex;
+        align-items: flex-end;
+      }
+
+      #url t-input {
+        flex: 1 1 auto;
+      }
+
+      #url paper-icon-button {
+        margin-bottom: 4px;
+        margin-left: 10px;
+        color: var(--primary-text-color, inherit);
+      }
+    </style>
+
+    <div id="url">
+      <t-input label="{{title}}" value="{{url}}"></t-input>
+      <paper-icon-button icon="editor:mode-edit" on-tap="editUrl"></paper-icon-button>
+    </div>
+    <iron-ajax id="ajax" url="{{url}}" handle-as="json" loading="{{loading}}" on-response="showJson" on-error="showError"></iron-ajax>
+    <paper-toast id="toast"></paper-toast>
+    <ace-element id="ace" value-saved="{{valueSaved}}" title="{{title}}" value="{{value}}"></ace-element>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'response-editor',
+
+      properties: {
+        url: {
+          type: String,
+          observer: '_urlChanged',
+          notify: true
+        },
+        valueSaved: {
+          type: Function,
+          value: function() {
+            return function valueSaved(value) {
+             if (!this.fireRef) return;
+
+             return this.fireRef.push(value)
+              .then(function(newDataRef) {
+                if (newDataRef) {
+                  this.url = this.fireRefUrl + '/' + newDataRef.key() + '.json';
+                  this._prevUrl = this.url;
+                }
+              }.bind(this));
+            }.bind(this);
+          }
+        },
+        fireRefUrl: String,
+        loading: Boolean,
+        _value: String,
+        title: String,
+        value: Object
+      },
+
+      ready: function() {
+        // shouldn't be hard coded
+        this.fireRefUrl = 'https://vivid-inferno-4587.firebaseio.com/data';
+
+        if (this.fireRefUrl) {
+          this.fireRef = new Firebase(this.fireRefUrl);
+        }
+      },
+
+      editUrl: function() {
+        if (this.url && this._prevUrl !== this.url) {
+          this._prevUrl = this.url;
+          this.$.ajax.generateRequest();
+        } else {
+          this.$.ace.openEditor();
+        }
+      },
+
+      _urlChanged: function() {
+        if (this.loading) {
+          this.$.ajax.cancelRequest();
+        }
+      },
+
+      showJson: function() {
+        this.value = this.$.ajax.lastResponse;
+        this.$.ace.openEditor();
+      },
+
+      showError: function() {
+        this.$.toast.text = 'Could not fetch json from provided url';
+        this.$.toast.open();
+      }
+    });
+  </script>
+</dom-module>

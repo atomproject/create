@@ -1,0 +1,27 @@
+{
+  "name": "code-generator-behavior",
+  "authors": [
+    "Ajinkya Tejankar <tejankarajinkya@gmail.com>"
+  ],
+  "description": "Generate html code for an element",
+  "main": "code-generator-behavior.html",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "^1.2.4",
+    "js-beautify": "beautify-web/js-beautify#^1.5.10"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.6"
+  },
+  "version": "1.1.0"
+}

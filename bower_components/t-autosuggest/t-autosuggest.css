@@ -1,15 +1,15 @@
   :host{
     position: relative;
     display: block;
-    font-family: var(--primary-font-family);
+    outline: none;
   }
-
+  
   :host *{
-    outline:0;    
+    outline:none;    
     box-shadow: none;
     -webkit-tap-highlight-color:transparent;
   }
-
+/* 
   :host([label]) label{
     color: var(--form-label-color);
     font-size: var(--form-label-size);
@@ -19,10 +19,10 @@
     width: 100%; 
     overflow: hidden;
     text-overflow: ellipsis;
-  }
+  } 
   :host([no-label-float]) label{
     display: none;
-  }
+  }*/
   #clearButton{
       position: absolute; 
       right: 5px;
@@ -42,11 +42,7 @@
       cursor: pointer;
       display: none;
   }  
-@media(min-width: 601px){
-  :host.label-is-floating:hover #clearButton{
-    display: block;
-  }
-}
+
   :host paper-material:hover input{
     padding-right: 25px!important;  
   }
@@ -56,7 +52,12 @@
       padding: 10px 0;
       z-index: 10;
   }
-
+   input{
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+/* 
   :host paper-material input{
     font-size: var(--autosuggest-input-text-size);
     color:var(--autosuggest-input-value-color);
@@ -70,15 +71,15 @@
   :host paper-material input::-webkit-input-placeholder {
    color: var(--autosuggest-input-placeholder-color);
   }
-  :host paper-material input:-moz-placeholder { /* Firefox 18- */
+  :host paper-material input:-moz-placeholder { Firefox 18-
      color: var(--autosuggest-input-placeholder-color);  
   }
-  :host paper-material input::-moz-placeholder {  /* Firefox 19+ */
+  :host paper-material input::-moz-placeholder {  Firefox 19+
      color: var(--autosuggest-input-placeholder-color);  
   }
   :host paper-material input:-ms-input-placeholder {  
      color: var(--autosuggest-input-placeholder-color);  
-  }
+  } */
   :host ::content .autocomplete {
     position: absolute;
     transition: all 0.5s ease 0s;
@@ -90,26 +91,6 @@
   }
 
   
-
-  .suggestions{
-    width: 100%;
-    padding: var(--standard-padding-input-field);
-    outline: 0;
-    font-family: inherit;
-  /* 
-  border-bottom: solid 1px #eee;
-  background: rgb(250,250,250); */
-  }
-
-  .suggestions[disabled]{
-  cursor: not-allowed;
-  color: rgb(84, 84, 84);
-  }
-
-  .suggestions([invalid]){
-  color: red;
-  border-bottom:solid 1px red;
-  }
   
   paper-material.paper-material-0{
     box-shadow: none;
@@ -144,8 +125,6 @@
     font-size: var(--autosuggest-item-text-size);
     overflow: hidden;
     padding: var(--autosuggest-item-padding);
-    /* line-height: 48px; */
-    /* height: 48px; */
     transition: background .15s linear;
     margin: 0;
     white-space: nowrap;
@@ -167,36 +146,14 @@
     display: none;
   }
 
-  :host.no-value .empty-error {
-    display: block;
-    position: absolute;
-    top: 100%;
-    padding: 0;
-    margin: 0;
-    left: 0;
-    font-size: var(--error-text-size);
-    color: var(--error-color);
-  }
-
+  :host.no-value .empty-error,
   :host.invalid-value .invalid-error {
-    display: block;
-    position: absolute;
-    top: 100%;
-    padding: 0;
-    margin: 0;
-    left: 0;
-    font-size: var(--error-text-size);
-    color: var(--error-color);
+    visibility: visible;
   }
 
-  :host.no-value input {
-   border-bottom: 2px solid ;
-   border-color:var(--error-color)!important;
-  }
-  
-  :host.invalid-value input {
-   border-bottom: 2px solid ;
-   border-color:var(--error-color)!important;
+  :host.no-value ::content .unfocused-line, 
+  :host.invalid-value ::content .unfocused-line {
+    background: var(--error-color);
   }  
 
   #spinner{
@@ -218,6 +175,9 @@
     z-index: 99;
     background: var(--primary-background-color,#fff);
   }
+  /* :host.label-is-floating:hover #clearButton{
+    display: block;
+  } */
   /* .label-container{
     overflow: hidden;
   } */
@@ -233,29 +193,31 @@
     box-sizing:border-box;
     overflow: hidden;
   }
+  :host.focused paper-material{
+      border-bottom: 1px solid var(--form-border-color, --secondary-text-color); 
+  }
+  :host.focused label,
+  :host.focused paper-material,
+  :host.focused ::content paper-input-error{
+    margin: 0 10px;
+  }
+  :host.focused #cancel,
+  :host.focused ::content .label-is-floating #clearButton{
+    display: block;
+  }
+  :host.focused ::content .label-is-floating label,
+  :host.focused ::content .unfocused-line{
+    display: none;
+  }
   :host.focused label{
-    margin-left: 10px;
-    top: 7px!important;
     padding-right: 16px;
     box-sizing: border-box;
   }
-  :host.focused paper-material{
-    margin: 0 10px;
-  }
-  :host.label-is-floating.focused label{
-    display: none;
-  }
-  :host.focused #cancel{
-    display: block;
-  }
-  :host.label-is-floating.focused #clearButton{
-    display: block;
-  }
-  
-  :host.label-is-floating.focused input{
+  :host.focused ::content .label-is-floating input{
     padding-right: 25px!important;  
   }
   :host.focused .label-container{
     position: relative;
   }
+
 }

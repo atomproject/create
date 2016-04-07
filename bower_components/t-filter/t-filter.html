@@ -6,11 +6,13 @@
 <link rel="import" href="../iron-ajax/iron-ajax.html" />
 <link rel="import" href="../iron-collapse/iron-collapse.html" />
 <link rel="import" href="../t-checkbox/t-checkbox.html" />
+<link rel="import" href="../t-calendar/t-calendar.html" />
 <link rel="import" href="../t-header/t-header.html" />
 <link rel="import" href="../paper-item/paper-item.html" />
 <link rel="import" href="../iron-icon/iron-icon.html" />
 <link rel="import" href="../iron-list/iron-list.html" />
 <link rel="import" href="../iron-icons/hardware-icons.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <!--
     `<t-filter>` is a polymer component that generates a playground for interacting with components.
 
@@ -29,7 +31,7 @@
 -->
 <dom-module id="t-filter">
     <template>
-        <style>
+        <style include="iron-flex">
         :root {
             --checkbox-unchecked-color: var(-grey-two, #eeeeee);
             --checkbox-unchecked-ink-color: var(-grey-two, #eeeeee);
@@ -37,6 +39,7 @@
         
         :host {
             font-size: var(--font-12, 12px);
+            font-family: var(--primary-font-family);
             cursor: pointer;
             display: block;
             color: var(--grey-six, #333333);
@@ -49,33 +52,30 @@
         
         .scrollsection > .item,
         .heading {
-            border-bottom: 1px solid;
-            border-color: var(--grey-two, #eeeeee);
             padding: 10px;
         }
         
         #controller .category {
-            padding: 10px 0;
+            padding: 2px 0;
+            font-size: var(--font-16, 16px);
         }
-        
+        #controller .category,
+          .chip {
+            border-bottom: 1px solid;
+            border-color: var(--grey-two, #eeeeee);
+        }
         .filter-block {
             padding: 0 0 10px;
         }
         
-        .filter-block .layout {
-            margin-top: 10px;
-        }
-        
-        .filter-block .layout:first-child {
-            margin-top: 0;
+        .filter-block > .layout {
+            margin-top: 20px;
         }
         
         .chip {
             background: #ffffd0;
             padding: 10px 5px;
             font-weight: 600;
-            border-bottom: 1px solid;
-            border-color: var(--grey-two, #eeeeee);
         }
         
         .chip:last-child {
@@ -87,12 +87,15 @@
             height: 16px;
         }
         
-        .range-block {
-            padding: 10px;
-        }
-        
         t-checkbox {
             width: 100%;
+        }
+        t-range{
+            margin: 0 48px;
+            font-weight: 600;
+        }
+        .range-block {
+            padding: 10px 0;
         }
         
         .font-12 {
@@ -113,12 +116,13 @@
             vertical-align: super;
             font-size: 0;
         }
+        
         .modal {
             bottom: 0;
             z-index: 10;
             background: #fff;
         }
-       
+        
         #filteredRatio {
             padding: 10px;
             border-bottom: 1px solid;
@@ -129,10 +133,10 @@
         }
         
         .total-results,
-        .icon-reset-search{
+        .icon-reset-search {
             margin-left: 5px;
         }
-
+        
         #searchBox {
             background: #fff;
             z-index: 1;
@@ -141,14 +145,10 @@
             width: 100%;
             left: 100%;
             /* color: #bbbbbb; */
-            -webkit-box-sizing: border-box; 
+            -webkit-box-sizing: border-box;
             box-sizing: border-box;
         }
         
-        #searchBox ::content input{
-            border: 0!important;
-            padding-left: 5px !important;
-        }
         #searchBox.active {
             left: 0;
         }
@@ -157,12 +157,12 @@
             width: 14px;
             height: 14px;
         }
-        
         /* patch to handle nexus page scroll */
-        #controller{
+        
+        #controller {
             overflow: hidden;
         }
-
+        
         .scrollsection {
             overflow: auto;
         }
@@ -178,11 +178,12 @@
             -ms-text-overflow: ellipsis;
             text-overflow: ellipsis;
         }
-
+        
         .link {
-            color: var(--link-color,#0098ff);
+            color: var(--link-color, #0098ff);
         }
-        .display-value{
+        
+        .display-value {
             margin-right: 5px;
         }
         .devider {
@@ -191,13 +192,23 @@
             margin: 0px 5px 0 10px;
             background: var(--grey-three, #bbbbbb);
         }
+        ::content #checkboxLabel{
+            padding-left: 20px!important;
+            line-height: 18px;
+            color: var(--primary-text-color, #333333);
+            font-weight: 600;
+        }
+        ::content .display-value,
+        .secondary-text{
+            color: var(--grey-three, #bbbbbb);
+        }
         </style>
         <div class="layout horizontal" id="filteredRatio">
             <div class="flex layout horizontal center">
                 <iron-icon icon="filter-list" on-click="_openModal"></iron-icon>
                 <span class="total-results" hidden$="[[!_loadingResultsSearchBox]]">
                     <span>{{_getFilteredRatio(resultsPagingInfo)}}</span>
-                    <span>results</span>
+                <span>results</span>
                 </span>
             </div>
             <!-- <span>{{_getFilterCount(cachedFilters.length)}}</span> -->
@@ -209,7 +220,7 @@
                     <iron-icon on-click="_toggleSearchBox" icon="search" hidden$="[[searchVal]]"></iron-icon>
                 </div>
                 <div class="layout horizontal center fit" id="searchBox">
-                    <t-input id="searchInput" no-label-float class="flex" label="Search hotel name" value="{{searchVal}}" on-keyup="searchSubmit"></t-input>
+                    <t-input id="searchInput" no-label-float class="flex" label="[[searchLabel]]" value="{{searchVal}}" on-keyup="searchSubmit"></t-input>
                     <span hidden$="[[!_loadingResultsSearchBox]]">{{_getFilteredRatio(resultsPagingInfo)}}</span>
                     <t-loader id="searchBox-loader" active hidden$="[[_loadingResultsSearchBox]]"></t-loader>
                     <span class="devider"></span>
@@ -224,8 +235,8 @@
                 <div id="controller" class="layout vertical flex">
                     <div class="heading">
                         <div class="layout horizontal center justified item-layout">
-                            <a class="link" on-click="_resetFilters">reset</a>
-                            <t-button label="Apply Filters" class="primary" on-click="_applyFilters"></t-button>
+                            <a class="link" on-click="_resetFilters">Reset</a>
+                            <t-button id="applyfilters" label="Apply Filters" class="primary" on-click="_applyFilters"></t-button>
                         </div>
                     </div>
                     <div class="flex scrollsection">
@@ -246,7 +257,7 @@
                                 <div class="layout item">
                                     <div class="category layout horizontal center" data-category$="[[key.category]]" data-category$="[[key.category]]" on-click="_toggle">
                                         <div class="flex label">[[key.label]]</div>
-                                        <iron-icon icon="hardware:keyboard-arrow-down"></iron-icon>
+                                        <iron-icon class="secondary-text" icon="hardware:keyboard-arrow-down"></iron-icon>
                                     </div>
                                     <iron-collapse opened="[[opened]]" id="[[key.category]]" data-label$="[[key.label]]">
                                         <div class="filter-block">
@@ -254,10 +265,18 @@
                                                 <template is="dom-repeat" items="[[key.items]]" as="item">
                                                     <div class="layout horizontal">
                                                         <div class="layout horizontal flex item-layout justified style-scope t-component-panel">
-                                                            <t-checkbox data-label$="{{key.label}}" data-type$="[[key.type]]" on-checked-change="_checkChanged">[[item.label]]</t-checkbox>
-                                                            <template is="dom-if" if="[[!item.displayValue]]">
-                                                                <span class="display-value">[[_getCountValue(item.additionalInfo)]]</span>
-                                                            </template>
+                                                            <t-checkbox data-label$="{{key.label}}" data-category$="[[key.category]]" data-type$="[[key.type]]" on-checked-change="_checkChanged">
+
+                                                            <div class="layout horizontal center justified">
+                                                                <div>[[item.label]]</div>
+                                                                <template is="dom-if" if="[[!item.displayValue]]">
+                                                                    <span class="display-value font-12 ">[[_getCountValue(item.additionalInfo)]]</span>
+                                                                </template>
+                                                            </div>
+
+
+                                                            </t-checkbox>
+                                                            
                                                         </div>
                                                         <template is="dom-if" if="[[item.displayValue]]">
                                                             <div class="display-value">[[item.displayValue]]</div>
@@ -271,7 +290,7 @@
                                                         <t-checkbox data-type$="[[key.type]]" data-label$="{{key.label}}" name$="[[item.name]]" value$="[[item.value]]" on-checked-change="_checkChanged">
                                                             <div class="layout horizontal center font-12 justified">
                                                                 <t-starrating disabled stars="5" rate="[[item.name]]"></t-starrating>
-                                                                <div  class="display-value">[[item.displayValue]]</div>
+                                                                <div class="display-value">[[item.displayValue]]</div>
                                                             </div>
                                                         </t-checkbox>
                                                     </div>
@@ -285,7 +304,7 @@
                                 <div class="layout item">
                                     <div class="category layout horizontal center" data-category$="[[key.category]]" on-click="_toggle">
                                         <div class="flex label">[[_getDisplayLabel(key)]]</div>
-                                        <iron-icon icon="hardware:keyboard-arrow-down"></iron-icon>
+                                        <iron-icon class="secondary-text" icon="hardware:keyboard-arrow-down"></iron-icon>
                                     </div>
                                     <iron-collapse opened="[[opened]]" id="Iron-collapse1">
                                         <div class="filter-block">
@@ -293,6 +312,31 @@
                                                 <template is="dom-if" if="[[_isEven(i)]]">
                                                     <div class="range-block">
                                                         <t-range show-twelve-hour-clock="[[showTwelveHourClock]]" label="[[range.label]]" no-label="[[_hideLabel(range)]]" data-index$="[[i]]" step="[[_getStepValue(range,i)]]" range-type="[[_getRangeType(range)]]" data-category$="[[key.category]]" data-type$="[[key.type]]" data-group$="[[range.group]]" min="[[_getMinRange(key.items, i)]]" max="[[_getMaxRange(key.items, i)]]" on-range-change="_rangeChanged" margin="1"></t-range>
+                                                    </div>
+                                                </template>
+                                            </template>
+                                        </div>
+                                    </iron-collapse>
+                                </div>
+                            </template>
+                            <template is="dom-if" if="{{_isTypeMatching(key,'DateRange')}}">
+                                <div class="layout item">
+                                    <div class="category layout horizontal center" data-category$="[[key.category]]" on-click="_toggle">
+                                        <div class="flex label">[[_getDisplayLabel(key)]]</div>
+                                        <iron-icon class="secondary-text" icon="hardware:keyboard-arrow-down"></iron-icon>
+                                    </div>
+                                    <iron-collapse opened="[[opened]]" id="[[key.category]]">
+                                        <div class="filter-block">
+                                            <template is="dom-repeat" items="[[key.items]]" as="dateRange" index-as="i">
+                                                <template is="dom-if" if="[[_isEven(i)]]">
+                                                    <div class="layout horizontal">
+                                                        <t-calendar class="flex margin-horizontal" data-index="0" data-category$="[[key.category]]" data-type$="[[key.type]]" data-group$="[[dateRange.group]]" label="Start Date" name="StartDate" id="startDate" selected-date="{{startDate}}" format="mm/dd/yyyy" on-selected-date-changed="_dateChanged" min="[[minStartDate]]">
+                                                        </t-calendar>
+                                                        &nbsp;
+                                                        &nbsp;
+                                                        &nbsp;
+                                                        <t-calendar class="flex" data-index="1" data-category$="[[key.category]]" data-type$="[[key.type]]" data-group$="[[dateRange.group]]" label="End Date" name="EndDate" id="endDate" selected-date="{{endDate}}" format="mm/dd/yyyy" on-selected-date-changed="_dateChanged" min="[[minEndDate]]">
+                                                        </t-calendar>
                                                     </div>
                                                 </template>
                                             </template>
@@ -326,6 +370,8 @@ Polymer({
             value: []
         },
 
+
+
         auto: {
             type: Boolean,
             value: false
@@ -348,6 +394,15 @@ Polymer({
             value: function() {
                 return [];
             }
+        },
+
+        /**
+         * Customize filter parameters
+         * array item is an object with key equal to category and value equal toitem name
+        */
+        excludedFilters:{
+            type: Array,
+            value: []
         },
 
         cachedFilters: {
@@ -376,6 +431,11 @@ Polymer({
             observer: '_searchValChanged'
         },
 
+        filterResponseParam:{
+            type:String,
+            value:'filters'
+        },
+
         _searchFilter: {
             type: Object,
             computed: 'findSearchFilter(response)'
@@ -387,14 +447,29 @@ Polymer({
         },
 
 
-        _loadingResultsSearchBox:{
+        _loadingResultsSearchBox: {
             type: Boolean,
             value: false
+        },
+
+        searchLabel:{
+            type:String
+        },
+
+        minStartDate:{
+            type:Boolean,
+            value:false
+        },
+
+        minEndDate:{
+            type:Boolean,
+            value:false
         }
     },
     observers: [
         '_onResultsResponse(resultsPagingInfo)',
-        '_addListenerBlur(_searchFilter)'
+        '_addListenerBlur(_searchFilter)',
+        '_setButtonState(cachedFilters.splices)'
     ],
 
     attached: function() {
@@ -402,6 +477,10 @@ Polymer({
         Polymer.dom(this.$.component).getDistributedNodes()[0];
         if (this.filterApi != '' && this.auto)
             this.generateFilter();
+    },
+
+    _setButtonState:function(changeReacord){
+        this.$.applyfilters.disabled =  this.cachedFilters.length > 0 ? false:true;
     },
 
     _getMaxRange: function(items, index) {
@@ -474,13 +553,32 @@ Polymer({
 
     _handleResponse: function(e) {
         var response = e.detail.response;
-        if (response.status.isSuccessful && response.filters && response.filters.length > 0) {
-            this.response = this._applyInclusions(response.filters);
+        if (response.status.isSuccessful && response[this.filterResponseParam] && response[this.filterResponseParam].length > 0) {
+            this.response = this._applyInclusions(response[this.filterResponseParam]);
+            this._customizeFilters();
             this.fire('modify-filter-data', {
                 element: this,
                 filters: this.response
             });
         }
+    },
+
+    _customizeFilters:function () {
+        if(!this.response || !this.response.length || !this.excludedFilters || !this.excludedFilters.length)
+            return;
+
+        for (var i = 0; i < this.response.length; i++) {
+            for (var j = 0; j < this.excludedFilters.length; j++) {
+                if(this.excludedFilters[j].hasOwnProperty(this.response[i].category)){
+                    var itemsToBeRemoved = this.excludedFilters[j][this.response[i].category];
+                    var itemsToBeRetained = this.response[i].items.filter(function (item) {
+                        return itemsToBeRemoved.indexOf(item.name) < 0;
+                    });
+                    this.response[i].items = itemsToBeRetained;
+                }
+            }
+        }
+
     },
 
     _handleError: function(e) {
@@ -513,11 +611,13 @@ Polymer({
 
     _checkChanged: function(e) {
         var instance = e.model.item;
+        var target = e.currentTarget;
+        var category = target.getAttribute("data-category");
         if (instance) {
             var label = e.currentTarget.getAttribute("data-label");
             var type = e.currentTarget.getAttribute("data-type");
             var currentFilter = {
-                "category": instance.group,
+                "category": category,
                 "group": instance.group,
                 "name": instance.name,
                 "value": instance.value,
@@ -583,15 +683,74 @@ Polymer({
 
     },
 
+    _dateChanged: function(e) {
+
+        if (!e.model.dateRange)
+            return;      
+
+        var instance = e.model.dateRange;
+        var target = e.currentTarget;
+
+        if (target.id === "startDate") {
+            this._startDateDateChanged();
+        } else{
+            this._endDateDateChanged();
+        }
+
+        var category = target.getAttribute("data-category");
+        var group = target.getAttribute("data-group");
+        var subCategory = target.label;
+        var elementIndex = target.getAttribute('data-index');
+        var type = target.getAttribute("data-type");
+        var name = target.getAttribute("name");
+
+        this.cachedFilters = this.cachedFilters.filter(function(instance) {
+            var cIndex = instance.element.getAttribute('data-index');
+            return instance.category != category || elementIndex !== cIndex;
+        });
+
+        var currentFilter = {
+            "category": category,
+            "group": group,
+            "subgroup": subCategory,
+            "name": name,
+            "min": target.from,
+            "max": target.to,
+            "label": category,
+            "type": type
+        };
+
+        currentFilter.element = e.target;
+        this.push('cachedFilters', currentFilter);
+
+    },
+
+    _startDateDateChanged: function() {
+        if (this.startDate != '') {
+                this.$$("#endDate").picker.set('min', new Date(this.startDate));
+        } else {
+            this.$$("#startDate").picker.set('max', false);
+            this.$$("#endDate").picker.set('min', false);
+        }
+    },
+
+    _endDateDateChanged: function() {
+        if (this.endDate != '') {
+            this.$$("#startDate").picker.set('max', new Date(this.endDate));
+        } else{
+            this.$$("#startDate").picker.set('max', false);
+        }
+    },
+
     _toggle: function(event) {
         var parentElement = event.currentTarget.parentElement,
-        element = parentElement.querySelector('iron-collapse');
+            element = parentElement.querySelector('iron-collapse');
         if (element !== null)
             element.toggle();
         event.stopPropagation();
         return false;
     },
-    
+
     _isRating: function(category) {
         return category.toLowerCase() === 'rating';
     },
@@ -615,6 +774,11 @@ Polymer({
             case 't-input':
                 element.value = '';
                 break;
+            case 't-calendar':
+                element._clear();
+                //patch because in app is not removing the input value
+                element.querySelector('input').value = '';
+                break;
         }
     },
 
@@ -633,13 +797,18 @@ Polymer({
     },
 
     _getDisplayLabel: function(key) {
-        if (key.items[0].additionalInfo[0].value.toLowerCase() !== 'ticks') {
+        if (key.items[0].additionalInfo && key.items[0].additionalInfo[0].value.toLowerCase() !== 'ticks') {
             return key.label + ' (' + key.items[0].additionalInfo[0].value + ')';
         }
         return key.label;
     },
 
-    _applyFilters: function() {
+    _applyFilters: function(e) {
+        if(e){
+            if(e.target.id == 'applyfilters' && e.target.disabled ){
+                return;
+            }
+        }
         var component = this;
         var filters = [];
         this._interstitialFilters = this.cachedFilters;
@@ -661,7 +830,7 @@ Polymer({
         switch (filter.type) {
             case 'Options':
                 filters.push({
-                    "category": filter.group,
+                    "category": filter.category,
                     "group": filter.group,
                     "name": filter.name,
                     "value": filter.value,
@@ -696,6 +865,17 @@ Polymer({
                     "label": filter.label,
                     "type": filter.type
                 });
+                break;
+            case 'DateRange':
+                filters.push({
+                    "category": filter.category,
+                    "group": filter.group,
+                    "name": filter.name,
+                    "value": filter.element.selectedDate,
+                    "label": filter.label,
+                    "type": filter.type
+                });
+                break;
         }
 
         return filters;
@@ -765,8 +945,8 @@ Polymer({
         return formattedTime;
     },
 
-
     _getChip: function(item, index) {
+
         var filter = this.cachedFilters[index];
         switch (filter.type) {
             case 'Options':
@@ -781,6 +961,18 @@ Polymer({
                 }
             case 'Search':
                 return filter.category;
+            case 'DateRange':
+                {
+                    return this._buildDateChip(filter);
+                }
+        }
+    },
+
+    _buildDateChip: function(filter) {
+        if (filter.name === 'StartDate') {
+            return 'trips after ' + filter.element.selectedDate;
+        } else {
+            return 'trips before ' + filter.element.selectedDate;
         }
     },
 
@@ -916,9 +1108,9 @@ Polymer({
         component.searchVal = null;
 
     },
-    
-    _clearFilterAndFocus:function(e){
-        if(this.searchVal){
+
+    _clearFilterAndFocus: function(e) {
+        if (this.searchVal) {
             this._removeSearchFilter();
             this._toggleSearchBox(e);
         }

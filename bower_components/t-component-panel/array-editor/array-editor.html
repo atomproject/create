@@ -1,0 +1,99 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-pages/iron-pages.html">
+<link rel="import" href="../../t-radio-group/t-radio-group.html">
+
+<link rel="import" href="../sheet-editor/sheet-editor.html">
+<link rel="import" href="../response-transformer/response-transformer.html">
+
+<dom-module id="array-editor">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: var(--primary-font-family, 'Open Sans');
+      }
+    </style>
+
+    <t-radio-group label="{{label}}" pill-button
+      selected-item="{{_getSelectedItem(pages, selected)}}" on-selected-item-changed="changePage"
+      data="{{pages}}"></t-radio-group>
+    <iron-pages selected="{{selected}}">
+      <sheet-editor id="sd" title="{{label}}" value="{{value}}"></sheet-editor>
+      <response-transformer id="dd" title="{{label}}" data-source="{{dataSource}}"
+        url="{{url}}" transform="{{transform}}" translator="{{translator}}">
+      </response-transformer>
+    </iron-pages>
+  </template>
+  <script>
+    Polymer({
+      is: 'array-editor',
+
+      properties: {
+        label: String,
+
+        url: {
+          type: String,
+          notify: true
+        },
+
+        transform: {
+          type: Function,
+          notify: true
+        },
+
+        translator: {
+          type: Function,
+          notify: true
+        },
+
+        value: {
+          type: Array,
+          notify: true
+        },
+
+        dataSource: {
+          type: Object,
+          notify: true
+        },
+
+        pages: {
+          type: Array,
+          value: function() {
+            return ["Static Data", "Dynamic Data"];
+          }
+        },
+
+        selected: {
+          type: Number,
+          value: 0,
+          notify: true
+        }
+      },
+
+      _getSelectedItem: function(pages, selected) {
+        return pages[selected];
+      },
+
+      changePage: function(event) {
+        var newPage;
+
+        if (!this.pages) {
+          return;
+        }
+
+        newPage = this.pages.indexOf(event.detail.value);
+
+        if (newPage !== -1) {
+          if (newPage === 0) {
+            this.$.sd.saveValue();
+          }
+          else if (newPage === 1) {
+            this.$.dd.saveDataSource();
+          }
+
+          this.selected = newPage;
+        }
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,50 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../highlightjs-element/highlightjs-element.html">
+<link rel="import" href="../ace-element/ace-element.html">
+
+<dom-module id="code-editor">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      highlightjs-element {
+        max-height: 100px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 1px solid #bbbbbb;
+        margin-top: 10px;
+        border-radius: 2px;
+      }
+    </style>
+
+    <highlightjs-element lang="json" text="{{snippet}}" on-tap="openEditor"></highlightjs-element>
+    <ace-element id="ace" value="{{value}}" str-val="{{strVal}}" title="{{title}}"></ace-element>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'code-editor',
+
+      properties: {
+        snippet: {
+          type: String,
+          value: 'Click to add the value.',
+          computed: '_createSnippet(strVal)'
+        },
+        value: Object,
+        strVal: String,
+        title: String
+      },
+
+      openEditor: function() {
+        this.$.ace.openEditor();
+      },
+
+      _createSnippet: function(strVal) {
+        return strVal;
+      }
+    });
+  </script>
+</dom-module>

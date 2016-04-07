@@ -4,7 +4,10 @@
 <link rel="import" href="../paper-material/paper-material.html">
 <link rel="import" href="../t-shared-components/jquery.html">
 <link rel="import" href="calendar-dependency.html">
-<link rel="import" href="../t-shared-components/shared-styles.html" />
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../paper-input/paper-input-behavior.html">
+<link rel="import" href="../paper-input/paper-input-error.html">
+<link rel="import" href="../t-input/t-input-container.html">
 <!--
 `t-calendar` is a polymer component which lets the user choose a date. The date picker is built on top of pickadate.js
  
@@ -17,12 +20,16 @@ Example:
 <dom-module id="t-calendar">
     <link rel="import" type="css" href="date.css">
     <template>
-        <style include="shared-styles"></style>
-        <label>{{label}}</label>
-        <div id="input">
-            <input is="iron-input" required$="{{required}}" id="date" placeholder="{{placeholder}}" value="{{selectedDate}}">
-        </div>
-        <p class="error">{{errorMessage}}</p>
+        <t-input-container id="inputContainer" no-label-float="[[noLabelFloat]]" disabled$="[[disabled]]" invalid="[[invalid]]">
+            <label hidden$="[[!label]]">[[label]]</label>
+            <div style="width:100%">
+            <input  is="iron-input"  id="input"
+                bind-value="{{selectedDate}}">
+            </div>
+            <template is="dom-if" if="[[errorMessage]]">
+                <paper-input-error class="error" invalid="[[invalid]]">[[errorMessage]]</paper-input-error>
+            </template>
+         </t-input-container>
     </template>
 </dom-module>
 <script>
@@ -31,25 +38,12 @@ Polymer({
 
     properties: {
 
+        
         /**
-         * Name property
+         * Check is the component is required
          */
-        name: {
-            type: String,
-            value: '',
-            reflectToAttribute: true
-        },
-
-        /**
-         * No label float is to make the label either on the body or on the top.
-         */
-        noLabelFloat: {
-            type: Boolean,
-            reflectToAttribute: true,
-            value: false,
-            observer: '_checkLabel'
-        },
-
+         required:Boolean,
+        
         /**
          * This attribute will return the selected date
          */
@@ -59,16 +53,6 @@ Polymer({
             reflectToAttribute: true,
             notify: true,
             observer: '_floatedLabel'
-        },
-
-        /**
-         * This attribute will put the default place holder of the input box
-         */
-        label: {
-            type: String,
-            reflectToAttribute: true,
-            value: '',
-            observer: '_checkLabel'
         },
 
         /**
@@ -115,15 +99,7 @@ Polymer({
             observer: '_setDisableDates'
         },
 
-        /**
-         * This is for the input required
-         */
-        required: {
-            type: Boolean,
-            value: false,
-            reflectToAttribute: true
-        },
-
+      
         /**
          * picker object will help you pass further methods
          */
@@ -167,14 +143,43 @@ Polymer({
             type: Object,
             notify: true,
             observer: '_dateFromObject'
-        }
+        },
 
+        /**
+         * Set to true to disable the floating label. The label disappears when the input value is
+         * not null.
+         */
+        noLabelFloat: {
+            type: Boolean,
+            value: false
+        },
 
+        /**
+         * True if the input is invalid. This property is set automatically when the input value
+         * changes if auto-validating, or when the `iron-input-valid` event is heard from a child.
+         */
+        invalid: {
+            type: Boolean,
+            reflectToAttribute:true,
+            value: false
+        },
+
+        /**
+         * The label for this input. If you're using PaperInputBehavior to
+         * implement your own paper-input-like element, bind this to
+         * `<label>`'s content and `hidden` property, e.g.
+         * `<label hidden$="[[!label]]">[[label]]</label>` in your `template`
+         */
+        label: {
+            type: String,
+            value: 'Select Date'
+        },
     },
 
     attached: function() {
         this._initiate();
         this._changeMinMax();
+        this.$.inputContainer.fireBlur = false;
     },
 
     _getMinMax: function() {
@@ -199,18 +204,15 @@ Polymer({
             if (this.max !== null) this.picker.set('max', this.max);
         } else {
             this.picker.set('min', this.min);
-            this.picker.set('max', this.max);
+            if (this.max !== null) this.picker.set('max', this.max);
         }
     },
 
-    _checkLabel: function() {
-        this.placeholder = this.noLabelFloat ? this.label : "";
-    },
 
     //to initiate the date picker...  
 
     _initiate: function() {
-        this._input = $(this.$.date);
+        this._input = $(this.$.input);
         var component = this;
         // component.disabledDates=[[2015,8,12]];
 
@@ -230,17 +232,19 @@ Polymer({
             closeOnSelect: true,
             selectMonths: component.isDob,
             onOpen: function() {
-
+                component.opened  = true;
             },
             onClose: function() {
-                component.selectedDate = component.$.date.value;
+                component.opened = false;
+                component.selectedDate = component.$.input.value;
                 $(document.activeElement).blur();
                 component.validate();
+                /*;
                 if (component._input.val() !== "") {
                     component._input.addClass('yes-value').siblings('i').addClass('active');
                 } else {
                     component._input.removeClass('yes-value').siblings('i').removeClass('active');
-                }
+                }*/
             }
         };
 
@@ -269,21 +273,38 @@ Polymer({
      * Private method to clear the value
      */
     _clear: function() {
-        this._instance.pickadate('picker').clear();
+        this.picker.clear();
         this.selectedDate = "";
+        this.$.input.value = "";
     },
 
 
     /*
      * Private method to clear the value
      */
-    _floatedLabel: function() {
-
-        if (this.selectedDate.length > 0) {
+    _floatedLabel: function(newValue, oldValue) {
+        /*if (this.selectedDate.length > 0) {
             this.classList.add('label-is-floating');
         } else {
             this.classList.remove('label-is-floating');
         }
+*/
+        //component load condition
+        //patch ATOM-501 added picker as a condition
+        if (!this.picker) {
+            return;
+        }
+        if (!newValue && !oldValue) {
+            return;
+        }
+        //break loop condition 
+        if (newValue && oldValue && newValue == oldValue)
+            return;
+
+        this.picker.set('select', newValue, {
+            format: this.format
+        });
+
     },
     /**
      * Function to validate if the date is selected
@@ -291,12 +312,12 @@ Polymer({
     validate: function() {
         if (this.required) {
             if (this.selectedDate && this.selectedDate.length > 0) {
-                if ('.no-value') {
-                    $(this).removeClass('no-value');
-                }
+                $(this).find('t-input-container').removeClass('invalid-input');
+                this.invalid = false;
                 return true;
             }
-            $(this).addClass('no-value');
+                $(this).find('t-input-container').addClass('invalid-input');
+                this.invalid = true;
             return false;
         }
     }

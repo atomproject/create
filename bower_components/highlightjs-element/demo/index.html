@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>highlightjs-element demo</title>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../highlightjs-element.html">
+</head>
+<body unresolved>
+  <highlightjs-element lang="xml"></highlightjs-element>
+
+  <script>
+  window.addEventListener('WebComponentsReady', function (e) {
+    var element = document.querySelector('highlightjs-element');
+    var xhr = new XMLHttpRequest();
+
+    xhr.addEventListener('load', function() {
+      element.text = this.responseText;
+    });
+
+    xhr.open('GET', window.location.href);
+    xhr.send();
+  });
+  </script>
+</body>
+</html>

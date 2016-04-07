@@ -25,19 +25,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   vertical-align: middle;
 }
 
-:host #ink {
-  position: absolute;
-  top: -16px;
-  left: -16px;
-  width: 48px;
-  height: 48px;
-  color: var(--radio-button-unchecked-ink-color);
-}
-
-:host #ink[checked] {
-  color: var(--radio-button-checked-ink-color);
-}
-
 :host #offRadio {
   position: absolute;
   top: 0px;
@@ -46,7 +33,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   height: 12px;
   border-radius: 50%;
   border: solid 2px;
-  border-color: var(--radio-button-unchecked-color);
+  border-color: var(--radio-button-unchecked-color, #e0e0e0);
   transition: border-color 0.28s;
 }
 
@@ -57,7 +44,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--radio-button-checked-color);
+  background-color: var(--radio-button-checked-color, #777777);
   -webkit-transform: scale(0);
   transform: scale(0);
   transition: -webkit-transform ease 0.28s;
@@ -65,7 +52,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 }
 
 :host([checked]) #offRadio {
-  border-color: var(--radio-button-checked-color);
+  border-color: var(--radio-button-checked-color, #777777);
 }
 
 :host([checked]) #onRadio {
@@ -80,8 +67,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   margin-left: 10px;
   white-space: normal;
   pointer-events: none;
-  font-size:var(--radio-item-text-size);
-  color:var(--radio-item-text-color);
+  font-size:var(--form-label-size, 16px);
+  color: var(--form-value-color, #777777);
 }
 
 #radioLabel[hidden] {
@@ -99,11 +86,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 }
 
 :host([disabled]) #offRadio {
-  border-color: var(--radio-button-unchecked-color);
+  border-color: var(--radio-button-unchecked-color, #e0e0e0);
 }
 
 :host([disabled][checked]) #onRadio {
-  background-color: var(--radio-button-unchecked-color);
+  background-color: var(--radio-button-unchecked-color, #e0e0e0);
 }
 
 :host([pill-button]) {
@@ -117,15 +104,4 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 }
 :host([radio-right]) #radioContainer {
   order:2;
-}
-
-/* TODO: Hack. Use iron behaviors to remove ripples */
-paper-ripple {
-  color: rgba(0, 0, 0, 0) !important;
-}
-
-@media (max-width: 600px) {
-  #radioLabel {
-    font-size: var(--standard-input-field-text-size);
-  }
 }

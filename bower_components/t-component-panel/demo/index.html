@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+  <title>t-component-panel demo</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../t-component-panel.html">
+  <link rel="import" href="../../t-shared-components/theme.html">
+
+  <style>
+  t-component-panel {
+    width: 300px;
+    margin: auto;
+    padding: 10px;
+    background-color: aliceblue;
+  }
+  </style>
+</head>
+<body unresolved>
+  <t-component-panel property-source="property.json"></t-component-panel>
+
+  <script>
+  window.addEventListener('WebComponentsReady', function (e) {
+    var panel = document.querySelector('t-component-panel');
+
+    panel.addEventListener('path-changed', function(e) {
+      console.log({path: e.detail.path, value: e.detail.value});
+    });
+  });
+  </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 {
   "name": "t-form",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "authors": [
     "Rahul Pilkhwal <rahul.pilkhwal@tavisca.com>",
     "Shailesh Kumar Srivastava <ssrivastava@tavisca.com>",
@@ -32,7 +32,6 @@
     "t-calendar": "atomelements/t-calendar#^1.0.0",
     "t-checkbox-group": "atomelements/t-checkbox-group#^1.0.0",
     "t-colorpicker": "atomelements/t-colorpicker#^1.0.0",
-    "t-dropdown": "atomelements/t-dropdown#^1.0.0",
     "t-input": "atomelements/t-input#^1.0.0",
     "t-notify": "atomelements/t-notify#^1.0.0",
     "t-radio-group": "atomelements/t-radio-group#^1.0.0",

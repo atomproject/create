@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 
 
@@ -7,11 +7,12 @@
   
 
 <dom-module id="t-stepper">
-    <style is="custom-style">
+    <template>
+    <style include="iron-flex">
       :host {
           display: block;
           font-family: var(--header-font-family, --primary-font-family);
-          color: var(--stepper-font-color,--grey-four);
+          color: var(--form-label-color, #bbbbbb);
           -webkit-user-select: none;  /* Chrome all / Safari all */
           -moz-user-select: none;     /* Firefox all */
           -ms-user-select: none;      /* IE 10+ */
@@ -21,8 +22,7 @@
       #add,
       #minus{
         border: 1px solid ;
-        border-color: var(--grey-three, #bbbbbb);
-        color: var(--grey-three, #bbbbbb);
+        border-color: var(--form-underline-color, #e0e0e0);
         cursor: pointer;
       }
       :host #minus{
@@ -36,22 +36,25 @@
       }
       #label,
       #count{
-        font-size: var(--standard-input-field-text-size,16px);
+        font-size: var(--form-label-size,16px);
         padding-left: 5px;
       }
+      #count{
+        color: var(--form-value-color, #777777);
+      }
       .secondaryLabel{
-        font-size: var(--secondary-input-field-text-size,12px);
+        font-size: var(--form-secondary-label-size,12px);
       }
       iron-icon{ 
         -ms-align-self: center;
         -webkit-align-self: center;
         align-self: center;
-        padding: 0 5px;
+        padding: 2px 5px;
       }
       :host([styled]) #minus{
         order:0;
         border-right: 1px solid;
-
+        border-color: var(--form-underline-color, #e0e0e0);
       }
       :host([styled]) #add{
         order:3;
@@ -72,7 +75,7 @@
         flex: 2;
         border-top:1px solid;
         border-bottom: 1px solid;
-        border-color: var(--grey-three, #bbbbbb);
+        border-color: var(--form-underline-color, #e0e0e0);
         text-align: right;
         padding: 5px;
       }
@@ -82,16 +85,12 @@
         flex: 4;
         text-align:left 
       }
-      :host([disable-plus]) #add iron-icon,
-      :host([disable-minus]) #minus iron-icon{
-        background: var(--grey-two, #eeeeee);
-        color: var( --primary-background-color, #fff);
-        opacity: 0.7;
-
+      :host([disable-plus]) #add,
+      :host([disable-minus]) #minus{
+        background: var(--form-underline-color, #e0e0e0);
       }
 
     </style>
-    <template>
         <div class="layout horizontal center">
           <div id="icon" hidden$="{{!hasIcon}}" restamp="true">
             <iron-icon icon="{{ico}}"></iron-icon>

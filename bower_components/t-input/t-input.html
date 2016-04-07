@@ -35,16 +35,9 @@ style this element.
 
 	<style>
 
-	:host {
+	:host , #input{
 	  display: block;
-	}
-
-	:host([no-label-float]) ::content .input-content label{
-	  font-size: var(--t-input-field-text-size);
-	  position: absolute;
-	  top: calc(var(--standard-padding-input-field) + 1px);
-	  right: 0;
-	  left: calc(var(--standard-padding-input-field) + 1px);
+	  outline: none;
 	}
 
 

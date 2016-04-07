@@ -7,7 +7,6 @@
 <link rel="import" href="../t-colorpicker/t-colorpicker.html" />
 <link rel="import" href="../t-calendar/t-calendar.html" />
 <link rel="import" href="../t-button/t-button.html" />
-<link rel="import" href="../t-dropdown/t-dropdown.html" />
 <link rel="import" href="../t-stepper/t-stepper.html" />
 <link rel="import" href="../t-notify/t-notify.html" />
 <link rel="import" href="../iron-ajax/iron-ajax.html" />
@@ -212,10 +211,6 @@ Polymer({
 
             case "t-calendar":
                 this.response[fieldName] = field.selectedDate;
-                break;
-
-            case "t-dropdown":
-                this.response[fieldName] = field.selectedItemLabel;
                 break;
 
             case "t-colorpicker":

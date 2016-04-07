@@ -2,7 +2,7 @@
     "t-autosuggest": {
         "attributes": {
             "required": "",
-            "label": "Untitled Autosuggest"
+            "label": "sas Autosuggest"
         },
         "property": {
             "name": "Autosuggest",
@@ -106,8 +106,7 @@
     "t-calendar": {
         "attributes": {
             "id": "one",
-            "required": "",
-            "label": "Select date"
+            "required": ""
         },
         "property": {
             "name": "Calendar",
@@ -255,9 +254,7 @@
         "innerHTML": ""
     },
     "t-input": {
-        "attributes": {
-            "required": ""
-        },
+        "attributes": {},
         "property": {
             "name": "Input Field",
             "properties": [
@@ -302,7 +299,15 @@
         "innerHTML": ""
     },
     "t-radio-group": {
-        "attributes": {},
+        "attributes": {
+            "id": "itineraryType",
+            "name": "itineraryType",
+            "data": "[\"RoundTrip\",\"OneWay\"]",
+            "class": "style-scope t-air-search x-scope t-radio-group-0",
+            "role": "radiogroup",
+            "tabindex": "0",
+            "label": "sas"
+        },
         "property": {
             "name": "Radio List",
             "properties": [
@@ -342,7 +347,7 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "\n"
     },
     "t-range": {
         "attributes": {

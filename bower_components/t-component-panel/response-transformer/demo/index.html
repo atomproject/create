@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>URL Response Component Demo</title>
+  <script src="../../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../response-transformer.html">
+  <link rel="import" href="../../../t-shared-components/theme.html">
+
+  <style>
+    body {
+      font-family: 'Open Sans';
+    }
+
+    response-transformer {
+      margin: auto;
+      margin-top: 50px;
+      width: 300px;
+    }
+  </style>
+</head>
+<body unresolved>
+  <response-transformer title="Some URL"
+    url="http://www.json-generator.com/api/json/get/bQODrtAkHS?indent=2"
+    transform="
+      function transform(inp) {
+        return inp.map(function(obj) {
+          return {
+            name: obj.name,
+            gender: obj.gender,
+            age: obj.age
+          };
+        });
+      }
+    "
+    translator="
+      function translator(inp) {
+        var columns = Object.keys(inp[0]);
+        var out = inp.map(function(obj) {
+          return columns.map(function(colName) {
+            return obj[colName];
+          });
+        });
+        out.unshift(columns);
+
+        return out;
+      }
+    ">
+  </response-transformer>
+</body>
+</html>

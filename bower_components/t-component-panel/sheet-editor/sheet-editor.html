@@ -1,0 +1,213 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../paper-dialog/paper-dialog.html">
+<link rel="import" href="../../paper-button/paper-button.html">
+<link rel="stylesheet" href="../../handsontable/dist/handsontable.full.css">
+
+<script src="../../handsontable/dist/handsontable.full.js" type="text/javascript" charset="utf-8"></script>
+
+<style>
+  .htContextMenu {
+    font-size: 12px;
+  }
+</style>
+
+<dom-module id="sheet-editor">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+      }
+
+      paper-dialog {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+      }
+
+      #grid {
+        padding: 0;
+        margin: auto;
+        margin-top: 20px;
+        overflow: hidden;
+        height: calc(100% - 132px);
+        width: calc(100% - 40px);
+        color: #222;
+      }
+
+      #snippet {
+        display: inline-block;
+        color: #222;
+      }
+
+      .snippet-container {
+        z-index: 104;
+        cursor: pointer;
+        background-color: transparent;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    </style>
+
+    <div class="snippet-container" on-tap="openDialog"></div>
+    <div id="snippet"></div>
+    <paper-dialog id="dialog" on-iron-overlay-opened="dialogOpened" on-iron-overlay-closed="saveValue">
+      <h2>{{title}}</h2>
+      <div id="grid"></div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm>Save</paper-button>
+      </div>
+    </paper-dialog>
+
+ </template>
+  <script>
+    Polymer({
+      is: 'sheet-editor',
+
+      properties: {
+        value: {
+          type: Array,
+          value: function() {
+            return [];
+          },
+          notify: true
+        },
+
+        title: {
+          type: String,
+          value: 'Array'
+        },
+
+        snippetSize: {
+          type: Number,
+          value: 3
+        },
+
+        _attachedHit: {
+          type: Boolean,
+          value: false
+        }
+      },
+
+      observers: ['_setSnippetData(value, snippetSize, _attachedHit)'],
+
+      grid: null,
+      snippet: null,
+
+      attached: function() {
+        if (this.grid) {
+          return;
+        }
+
+        this.initGrid();
+        this.initSnippet();
+        this._attachedHit = true;
+      },
+
+      openDialog: function() {
+        this.$.dialog.open();
+      },
+
+      dialogOpened: function() {
+        if (this.grid.countRenderedRows() === -1 ||
+            this.grid.countRenderedCols() === -1) {
+
+          this.grid.render();
+        }
+      },
+
+      initGrid: function() {
+        var value;
+
+        if (this.value && this.value.length) {
+          value = JSON.parse(JSON.stringify(this.value));
+        }
+
+        this.grid = new Handsontable(this.$.grid, {
+          data: value,
+          colHeaders: true,
+          rowHeaders: true,
+          trimWhitespace: true,
+          contextMenu: true,
+          startRows: 40,
+          startCols: 20,
+          minSpareCols: 1,
+          minSpareRows: 1,
+          stretchH: 'all'
+        });
+      },
+
+      initSnippet: function() {
+        this.snippet = new Handsontable(this.$.snippet, {
+          colHeaders: true,
+          rowHeaders: true,
+          startRows: this.snippetSize,
+          startCols: this.snippetSize,
+          width: 240,
+          height: 100,
+          editor: false,
+          stretchH: 'all'
+        });
+
+        setTimeout(function() {
+          this.snippet.render();
+        }.bind(this), 100);
+      },
+
+      _setSnippetData: function(value, n, _attachedHit) {
+        if (!value || !value.length || !_attachedHit) {
+          return;
+        }
+
+        value = value.slice(0, n).map(function(row) {
+          var col = Object.keys(row).slice(0, n).map(function(colKey) {
+            var cell = row[colKey];
+
+            return cell && cell.length > 5 ? cell.slice(0, 2) + '...' : cell;
+          });
+
+          col.length = n;
+
+          return col;
+        });
+
+        value.length = n;
+        this.snippet.loadData(value);
+
+        setTimeout(function() {
+          this.snippet.render();
+        }.bind(this), 100);
+      },
+
+      saveValue: function(event) {
+        var value, lastRow = -1, lastCol = -1;
+
+        if (!event || event.detail.confirmed) {
+          value = this.grid.getData();
+
+          value.forEach(function(row, i) {
+            row.forEach(function(cell, k) {
+              if (cell) {
+                lastRow = i > lastRow ? i : lastRow;
+                lastCol = k > lastCol ? k : lastCol;
+              }
+            });
+          });
+
+          value = value.slice(0, lastRow + 1).map(function(col) {
+            return col.slice(0, lastCol + 1);
+          });
+
+          this.value = value;
+        }
+      }
+    });
+  </script>
+</dom-module>

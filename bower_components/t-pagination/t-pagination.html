@@ -93,30 +93,34 @@
 			this._handleExtremities();	
 		},
 
-		_handleExtremities:function(){
-			if(this.pageNumber==this.pageCount)
-			{
+		_handleExtremities: function() {
+			this.style.display = 'block';
+			
+			if (this.pageNumber == 1) {
 				this.$.next.style.display='none';
+				this.$.prev.style.display='none';
+				this.$.first.style.display='none';
+				this.$.current.style.display='none';
+				
+				if (this.pageCount == this.pageNumber) {
+					this.$.firstload.style.display='none';
+					this.style.display = 'none';
+				} else {
+					this.$.firstload.style.display='block';
+				}
+			} else if (this.pageNumber == this.pageCount) {
+				this.$.next.style.display='none';
+				this.$.firstload.style.display='none';
+
+				this.$.prev.style.display='block';
+				this.$.current.style.display='block';
+				this.$.first.style.display='block';
+			} else {
+				this.$.next.style.display='block';
 				this.$.prev.style.display='block';
 				this.$.first.style.display='block';
 				this.$.current.style.display='block';
 				this.$.firstload.style.display='none';
-			}
-			else{
-				if(this.pageNumber==1 ){
-					this.$.next.style.display='none';
-					this.$.prev.style.display='none';
-					this.$.first.style.display='none';
-					this.$.firstload.style.display='block';
-					this.$.current.style.display='none';
-				}
-				else{
-					this.$.next.style.display='block';
-					this.$.prev.style.display='block';
-					this.$.first.style.display='block';
-					this.$.firstload.style.display='none';
-					this.$.current.style.display='block';
-				}
 			}
 		},
 

@@ -12,9 +12,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
 <link rel="import" href="../paper-input/paper-input-behavior.html">
 
-<link rel="import" href="../paper-input/paper-input-error.html">
-<link rel="import" href="../paper-input/paper-input-char-counter.html">
-<link rel="import" href="../t-shared-components/shared-styles.html" />
 <link rel="import" href="t-input-container.html">
 <!--
 `<paper-input>` is a single-line text field with Material Design styling.
@@ -43,7 +40,6 @@ style this element.
 
   
   <template>
-<style include="shared-styles"></style>
 
     <t-input-container fire-blur="{{validateOnBlur}}" no-label-float="[[noLabelFloat]]" always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]" auto-validate$="[[autoValidate]]" disabled$="[[disabled]]" invalid="[[invalid]]">
 

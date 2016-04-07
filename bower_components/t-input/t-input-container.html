@@ -9,7 +9,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-styles/paper-styles.html">
 
 <!--
 `<paper-input-container>` is a container for a `<label>`, an `<input is="iron-input">` or
@@ -78,6 +77,9 @@ This element is `display:block` by default, but you can set the `inline` attribu
       display: block;
       position: relative;
       font-family: var(--primary-font-family);
+     /* Removing padding to adjust in the current scenairo */
+     /*  padding: 8px 0; */
+
     }
 
     :host[inline] {
@@ -102,145 +104,129 @@ This element is `display:block` by default, but you can set the `inline` attribu
     :host.invalid-input .input-content ::content .input {
       border-color:  var(--error-theme-color,--error-color)!important;
     }
-    /* 
-    
-    .focused-line {
-      height: 2px;
-    
-      -webkit-transform-origin: center center;
-      transform-origin: center center;
-      -webkit-transform: scale3d(0,1,1);
-      transform: scale3d(0,1,1);
-    
-      background: var(--paper-input-container-focus-color, --default-primary-color);
-    }
-    
-    .is-highlighted .focused-line {
-      -webkit-transform: none;
-      transform: none;
-      -webkit-transition: -webkit-transform 0.25s;
-      transition: transform 0.25s;
-    
-      @apply(--paper-transition-easing);
-    }
-    
-    .is-invalid .focused-line {
-      background: var(--paper-input-container-invalid-color, --google-red-500);
-    
-      -webkit-transform: none;
-      transform: none;
-      -webkit-transition: -webkit-transform 0.25s;
-      transition: transform 0.25s;
-    
-      @apply(--paper-transition-easing);
-    }
-    
-    .unfocused-line {
-      height: 1px;
-      background: var(--paper-input-container-color, --secondary-text-color);
-    }
-    
-    :host([disabled]) .unfocused-line {
-      border-bottom: 1px dashed;
-      border-color: var(--paper-input-container-color, --secondary-text-color);
-      background: transparent;
-    } */
+    .underline {
+        position: relative;
+      }
 
-    .input-content {
-      position: relative;
-    }
+      .floated-label-placeholder {
+        @apply(--t-font-caption);
+      }
 
-    .input-content ::content label,
-    .input-content ::content .paper-input-label {
-      color: var(--form-label-color);
-      font-size: var(--form-label-size);
-      display: block;
-      margin-bottom: var(--form-label-margin);
+      .input-content.label-is-hidden ::content label,
+      .input-content.label-is-hidden ::content .paper-input-label {
+        visibility: hidden;
+      }
+      
 
-    }
 
-    /* .input-content.label-is-floating ::content label,
-    .input-content.label-is-floating ::content .paper-input-label {
-       @apply(--paper-transition-easing);
-    } */
-/* 
-    .input-content.label-is-highlighted ::content label,
-    .input-content.label-is-highlighted ::content .paper-input-label {
-      color: var(--paper-input-container-focus-color, --default-primary-color);
-    }
- */
-/*     .input-content.is-invalid ::content label,
-.input-content.is-invalid ::content .paper-input-label {
-  color: var(--paper-input-container-invalid-color, --google-red-500);
-}
- */
-    .input-content.label-is-hidden ::content label,
-    .input-content.label-is-hidden ::content .paper-input-label {
-      visibility: hidden;
-    }
+      .unfocused-line {
+        @apply(--layout-fit);
 
-    .input-content ::content iron-autogrow-textarea#input{
-      border-radius: var(--standard-border-radius);
-      border-color: var(--t-input-border-color);
-      border: 1px solid;
-    }
+        background: var(--form-underline-color, --secondary-text-color);
+        height: 1px;
 
+      }
+      :host.invalid-input .unfocused-line {
+        background: var(--paper-input-container-invalid-color, --error-color);
+        -webkit-transform: none;
+        transform: none;
+        -webkit-transition: -webkit-transform 0.25s;
+        transition: transform 0.25s;
+
+        @apply(--paper-transition-easing);
+      }
+      :host([disabled]) .unfocused-line {
+        border-bottom: 1px dashed;
+        border-color: var(--paper-input-container-color, --secondary-text-color);
+        background: transparent;
+
+      }
+      .input-content {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+
+        position: relative;
+      }
+
+      .input-content ::content label,
+      .input-content ::content .paper-input-label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        font: inherit;
+        color: var( --form-label-color, #777);
+        -webkit-transition: -webkit-transform 0.25s, width 0.25s;
+        transition: transform 0.25s, width 0.25s;
+        -webkit-transform-origin: left top;
+        transform-origin: left top;
+        line-height: 28px;
+        @apply(--t-font-common-nowrap);
+        @apply(--t-font-subhead);
+        @apply(--t-input-container-label);
+        @apply(--t-form-transition-easing);
+      }
+
+      .input-content.label-is-floating ::content label,
+      .input-content.label-is-floating ::content .paper-input-label {
+        -webkit-transform: translateY(-75%) scale(0.75);
+        transform: translateY(-75%) scale(0.75);
+
+        /* Since we scale to 75/100 of the size, we actually have 100/75 of the
+        original space now available */
+        width: 133%;
+
+        @apply(--t-input-container-label-floating);
+      }
+    
     .input-content ::content input,
     .input-content ::content textarea,
     .input-content ::content .paper-input-input {
-      font-family: var(--primary-font-family);
-      font-size: var(--t-input-field-text-size);
-      position: relative; /* to make a stacking context */
-      outline: none;
-      box-shadow: none;
-      padding: var(--standard-padding-input-field);
-      background: transparent;
-      color: var(--paper-input-container-input-color, --primary-text-color);
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
-      width: 100%;
-      @apply(--paper-input-container-input);
+        position: relative; /* to make a stacking context */
+        box-shadow: none;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+        background: transparent;
+        border: none;
+        color: var( --form-value-color, #777);
+        -webkit-appearance: none;
+        text-align: inherit;
+        outline: 0;
+        line-height: 28px;
+        @apply(--t-font-subhead);
+        @apply(--t-input-container-input);
     }
 
-    /* Firefox sets a min-width on the input, which can cause layout issues */
-    .input-content ::content input {
-      min-width: 0;
-      border-radius: var(--standard-border-radius);
-      border-color: var(--t-input-border-color);
-      border: 1px solid;
-    }
+  
 
     .input-content ::content textarea {
       resize: none;
     }
-/* 
-    .add-on-content.is-invalid ::content * {
-      color: var(--paper-input-container-invalid-color, --google-red-500);
-    }
 
-    .add-on-content.is-highlighted ::content * {
-      color: var(--paper-input-container-focus-color, --default-primary-color);
-    } */
-    :host ::content paper-input-error{
-      display: block;
-      position: absolute;
-      top: 100%;
-      padding: 0;
-      margin: 0;
-      left: 0;
-      font-size: var(--error-text-size);
-      color: var(--error-theme-color,--error-color);
-    }
+    .add-on-content.is-invalid ::content * {
+        color: var(--paper-input-container-invalid-color, --error-color);
+      }
+
   </style>
 
   <template>
+    
 
+<template is="dom-if" if="[[!noLabelFloat]]">
+      <div class="floated-label-placeholder">&nbsp;</div>
+    </template>
 
     <div class$="[[_computeInputContentClass(noLabelFloat,alwaysFloatLabel,focused,invalid,_inputHasContent)]]">
       <content select=":not([add-on])"></content>
     </div>
-
+    
+    <div class$="[[_computeUnderlineClass(focused,invalid)]]">
+      <div class="unfocused-line"></div>
+      <!-- <div class="focused-line"></div> -->
+    </div>
+    
     <div class$="[[_computeAddOnContentClass(focused,invalid)]]">
       <content id="addOnContent" select="[add-on]"></content>
     </div>
@@ -491,7 +477,7 @@ This element is `display:block` by default, but you can set the `inline` attribu
         }
       }
       return cls;
-    },/*
+    },
 
     _computeUnderlineClass: function(focused, invalid) {
       var cls = 'underline';
@@ -502,7 +488,7 @@ This element is `display:block` by default, but you can set the `inline` attribu
       }
       return cls;
     },
-*/
+
     _computeAddOnContentClass: function(focused, invalid) {
       var cls = 'add-on-content';
       if (invalid) {

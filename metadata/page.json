@@ -120,17 +120,17 @@
                     "fields": {
                         "dataApi": {
                             "name": "URL for list data",
-                            "type": "string",
-                            "value": "results.json"
+                            "type": "url",
+                            "value": "https://vivid-inferno-4587.firebaseio.com/results.json"
                         },
                         "filterApi": {
                             "name": "URL for the filter",
-                            "type": "string",
-                            "value": "filter.json"
+                            "type": "url",
+                            "value": "https://vivid-inferno-4587.firebaseio.com/filter.json"
                         },
                         "paginatedApi": {
                             "name": "URL for pagination",
-                            "type": "string",
+                            "type": "url",
                             "value": ""
                         }
                     }
@@ -186,9 +186,7 @@
     },
     "t-table": {
         "attributes": {
-            "id": "rtable",
-            "sortable": "",
-            "searchable": ""
+            "id": "rtable"
         },
         "property": {
             "name": "Table",
@@ -220,12 +218,61 @@
                             "name": "Hoverable Rows",
                             "type": "boolean",
                             "value": false
+                        },
+                        "firstRowAsHeaders": {
+                            "name": "Headers From Data",
+                            "type": "boolean",
+                            "value": true
+                        }
+                    }
+                },
+                {
+                    "name": "Data",
+                    "fields": {
+                        "seedData": {
+                            "name": "Table Data",
+                            "type": "array",
+                            "value": [
+                                [
+                                    "Student Name",
+                                    "Gender",
+                                    "Class Level",
+                                    "Home State"
+                                ],
+                                [
+                                    "Alexandra",
+                                    "Female",
+                                    "4. Senior",
+                                    "CA"
+                                ],
+                                [
+                                    "Andrew",
+                                    "Male",
+                                    "1. Freshman",
+                                    "SD"
+                                ],
+                                [
+                                    "Anna",
+                                    "Female",
+                                    "1. Freshman",
+                                    "NC"
+                                ],
+                                [
+                                    "Becky",
+                                    "Female",
+                                    "2. Sophomore",
+                                    "SD"
+                                ]
+                            ],
+                            "url": "http://www.json-generator.com/api/json/get/bQODrtAkHS?indent=2",
+                            "translator": "function translator(inp) {\nvar out, cols; if (!inp || !inp.length || !(inp[0] instanceof Object)) {throw('Invalid input type');} cols = Object.keys(inp[0]); out = inp.map(function(obj) {return cols.map(function(key) {return obj[key]; }); }); out.unshift(cols); return out; }",
+                            "transform": "function transform(inp) {return inp.map(function(obj) {return {name: obj.name, age: obj.age }; });}"
                         }
                     }
                 }
             ]
         },
-        "innerHTML": "\n\t\t\t<t-column hide-on=\"tablet\" data-value=\"fruit\" display-value=\"Name\" column-template=\"test\"></t-column>\n\t\t\t<t-column hide-on=\"phone\" data-value=\"alice\" display-value=\"Role\"></t-column>\n\t\t\t<t-column ignore-sort=\"true\" data-value=\"bill\" display-value=\"Last\"></t-column>\n\t\t\t<t-column data-value=\"casey\" display-value=\"Status\"></t-column>\n\t\t\t\t<template id=\"test\" name=\"edit\">\n\t\t\t\t\t<iron-icon src=\"http://www.unixstickers.com/image/cache/data/stickers/golang/golang.sh-600x600.png\" style=\"width: 24px; height: 24px;\"> </iron-icon>\n\t\t\t\t\t<span>{{}}</span>\n\t\t\t\t</template>\t\n\n\t\t\t\t<t-body>\n\t\t\t\t\t[\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;pear&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 2,\t&quot;casey&quot;: 8 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;apple&quot;,\t&quot;alice&quot;: 4,\t&quot;bill&quot;: 10,\t&quot;casey&quot;: 2 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;banana&quot;,\t&quot;alice&quot;: 0,\t&quot;bill&quot;: 4,\t&quot;casey&quot;: 0 },\n\t\t\t\t\t{ &quot;fruit&quot;:&quot;grape&quot;,\t&quot;alice&quot;: 2,\t&quot;bill&quot;: 3,\t&quot;casey&quot;: 5 }\n\t\t\t\t\t]\n\t\t\t\t</t-body>\n\t\t"
+        "innerHTML": "\n\t\t\t<t-column data-value=\"0\" display-value=\"Name\" hide-on=\"tablet\" column-template=\"test\"></t-column>\n\t\t\t<t-column data-value=\"1\" display-value=\"Role\" hide-on=\"phone\"></t-column>\n\t\t\t<t-column data-value=\"2\" display-value=\"Last\"></t-column>\n\t\t\t<t-column data-value=\"3\" display-value=\"Status\"></t-column>\n\t\t"
     },
     "t-tabs": {
         "attributes": {
@@ -311,7 +358,7 @@
                         "videoId": {
                             "name": "Youtube Video Link",
                             "type": "string",
-                            "value": "SVaD8rouJn0"
+                            "value": "Yqvbv-SB4bg"
                         }
                     }
                 },

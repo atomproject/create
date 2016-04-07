@@ -3,7 +3,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/t-form/t-form.html">
 <link rel="import" href="../bower_components/t-page/t-page.html">
-<link rel="import" href="code-generator-behavior.html">
+<link rel="import" href="../bower_components/code-generator-behavior/code-generator-behavior.html">
 <link rel="import" href="state-converter-behavior.html">
 
 <dom-module id="t-stage">
@@ -77,6 +77,11 @@
         builderType: String,
         componentPanel: Object,
         metadata: Object,
+
+        _dsTargets: {
+          type: Object,
+          value: function() { return {}; }
+        }
       },
 
       observers: [
@@ -94,7 +99,9 @@
 
       ready: function() {
         window.onbeforeunload = function() {
-          if (this.builderType && this._elementSateList.length) {
+          if (this.builderType && this._elementSateList.length &&
+            !localStorage.getItem('atom-builder')) {
+
             return 'All changes will be lost!';
           }
         }.bind(this);
@@ -149,19 +156,6 @@
               } else {
                 attributes = meta.attributes = {};
               }
-
-              (meta.property.properties || []).forEach(function(prop) {
-                var fields = prop.fields || {};
-
-                Object.keys(fields).forEach(function(field) {
-                  var attrName = field;
-                  var value = fields[field].value;
-
-                  if (value !== null && value !== undefined) {
-                    attributes[attrName] = value;
-                  }
-                });
-              });
 
               meta.html = this.getComponentCode(name, attributes, innerHTML);
             }.bind(this));
@@ -282,14 +276,16 @@
         return container.root.querySelector('.field-container');
       },
 
-      getElementPosition: function(el) {
-        var posX, posY;
+      getElementState: function(el) {
+        var posX, posY, state;
         var fieldContainers = this.querySelectorAll('li.field-container') || [];
 
         fieldContainers = Array.prototype.slice.call(fieldContainers);
         fieldContainers.forEach(function(container, index) {
           var fieldsets = container.querySelectorAll('.fieldset') || [];
+
           fieldsets = Array.prototype.slice.call(fieldsets);
+
           if (fieldsets.indexOf(el) !== -1) {
             posY = fieldsets.indexOf(el);
             posX = index;
@@ -300,7 +296,11 @@
           throw new Error('Could not locate the element');
         }
 
-        return {x: posX, y: posY};
+        state = this._elementSateList.find(function(state) {
+          return state.posX === posX && state.posY === posY;
+        });
+
+        return {x: posX, y: posY, state: state};
       },
       /* section: end */
 
@@ -523,50 +523,113 @@
       updatePath: function(event) {
         var key = event.detail.path;
         var value = event.detail.value;
-        var name, attributes, pos, targetElementState, container, innerHTML;
-        var html;
+        var dataSource = event.detail.dataSource;
+        var target = this.componentPanelTarget;
+        var state, container;
 
-        if (!this.componentPanelTarget || !key ||
-          value === undefined || value === null) {
+        if (!target || !key ||
+            ((value === undefined || value === null) && !dataSource)) {
+
           return;
         }
 
-        if ($(this.componentPanelTarget).is(this.builderType)) {
-          this.updateBuilderState(key, value);
-          return;
+        if ($(target).is(this.builderType)) {
+          target = this.querySelector(this.builderType);
+          state = this.builderState;
+        } else {
+          container = $(target).closest('.fieldset');
+          container = container[0];
+          state = this.getElementState(container).state;
         }
 
-        value = _.cloneDeep(value);
-        this.componentPanelTarget.set(key, value);
-
-        value = _.cloneDeep(value);
-        container = $(this.componentPanelTarget).closest('.fieldset');
-        container = container[0];
-        name = container.getAttribute('data-name');
-        pos = this.getElementPosition(container);
-        targetElementState = this._elementSateList.find(function(state) {
-          return state.posX === pos.x && state.posY === pos.y;
-        });
-        attributes = targetElementState.attributes;
-        innerHTML = targetElementState.innerHTML;
-        attributes[key] = value;
-        html = this.getComponentCode(name, attributes, innerHTML);
-        targetElementState.html = html;
+        if (dataSource) {
+          this.updateDataSource(target, state, key, dataSource);
+        } else {
+          this.updateProperty(target, state, key, value);
+        }
       },
 
-      updateBuilderState: function(key, value) {
-        var targetElementState, attributes, name;
-
-        name = this.builderType;
-        targetElementState =  this.builderState;
-        attributes = targetElementState.attributes;
+      updateProperty: function(target, state, key, value) {
+        value = _.cloneDeep(value);
+        target.set(key, value);
 
         value = _.cloneDeep(value);
-        this.querySelector(this.builderType).set(key, value);
+        state.attributes[key] = value;
 
-        value = _.cloneDeep(value);
-        attributes[key] = value;
-        targetElementState.html = this.getComponentCode(name, attributes);
+        state.showDs = false;
+        state.html = this.generateCode(state);
+      },
+
+      updateDataSource: function(target, state, key, dataSource) {
+        var ds = state.dataSources[key];
+        var url = dataSource.url;
+        var transform = dataSource.transform;
+        var dsTarget;
+
+        if (!ds) {
+          ds = this.createDataSource(target, state, key);
+        }
+
+        dsTarget = this._dsTargets[ds.id];
+        ds.attributes.url = dsTarget.url = url;
+        ds.attributes.transform = dsTarget.transform = transform;
+
+        ds.showDs = true;
+        state.html = this.generateCode(state);
+      },
+
+      generateCode: function(state) {
+        var name = state.name, attributes = state.attributes;
+        var innerHTML = state.innerHTML;
+        var code = this.getComponentCode(name, attributes, innerHTML);
+
+        if (state.dataSources) {
+          Object.keys(state.dataSources).forEach(function(key) {
+            var ds = state.dataSources[key];
+
+            if (!ds.showDs) {
+              return;
+            }
+
+            code += this.getComponentCode(ds.name, ds.attributes);
+          }.bind(this));
+        }
+
+        return code;
+      },
+
+      createDataSource: function(target, state, key) {
+        var dsElement = document.createElement('dynamic-data-source');
+        var dataSource, className, id, targetClasses;
+
+        this._dsCounter = this._dsCounter || 0;
+        className = 'ds' + this._dsCounter++;
+        dsElement.propertyName = key;
+        dsElement.auto = true;
+        dsElement.target = '.' + className;
+
+        target.classList.add(className);
+        targetClasses = state.attributes.class || '';
+        targetClasses += ' ' + className;
+        state.attributes.class = targetClasses;
+
+        id = target.tagName + '.' + key + dsElement.target;
+        id = id.toLowerCase();
+
+        target.parentElement.appendChild(dsElement);
+        this._dsTargets[id] = dsElement;
+
+        dataSource = state.dataSources[key] = {
+          name: 'dynamic-data-source',
+          attributes: {
+            target: dsElement.target,
+            propertyName: key,
+            auto: true
+          },
+          id: id
+        };
+
+        return dataSource;
       },
       /* section: end */
 
@@ -655,16 +718,13 @@
           fieldContainer = this.getWrapper();
 
           row.forEach(function(column, posY) {
-            var innerHTML = column.innerHTML;
-            name = column.name;
-            attributes = column.attributes;
-            column.html = this.getComponentCode(name, attributes, innerHTML);
+            column.html = this.generateCode(column);
             state = this.getNewElementState(column, posX, posY);
             this.push('_elementSateList', state);
 
             //TODO: persist category in the state file
             //TODO: column.html and html must end up being same
-            fieldSet = this.getFieldset(name, '', column.html);
+            fieldSet = this.getFieldset(column.name, '', column.html);
             fieldContainer.appendChild(fieldSet);
           }.bind(this));
 
@@ -688,7 +748,7 @@
       /* section: component panel */
       showPanelForElement: function(el) {
         var name = el.getAttribute('data-name');
-        var pos, state, target;
+        var state, target;
 
         target = el.querySelector(name);
 
@@ -696,17 +756,12 @@
           return;
         }
 
-        pos = this.getElementPosition(el);
-        state = this._elementSateList.find(function(item) {
-          return item.posX === pos.x && item.posY === pos.y;
-        });
-
+        state = this.getElementState(el).state;
 
         $(this.componentPanelTarget)
           .closest('li.field-container')
           .children('.overlap')
           .removeClass('active');
-
 
         $(target)
           .closest('li.field-container')
@@ -771,6 +826,7 @@
 
           this.showPanelForBuilder();
           panel.addEventListener('path-changed', this.updatePath.bind(this));
+          panel.addEventListener('update-data-source', this.updatePath.bind(this));
         }.bind(this));
       }
       /* section: end */

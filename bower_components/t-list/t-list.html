@@ -195,7 +195,7 @@ after the list became visible again. e.g.
     <template>        
         <div id="listContainer" >
             <div hidden="[[!withFilter]]">                
-                <t-filter opened id="filter" show-twelve-hour-clock="[[showTwelveHourClock]]" auto="[[auto]]" class="flex" style="overflow:auto" filter-api="[[filterApi]]" filter-api-params="[[filterApiParams]]" include-filters="[[includeFilters]]" on-filter-change="_applyFilters" on-filter-close="_closeModal" on-filter-open="_onFilterOpen" results-paging-info="[[data.pagingInfo]]"></t-filter>
+                <t-filter opened excluded-filters= "[[excludedFilters]]"  filter-response-param="[[filterResponseParam]]" id="filter" search-label="[[filterSearchLabel]]" show-twelve-hour-clock="[[showTwelveHourClock]]" auto="[[auto]]" class="flex" style="overflow:auto" filter-api="[[filterApi]]" filter-api-params="[[filterApiParams]]" include-filters="[[includeFilters]]" on-filter-change="_applyFilters" on-filter-close="_closeModal" on-filter-open="_onFilterOpen" results-paging-info="[[data.pagingInfo]]" min-start-date="[[minStartDate]]" min-end-date="[[minEndDate]]"></t-filter>
             </div>
             <div class="sorting paper-header" id="sortCntr">
                 <template is="dom-if" if$="[[withSorting]]">
@@ -211,21 +211,24 @@ after the list became visible again. e.g.
             <div class="error-message section-small" hidden$="[[!_noResultsMatched]]">
                 <div hidden$="[[!_noResultFound]]">
                     <div>[[noResultsFoundMessage]]</div>
-                    <div><a class="link" on-click="_redirectToPage" >modify search</a></div>
+                    <div><a class="link" on-click="_redirectToPage" >[[redirectLinkText]]</a></div>
                 </div>
                 <div hidden$="[[!_noResultsFiltered]]">
                     <div>[[noResultsFilteredMessage]]</div>
-                    <div><a class="link" on-click="_showFilters" >modify filter</a> or <a class="link" on-click="_redirectToPage" >modify search</a></div>
+                    <div><a class="link" on-click="_showFilters" >modify filter</a> or <a class="link" on-click="_redirectToPage" >[[redirectLinkText]]</a></div>
                 </div>
                 <div  hidden$="[[!_noResultsFilteredForSearchTerm]]">
                     <div>[[_noResultsFilteredForSearchTermMessage]]</div>
                     <div>Modify the search term or <a class="link" on-click="_resetSearchFilter" >reset.</a></div>
                 </div>
             </div>
-            <!-- <div class="error-message " hidden$="[[_noResultsMatched]]">[[note]]</div> -->
-            <div class="absolute horizontal layout center-justified" hidden$="{{_contentLoaded}}">
+            <template is="dom-if" if="{{!_contentLoaded}}">
+                <div class="absolute horizontal layout center-justified">
                 <t-loader id="contentLoader" active></t-loader>
             </div>
+            </template>
+            <!-- <div class="error-message " hidden$="[[_noResultsMatched]]">[[note]]</div> -->
+            
             <div class="layout vertical" style="height:100%">
                 <!--  selection-enabled has been removed to handle behaviour for Iphone-6-->
                 <t-simple-list id="list" selection-enabled items="{{_list}}" class="flex" on-selected-item-changed="_selectionChanged">
@@ -236,8 +239,8 @@ after the list became visible again. e.g.
                 <t-loader id="ajaxLoader" active></t-loader>
             </div>
         </div>
-        <iron-ajax id="dataCall" method="GET" headers='{"accept": "application/json"}' content-type="application/json" handle-as="json" params="[[dataApiParams]]" last-response="{{data}}" on-response="_listPopulated"></iron-ajax>
-        <iron-ajax id="applyFilterCall" headers='{"accept": "application/json"}' content-type="application/json" method="POST" handle-as="json" url="{{filterResultsApi}}" last-response="{{data}}" on-response="_listPopulated"></iron-ajax>
+        <iron-ajax id="dataCall" method="[[dataCallMethod]]" headers='{"accept": "application/json"}' content-type="application/json" handle-as="json" params="[[dataApiParams]]" last-response="{{data}}" on-response="_listPopulated"></iron-ajax>
+        <iron-ajax id="applyFilterCall" headers='{"accept": "application/json"}' content-type="application/json" method="[[filterCallMethod]]" handle-as="json" url="{{filterResultsApi}}" last-response="{{data}}" on-response="_listPopulated"></iron-ajax>
     </template>
 </dom-module>
 <script>
@@ -288,7 +291,24 @@ after the list became visible again. e.g.
                     value: 'We could not find any flights for your search.'
                 },
 
+                filterResponseParam: {
+                    type: String,
+                    value: 'filters'
+                },
+
+                /**
+                 * The redirect link which appears when there is no result to go to search 
+                 * page usually.
+                 */
                 redirectLink: String,
+
+                /**
+                 * The search term is the link which appears when there is no result.
+                 */
+                redirectLinkText: {
+                    type: String,
+                    value:'modify search'
+                },
 
                 _noResultFound: {
                     type: Boolean,
@@ -329,7 +349,8 @@ after the list became visible again. e.g.
                  */
                 dataApi: {
                     type: String,
-                    value: ""
+                    value: "",
+                    observer: "_dataApiChanged"
                 },
 
                 /**
@@ -340,6 +361,15 @@ after the list became visible again. e.g.
                     value: function () {
                         return [];
                     }
+                },
+
+                /**
+                 * Customize filter parameters
+                 * array item is an object with key equal to category and value equal toitem name
+                */
+                excludedFilters:{
+                    type: Array,
+                    value: []
                 },
 
                 /**
@@ -482,11 +512,45 @@ after the list became visible again. e.g.
                     type: Object,
                     value: null,
                     notify: true
+                },
+
+                filterSearchLabel:{
+                    type:String,
+                    value:'Search hotel name'
+                },
+
+                dataCallMethod:{
+                    type:String,
+                    value:'GET'
+                },
+
+                filterCallMethod:{
+                    type:String,
+                    value:'POST'
+                },
+
+                /**
+                 * This flag is used to restrict minimum value for start date in date range filter
+                 * All past dates are shown by default
+                */
+                minStartDate:{
+                    type:Boolean,
+                    value:false
+                },
+
+                /**
+                 * This flag is used to restrict minimum value for end date in date range filter
+                 * All past dates are shown by default
+                */
+                minEndDate:{
+                    type:Boolean,
+                    value:false
                 }
             },
 
 
         attached: function() {            
+            this.attachedHit = true;
             if (this.auto)
                 this.generateList();
         },
@@ -523,6 +587,10 @@ after the list became visible again. e.g.
             },
 
             _dataApiChanged: function () {
+                var component = this;
+
+                if (!this.attachedHit) return;
+
                 if (this.dataApi != undefined && this.dataApi != "" && this.auto) {
                     this.$.dataCall.url = this.dataApi + (this.dataApi.indexOf('?') > -1 ? '&' : '?') + component._defaultSorting + "+asc";
                     this._isSorted = true;

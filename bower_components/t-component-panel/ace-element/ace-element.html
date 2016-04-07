@@ -1,0 +1,163 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../paper-toast/paper-toast.html">
+<link rel="import" href="../../paper-dialog/paper-dialog.html">
+<link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="indentation-icon.html">
+<link rel="import" href="ace-lib.html">
+
+<dom-module id="ace-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-icon-button {
+        background-color: #F0F0F0;
+        border-radius: 50% 50%;
+        margin-left: 15px;
+      }
+
+      #editor-dialog {
+        z-index: 106 !important;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+      }
+
+      #editor-dialog #ace-container {
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        box-sizing: border-box;
+        height: calc(100% - 136px);
+        width: calc(100% - 40px);
+        margin: 20px;
+        margin-bottom: 0;
+      }
+    </style>
+
+    <paper-toast id="toast"></paper-toast>
+    <paper-dialog id="editor-dialog" modal on-iron-overlay-opened="editorOpened">
+      <h2>{{title}} <paper-icon-button icon="indent:prettify" on-tap="prettify"></paper-icon-button></h2>
+      <div id="ace-container"></div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm on-tap="saveJson">Save</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'ace-element',
+
+      properties: {
+        value: {
+          type: Object,
+          observer: '_setStringValue',
+          notify: true
+        },
+        strVal: {
+          type: String,
+          notify: true
+        },
+        valueSaved: Function,
+        title: String
+      },
+
+      attached: function() {
+        this.editor = ace.edit(this.$['ace-container']);
+        this.editor.getSession().setMode('ace/mode/json');
+        this.editor.setTheme('ace/theme/github');
+        this.editor.getSession().setTabSize(2);
+        this.editor.getSession().setUseSoftTabs(true);
+        this.editor.setShowPrintMargin(false);
+
+        if (this.strVal !== undefined) {
+          this.editor.setValue(this.strVal );
+          this.editor.renderer.updateText();
+        }
+      },
+
+      editorOpened: function(event) {
+        if (this.strVal !== this.editor.getValue()) {
+          this.editor.setValue(this.strVal || '');
+        }
+
+        this.editor.selection.clearSelection();
+      },
+
+      saveJson: function(event) {
+        Promise.resolve(this.editor.getValue())
+          .then(function(strVal) {
+            return JSON.parse(strVal);
+          }.bind(this))
+          .then(function(value) {
+            this.value = value;
+
+            if (this.valueSaved) {
+              return this.valueSaved(value);
+            }
+
+            return ;
+          }.bind(this))
+          .then(function() {
+            this.closeEditor();
+          }.bind(this))
+          .catch(function(e) {
+            this.$.toast.text = e.toString();
+            this.$.toast.open();
+          }.bind(this));
+
+        event.stopPropagation();
+        event.preventDefault();
+      },
+
+      _setStringValue: function() {
+        if (this.value === null) this.value = undefined;
+
+        try {
+          this.strVal = JSON.stringify(this.value, null, 2);
+        } catch (e) {
+          this.$.toast.text = e.toString();
+          this.$.toast.open();
+        }
+
+        if (!this.editor || this.strVal === this.editor.getValue()) {
+          return;
+        }
+
+        this.editor.setValue(this.strVal );
+        this.editor.selection.clearSelection();
+      },
+
+      prettify: function() {
+        var strVal = this.editor.getValue();
+
+        try {
+          strVal = JSON.stringify(JSON.parse(strVal), null, 2);
+          this.strVal = strVal;
+          this.editor.setValue(strVal);
+          this.editor.selection.clearSelection();
+        } catch (e) {
+          this.$.toast.text = e.toString();
+          this.$.toast.open();
+        }
+      },
+
+      openEditor: function() {
+        this.$['editor-dialog'].open();
+      },
+
+      closeEditor: function() {
+        this.$['editor-dialog'].close();
+      }
+    });
+  </script>
+</dom-module>

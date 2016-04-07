@@ -13,7 +13,7 @@ Example:
     <style is="custom-style">
     :host {
         display: block;
-        color: var(--dark-color-1, --grey-four);
+        color: var(--section-header-color, #777);
         font-size: var(--section-header-text-size, 16px);
         font-family: var(--primary-font-family);
         font-weight: 500;
@@ -23,7 +23,7 @@ Example:
     :host #border {
         margin-top: 9px;
         height: 1px;
-        background-color: var(--dark-color-2, --grey-three);
+        background-color: var(--section-header-bg-color, --grey-three);
     }
     
     h5 {
@@ -37,11 +37,8 @@ Example:
             display: none;
         }
         :host {
-            /*     border-bottom: 1px solid ;
-        border-color: var(--border-color,--grey-three);
-         */
             padding: 10px;
-            background: var(--grey-two,#eeeeee);
+            background: var(--section-header-bg-color,#eeeeee);
         }
     }
     </style>

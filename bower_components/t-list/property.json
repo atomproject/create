@@ -5,17 +5,17 @@
         "fields": {
             "dataApi": {
                 "name": "URL for list data",
-                "type": "string",
-                "value": "results.json"
+                "type": "url",
+                "value": "https://vivid-inferno-4587.firebaseio.com/results.json"
             },
             "filterApi": {
                 "name": "URL for the filter",
-                "type": "string",
-                "value": "filter.json"
+                "type": "url",
+                "value": "https://vivid-inferno-4587.firebaseio.com/filter.json"
             },
             "paginatedApi": {
                 "name": "URL for pagination",
-                "type": "string",
+                "type": "url",
                 "value": ""
             }
         }

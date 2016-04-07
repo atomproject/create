@@ -1,89 +1,9 @@
-
+:host{
+  display: block;
+}
 :host *,:host ::content *{
   box-sizing: border-box;
   -moz-box-sizing: border-box;
-}
-
-:host{
-  position: relative;
-  display: block;
-  font-family: var(--primary-font-family);
-}
-
-:host([label]) label{
-  color: var(--form-label-color);
-  font-size: var(--form-label-size);
-  display: block;
-  margin-bottom: var(--form-label-margin);
-}
-
-:host([no-label-float]) label{
-  display: none;
-}
-:host #input{
-  display: block;
-  border: 1px solid ;
-  border-color: var(--calendar-input-border-color);
-  border-radius: var(--standard-border-radius);
-  position: relative;
-  ovh
-}
-:host([no-label-float]) #input{
-  margin-top: 0;
-}
-
-:host p{
-  display: none;
-}
-
-/* line 12, D:\filter\less\date-input.less */
-:host.no-value input {
- border:1px solid var(--error-color);
-}
-/* line 12, D:\filter\less\date-input.less */
-:host.no-value #input {
- border:0;
-}
-
-:host.no-value p {
-  display: block;
-  position: absolute;
-  top: 100%;
-  padding: 0;
-  margin: 0;
-  left: 0;
-  font-size: var(--error-text-size);
-  color: var(--error-color);
-}
-
-
-:host input {
-  border: 0;
-  padding: var(--standard-padding-input-field);
-  /* min-width: 200px; */
-  width: 100%;
-  font-size: var(--calendar-input-text-size);
-  color: var(--calendar-input-value-color);
-  font-family: inherit;
-}
-
-:host input::-webkit-input-placeholder {
-   color: var(--calendar-input-placeholder-color);
-}
-:host input:-moz-placeholder { /* Firefox 18- */
-   color: var(--calendar-input-placeholder-color);  
-}
-
-:host input::-moz-placeholder {  /* Firefox 19+ */
-   color: var(--calendar-input-placeholder-color);  
-}
-:host input:-ms-input-placeholder {  
-   color: var(--calendar-input-placeholder-color);  
-}
-/* line 12, D:\filter\less\date-time\base.less */
-:host ::content.picker {
-  line-height: 1.2;
-  color: var(--calendar-year-month-text-color);
 }
 
 :host ::content .picker__input {
@@ -102,10 +22,11 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 9; 
+  z-index: 1; 
   -webkit-transform: translateY(100%);
       -ms-transform: translateY(100%);
           transform: translateY(100%);
+          outline: 0;
 }
 /* line 27, D:\filter\less\date-time\default.less */
 :host ::content .picker__frame {
