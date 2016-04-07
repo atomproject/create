@@ -1,4 +1,15 @@
 var dragAndDropSetup = function () {
+  var stateFile = localStorage.getItem('atom-builder');
+  var stage = document.querySelector('t-stage');
+
+  localStorage.removeItem('atom-builder');
+
+  if (stateFile) {
+    // TODO: you shouldn't have to call this
+    stage.reset();
+    stage.recreateBuilder(stateFile);
+  }
+
   // draggable menu items setup
   $('.control').draggable({
     addClasses: false,
@@ -12,6 +23,26 @@ var dragAndDropSetup = function () {
   // trigger the click on the input element with `type='file'`
   $('#uploadJson').on('click', function () {
     document.querySelector('#uploadInput').click();
+  });
+
+  $('#canvasRefresh').on('click', function() {
+    var stage = document.querySelector('t-stage');
+    var stateFile, builderState, states;
+
+    if (!stage) {
+      return;
+    }
+
+    builderState = stage.builderState;
+    states = stage._elementSateList;
+
+    try {
+      stateFile = stage.getStateFile(builderState, states);
+      localStorage.setItem('atom-builder', stateFile);
+    } catch (exception) {
+    } finally {
+      window.location.reload();
+    }
   });
 
   // triggered when user selects a file, read the file and reset the builder

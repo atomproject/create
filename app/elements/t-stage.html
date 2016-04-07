@@ -94,7 +94,9 @@
 
       ready: function() {
         window.onbeforeunload = function() {
-          if (this.builderType && this._elementSateList.length) {
+          if (this.builderType && this._elementSateList.length &&
+            !localStorage.getItem('atom-builder')) {
+
             return 'All changes will be lost!';
           }
         }.bind(this);
