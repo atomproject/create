@@ -74,7 +74,10 @@
     "iron-iconset-svg": "polymerElements/iron-iconset-svg#^1.0.9",
     "paper-menu-button": "polymerElements/paper-menu-button#^1.0.4",
     "t-section-header": "atomelements/t-section-header#^1.0.0",
-    "t-result-item": "travelnxtelements/t-result-item#master"
+    "code-generator-behavior": "atomproject/code-generator-behavior#^1.0.0",
+    "t-component-panel": "atomproject/t-component-panel#^1.0.0",
+    "t-result-item": "travelnxtelements/t-result-item#master",
+    "dynamic-data-source": "atomproject/dynamic-data-source#^1.0.0"
   },
   "resolutions": {
     "iron-icons": "^1.0.6"

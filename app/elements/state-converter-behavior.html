@@ -2,6 +2,7 @@
 
 <script>
   Polymer.StateConverterBehavior = {
+    // Also assumes the property `this.metadata`. Used in `getNewElementState`.
     properties: {
       templateCache: {
         type: Object,
@@ -25,7 +26,8 @@
         return {
           posX: x, posY: y,
           name: meta.name, html: meta.html,
-          attributes: meta.attributes, property: meta.property
+          attributes: meta.attributes, property: meta.property,
+          dataSources: {}
         };
       } else {
         meta = this.metadata[name];
@@ -35,7 +37,8 @@
         name: name, posX: x, posY: y,
         html: meta.html,
         attributes: _.cloneDeep(meta.attributes),
-        property: _.cloneDeep(meta.property)
+        property: _.cloneDeep(meta.property),
+        dataSources: {}
       };
     },
 
@@ -77,6 +80,7 @@
         column.html = state.html;
         column.attributes = state.attributes;
         column.property = state.property;
+        column.dataSources = state.dataSources;
       });
 
       return rows;
