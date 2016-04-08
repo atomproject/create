@@ -12,6 +12,8 @@
       }
     },
 
+    _dsCounter: 0,
+
     getNewElementState: function(name, x, y) {
       var meta, states;
 
@@ -43,6 +45,43 @@
         attributes: _.cloneDeep(meta.attributes),
         property: _.cloneDeep(meta.property),
         dataSources: {}
+      };
+    },
+
+    createDataSource: function(target, state, key) {
+      var dsElement = document.createElement('dynamic-data-source');
+      var dsState, className, id, targetClasses;
+
+      className = 'ds' + this._dsCounter++;
+      dsElement.propertyName = key;
+      dsElement.auto = true;
+      dsElement.target = '.' + className;
+
+      target.classList.add(className);
+      targetClasses = state.attributes.class || '';
+      targetClasses += ' ' + className;
+      state.attributes.class = targetClasses;
+
+      id = target.tagName + '.' + key + dsElement.target;
+      id = id.toLowerCase();
+
+      target.parentElement.appendChild(dsElement);
+
+      dsState = state.dataSources[key] = {
+        name: 'dynamic-data-source',
+        attributes: {
+          // `dsElement.target` is the selector not an element
+          target: dsElement.target,
+          propertyName: key,
+          auto: true
+        },
+        id: id,
+        showDs: false
+      };
+
+      return {
+        state: dsState,
+        target: dsElement
       };
     },
 
@@ -93,7 +132,7 @@
     getDependencies: function(states) {
       var scriptImports = {}, linkImports = {};
       var bower = {}, bowerDev = {}, metadata = this.metadata;
-      var components;
+      var componentNames, showDs;
 
       function toArray(obj) {
         return Object.keys(obj)
@@ -116,7 +155,7 @@
           });
       }
 
-      components = states
+      componentNames = states
         .map(function(state) {
           return state.name;
         })
@@ -126,7 +165,7 @@
         })
         .sort();
 
-      components.forEach(function(name) {
+      componentNames.forEach(function(name) {
         var dependencies = metadata[name].dependencies;
 
         dependencies.forEach(function(dep) {
@@ -137,6 +176,25 @@
         gatherImports(dependencies, 'script', scriptImports);
       });
 
+      showDs = states.reduce(function(showDs, state) {
+        var dataSources = state.dataSources;
+
+        (Object.keys(dataSources)).forEach(function(key) {
+          showDs = showDs || dataSources[key].showDs;
+        });
+
+        return showDs;
+      }, false);
+
+      if (showDs) {
+        bower['dynamic-data-source'] = linkImports['dynamic-data-source'] = {
+          pkg: 'dynamic-data-source',
+          install: 'atomproject/dynamic-data-source#^1.0.0',
+          relPath: 'dynamic-data-source/dynamic-data-source.html',
+          type: 'link'
+        };
+      }
+
       return {
         bower: toArray(bower),
         bowerDev: toArray(bowerDev),
@@ -145,8 +203,8 @@
       };
     },
 
-    getBowerFile: function(builderState, states) {
-      var context = {};
+    getBowerDependencies: function(builderState, states) {
+      var dependencies = this.getDependencies(states);
       var polyfill = {
         pkg: 'webcomponentsjs',
         install: '^0.7.19',
@@ -154,24 +212,30 @@
         type: 'script'
       };
 
-      if (!builderState || !states) {
-        return;
-      }
-
-      context.dependencies = this.getDependencies(states);
-      context.componentName = builderState.attributes.name;
-
       // `type` and `relPath` are not needed
-      context.dependencies.bower.push({
+      dependencies.bower.push({
         pkg: builderState.name,
         install: 'atomelements/' + builderState.name + '#^1.0.0'
       });
 
       if (builderState.isPage) {
-        context.dependencies.bower.push(polyfill);
+        dependencies.bower.push(polyfill);
       } else {
-        context.dependencies.bowerDev.push(polyfill);
+        dependencies.bowerDev.push(polyfill);
       }
+
+      return dependencies;
+    },
+
+    getBowerFile: function(builderState, states) {
+      var context = {};
+
+      if (!builderState || !states) {
+        return;
+      }
+
+      context.dependencies = this.getBowerDependencies(builderState, states);
+      context.componentName = builderState.attributes.name;
 
       return this.getFile('templates/bower.jst', context);
     },
