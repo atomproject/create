@@ -2,7 +2,7 @@
 
 <script>
   Polymer.StateConverterBehavior = {
-    // Also assumes the property `this.metadata`. Used in `getNewElementState`.
+    // Also assumes the property `this.metadata`.
     properties: {
       templateCache: {
         type: Object,
@@ -11,6 +11,8 @@
         }
       }
     },
+
+    _dsCounter: 0,
 
     getNewElementState: function(name, x, y) {
       var meta, states;
@@ -21,24 +23,65 @@
           return item.posX === x && item.posY === y;
         });
         name = meta.name;
-      } else if (_.isObject(name)) {
+      }
+      else if (_.isObject(name)) {
         meta = name;
+
         return {
           posX: x, posY: y,
-          name: meta.name, html: meta.html,
+          name: meta.name,
+          html: meta.html, innerHTML: meta.innerHTML,
           attributes: meta.attributes, property: meta.property,
           dataSources: {}
         };
-      } else {
+      }
+      else {
         meta = this.metadata[name];
       }
 
       return {
         name: name, posX: x, posY: y,
-        html: meta.html,
+        html: meta.html, innerHTML: meta.innerHTML,
         attributes: _.cloneDeep(meta.attributes),
         property: _.cloneDeep(meta.property),
         dataSources: {}
+      };
+    },
+
+    createDataSource: function(target, state, key) {
+      var dsElement = document.createElement('dynamic-data-source');
+      var dsState, className, id, targetClasses;
+
+      className = 'ds' + this._dsCounter++;
+      dsElement.propertyName = key;
+      dsElement.auto = true;
+      dsElement.target = '.' + className;
+
+      target.classList.add(className);
+      targetClasses = state.attributes.class || '';
+      targetClasses += ' ' + className;
+      state.attributes.class = targetClasses;
+
+      id = target.tagName + '.' + key + dsElement.target;
+      id = id.toLowerCase();
+
+      target.parentElement.appendChild(dsElement);
+
+      dsState = state.dataSources[key] = {
+        name: 'dynamic-data-source',
+        attributes: {
+          // `dsElement.target` is the selector not an element
+          target: dsElement.target,
+          propertyName: key,
+          auto: true
+        },
+        id: id,
+        showDs: false
+      };
+
+      return {
+        state: dsState,
+        target: dsElement
       };
     },
 
@@ -86,21 +129,102 @@
       return rows;
     },
 
-    getComponentNames: function(states) {
-      var components = [];
+    getDependencies: function(states) {
+      var scriptImports = {}, linkImports = {};
+      var bower = {}, bowerDev = {}, metadata = this.metadata;
+      var componentNames, showDs;
 
-      states
+      function toArray(obj) {
+        return Object.keys(obj)
+          .map(function(key) {
+            return obj[key];
+          })
+          .filter(function(val) {
+            return val !== undefined || val !== null;
+          });
+      }
+
+      function gatherImports(deps, type, imports) {
+        deps
+          .filter(function(dep) {
+            return dep.type === type;
+          })
+          // save only unique imports
+          .forEach(function(dep) {
+            imports[dep.relPath] = dep;
+          });
+      }
+
+      componentNames = states
         .map(function(state) {
           return state.name;
         })
-        .sort()
-        .forEach(function(name) {
-          if (components.indexOf(name) === -1) {
-            components.push(name);
-          }
+        // get unique names
+        .filter(function(name, i, arr) {
+          return arr.indexOf(name) === i;
+        })
+        .sort();
+
+      componentNames.forEach(function(name) {
+        var dependencies = metadata[name].dependencies;
+
+        dependencies.forEach(function(dep) {
+          bower[dep.pkg] = dep;
         });
 
-      return components;
+        gatherImports(dependencies, 'link', linkImports);
+        gatherImports(dependencies, 'script', scriptImports);
+      });
+
+      showDs = states.reduce(function(showDs, state) {
+        var dataSources = state.dataSources;
+
+        (Object.keys(dataSources)).forEach(function(key) {
+          showDs = showDs || dataSources[key].showDs;
+        });
+
+        return showDs;
+      }, false);
+
+      if (showDs) {
+        bower['dynamic-data-source'] = linkImports['dynamic-data-source'] = {
+          pkg: 'dynamic-data-source',
+          install: 'atomproject/dynamic-data-source#^1.0.0',
+          relPath: 'dynamic-data-source/dynamic-data-source.html',
+          type: 'link'
+        };
+      }
+
+      return {
+        bower: toArray(bower),
+        bowerDev: toArray(bowerDev),
+        linkImports: toArray(linkImports),
+        scriptImports: toArray(scriptImports)
+      };
+    },
+
+    getBowerDependencies: function(builderState, states) {
+      var dependencies = this.getDependencies(states);
+      var polyfill = {
+        pkg: 'webcomponentsjs',
+        install: '^0.7.19',
+        relPath: 'webcomponentsjs/webcomponents-lite.js',
+        type: 'script'
+      };
+
+      // `type` and `relPath` are not needed
+      dependencies.bower.push({
+        pkg: builderState.name,
+        install: 'atomelements/' + builderState.name + '#^1.0.0'
+      });
+
+      if (builderState.isPage) {
+        dependencies.bower.push(polyfill);
+      } else {
+        dependencies.bowerDev.push(polyfill);
+      }
+
+      return dependencies;
     },
 
     getBowerFile: function(builderState, states) {
@@ -110,8 +234,7 @@
         return;
       }
 
-      context.dependencies = this.getComponentNames(states);
-      context.dependencies.push(builderState.name);
+      context.dependencies = this.getBowerDependencies(builderState, states);
       context.componentName = builderState.attributes.name;
 
       return this.getFile('templates/bower.jst', context);
@@ -162,7 +285,7 @@
       }
 
       context.rows = this.getStateHierarchy(states);
-      context.dependencies = this.getComponentNames(states);
+      context.dependencies = this.getDependencies(states);
       context.componentName = builderState.attributes.name;
 
       context.builderEndTag = endTag = '</' + builderState.name + '>';

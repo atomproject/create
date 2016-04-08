@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <!--
 `t-section-header` is a dropdown to select an item from a list of dropdown. The default text if you don't pass any level is "Select value from items"
 
@@ -10,7 +11,8 @@ Example:
         </t-section-header>
 -->
 <dom-module id="t-section-header">
-    <style is="custom-style">
+    <template>
+    <style include="iron-flex">
     :host {
         display: block;
         color: var(--section-header-color, #777);
@@ -42,7 +44,6 @@ Example:
         }
     }
     </style>
-    <template>
         <div class="layout horizontal center">
             <label>{{label}}</label>
             <div class="flex"></div>

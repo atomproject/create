@@ -1,6 +1,6 @@
 {
   "name": "t-text-container",
-  "version": "0.0.0",
+  "version": "1.1.0",
   "authors": [
     "Sounak <talk2sounak@gmail.com>"
   ],
@@ -21,7 +21,7 @@
     "test",
     "tests"
   ],
-  "dependencies": { 
+  "dependencies": {
     "polymer": "Polymer/polymer#^1.0.0"
   },
   "devDependencies": {

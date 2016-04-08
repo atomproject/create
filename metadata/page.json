@@ -1,9 +1,5 @@
 {
     "t-google-map": {
-        "attributes": {
-            "language": "en",
-            "style": "height: 400px;"
-        },
         "property": {
             "name": "Google Map",
             "properties": [
@@ -60,13 +56,27 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "language": "en",
+            "style": "height: 400px;"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-google-map",
+                "relPath": "t-google-map/t-google-map.html",
+                "install": "atomelements/t-google-map#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-image": {
-        "attributes": {
-            "style": "width:100%; height:400px;",
-            "preload": ""
-        },
         "property": {
             "name": "Image",
             "properties": [
@@ -106,12 +116,27 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "style": "width:100%; height:400px;",
+            "preload": ""
+        },
+        "dependencies": [
+            {
+                "pkg": "t-image",
+                "relPath": "t-image/t-image.html",
+                "install": "atomelements/t-image#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-list": {
-        "attributes": {
-            "auto": ""
-        },
         "property": {
             "name": "List",
             "properties": [
@@ -157,12 +182,32 @@
                 }
             ]
         },
-        "innerHTML": "\n            <template>\n                <t-result-item itinerary=\"{{item}}\"></t-result-item>\n            </template>        \n    "
+        "innerHTML": "\n            <template>\n                <t-result-item itinerary=\"{{item}}\"></t-result-item>\n            </template>        \n    ",
+        "attributes": {
+            "auto": ""
+        },
+        "dependencies": [
+            {
+                "pkg": "t-list",
+                "relPath": "t-list/t-list.html",
+                "install": "atomelements/t-list#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-result-item",
+                "relPath": "t-result-item/t-result-item.html",
+                "install": "travelnxtelements/t-result-item#master",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-loader": {
-        "attributes": {
-            "active": ""
-        },
         "property": {
             "properties": [
                 {
@@ -182,12 +227,26 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "active": ""
+        },
+        "dependencies": [
+            {
+                "pkg": "t-loader",
+                "relPath": "t-loader/t-loader.html",
+                "install": "atomelements/t-loader#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-table": {
-        "attributes": {
-            "id": "rtable"
-        },
         "property": {
             "name": "Table",
             "properties": [
@@ -272,14 +331,38 @@
                 }
             ]
         },
-        "innerHTML": "\n\t\t\t<t-column data-value=\"0\" display-value=\"Name\" hide-on=\"tablet\" column-template=\"test\"></t-column>\n\t\t\t<t-column data-value=\"1\" display-value=\"Role\" hide-on=\"phone\"></t-column>\n\t\t\t<t-column data-value=\"2\" display-value=\"Last\"></t-column>\n\t\t\t<t-column data-value=\"3\" display-value=\"Status\"></t-column>\n\t\t"
+        "innerHTML": "\n\t\t\t<t-column data-value=\"0\" display-value=\"Name\" hide-on=\"tablet\" column-template=\"test\"></t-column>\n\t\t\t<t-column data-value=\"1\" display-value=\"Role\" hide-on=\"phone\"></t-column>\n\t\t\t<t-column data-value=\"2\" display-value=\"Last\"></t-column>\n\t\t\t<t-column data-value=\"3\" display-value=\"Status\"></t-column>\n\t\t",
+        "attributes": {
+            "id": "rtable"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-table",
+                "relPath": "t-table/t-table.html",
+                "install": "atomelements/t-table#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-table",
+                "relPath": "t-table/t-column.html",
+                "install": "atomelements/t-table#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "iron-icon",
+                "relPath": "iron-icon/iron-icon.html",
+                "install": "PolymerElements/iron-icon#^1.0.7",
+                "type": "link"
+            }
+        ]
     },
     "t-tabs": {
-        "attributes": {
-            "selected": "0",
-            "noink": "true",
-            "class": "container-element"
-        },
         "property": {
             "name": "Tabs",
             "properties": [
@@ -323,10 +406,28 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "selected": "0",
+            "noink": "true",
+            "class": "container-element"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-tabs",
+                "relPath": "t-tabs/t-tabs.html",
+                "install": "atomelements/t-tabs#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-section-header": {
-        "attributes": {},
         "property": {
             "name": "Section Header",
             "properties": [
@@ -342,13 +443,24 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {},
+        "dependencies": [
+            {
+                "pkg": "t-section-header",
+                "relPath": "t-section-header/t-section-header.html",
+                "install": "atomelements/t-section-header#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-google-youtube": {
-        "attributes": {
-            "height": "400px",
-            "width": "100%"
-        },
         "property": {
             "name": "Youtube Video",
             "properties": [
@@ -374,12 +486,27 @@
                 }
             ]
         },
-        "innerHTML": "\n  "
+        "innerHTML": "\n  ",
+        "attributes": {
+            "height": "400px",
+            "width": "100%"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-google-youtube",
+                "relPath": "t-google-youtube/t-google-youtube.html",
+                "install": "atomelements/t-google-youtube#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-form": {
-        "attributes": {
-            "class": "canvas empty vertical layout flex"
-        },
         "property": {
             "name": "Form",
             "properties": [
@@ -414,12 +541,13 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "class": "canvas empty vertical layout flex"
+        },
+        "dependencies": []
     },
     "t-page": {
-        "attributes": {
-            "class": "page canvas empty vertical layout flex"
-        },
         "property": {
             "name": "Page",
             "properties": [
@@ -435,6 +563,10 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "class": "page canvas empty vertical layout flex"
+        },
+        "dependencies": []
     }
 }

@@ -16,15 +16,17 @@
   ],
   "dependencies": {
   <%
-    dependencies.forEach(function(name) {
-    // TODO: atomelements cannot be hardcoded here
-    %>"<%= name %>": "atomelements/<%= name %>#master",<%
+    dependencies.bower.forEach(function(dep) {
+    %>"<%= dep.pkg %>": "<%= dep.install %>",<%
     });
-    %>"t-shared-components": "atomelements/t-shared-components#master",<%
-    %>"polymer": "polymer/polymer"<%
+    %>"polymer": "polymer/polymer#^1.0.0"<%
   %>
   },
   "devDependencies": {
-    "webcomponentsjs": "~0.7.19"
+  <%
+    dependencies.bowerDev.forEach(function(dep, i, a) {
+    %>"<%= dep.pkg %>": "<%= dep.install %>"<%= i < a.length - 1 ? "," : "" %><%
+    });
+  %>
   }
 }

@@ -11,7 +11,6 @@
 <link rel="import" href="../paper-item/paper-item.html" />
 <link rel="import" href="../iron-icon/iron-icon.html" />
 <link rel="import" href="../iron-list/iron-list.html" />
-<link rel="import" href="../iron-icons/hardware-icons.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <!--
     `<t-filter>` is a polymer component that generates a playground for interacting with components.
@@ -31,6 +30,8 @@
 -->
 <dom-module id="t-filter">
     <template>
+        <style include="iron-flex-alignment"></style>
+        <style include="iron-positioning"></style>
         <style include="iron-flex">
         :root {
             --checkbox-unchecked-color: var(-grey-two, #eeeeee);
@@ -134,7 +135,7 @@
         
         .total-results,
         .icon-reset-search {
-            margin-left: 5px;
+            margin-left: 10px;
         }
         
         #searchBox {
@@ -205,7 +206,7 @@
         </style>
         <div class="layout horizontal" id="filteredRatio">
             <div class="flex layout horizontal center">
-                <iron-icon icon="filter-list" on-click="_openModal"></iron-icon>
+                <iron-icon icon="[[filterIcon]]" on-click="_openModal"></iron-icon>
                 <span class="total-results" hidden$="[[!_loadingResultsSearchBox]]">
                     <span>{{_getFilteredRatio(resultsPagingInfo)}}</span>
                 <span>results</span>
@@ -217,7 +218,7 @@
                     <span on-click="_toggleSearchBox" class="flex searchBox-content-ellipsis">[[searchVal]]</span>
                     <!-- <span class="devider" hidden$="[[!searchVal]]"></span> -->
                     <iron-icon class="icon-reset-search" on-click="_removeSearchFilter" icon="close" hidden$="[[!searchVal]]"></iron-icon>
-                    <iron-icon on-click="_toggleSearchBox" icon="search" hidden$="[[searchVal]]"></iron-icon>
+                    <iron-icon on-click="_toggleSearchBox" icon="[[searchIcon]]" hidden$="[[searchVal]]"></iron-icon>
                 </div>
                 <div class="layout horizontal center fit" id="searchBox">
                     <t-input id="searchInput" no-label-float class="flex" label="[[searchLabel]]" value="{{searchVal}}" on-keyup="searchSubmit"></t-input>
@@ -257,7 +258,7 @@
                                 <div class="layout item">
                                     <div class="category layout horizontal center" data-category$="[[key.category]]" data-category$="[[key.category]]" on-click="_toggle">
                                         <div class="flex label">[[key.label]]</div>
-                                        <iron-icon class="secondary-text" icon="hardware:keyboard-arrow-down"></iron-icon>
+                                        <iron-icon class="secondary-text" icon="icons:expand-more"></iron-icon>
                                     </div>
                                     <iron-collapse opened="[[opened]]" id="[[key.category]]" data-label$="[[key.label]]">
                                         <div class="filter-block">
@@ -304,7 +305,7 @@
                                 <div class="layout item">
                                     <div class="category layout horizontal center" data-category$="[[key.category]]" on-click="_toggle">
                                         <div class="flex label">[[_getDisplayLabel(key)]]</div>
-                                        <iron-icon class="secondary-text" icon="hardware:keyboard-arrow-down"></iron-icon>
+                                        <iron-icon class="secondary-text" icon="icons:expand-more"></iron-icon>
                                     </div>
                                     <iron-collapse opened="[[opened]]" id="Iron-collapse1">
                                         <div class="filter-block">
@@ -323,7 +324,7 @@
                                 <div class="layout item">
                                     <div class="category layout horizontal center" data-category$="[[key.category]]" on-click="_toggle">
                                         <div class="flex label">[[_getDisplayLabel(key)]]</div>
-                                        <iron-icon class="secondary-text" icon="hardware:keyboard-arrow-down"></iron-icon>
+                                        <iron-icon class="secondary-text" icon="icons:expand-more"></iron-icon>
                                     </div>
                                     <iron-collapse opened="[[opened]]" id="[[key.category]]">
                                         <div class="filter-block">
@@ -359,6 +360,21 @@ Polymer({
     is: 't-filter',
 
     properties: {
+
+
+
+        /*Filter icon to be replaced and given value*/
+        filterIcon: {
+            type: String,
+            value: 'filter-list'
+        },
+
+        /*search icon to be replaced and given value*/
+        searchIcon: {
+            type: String,
+            value: 'search'
+        },
+
 
         showTwelveHourClock: {
             type: Boolean,

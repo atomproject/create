@@ -1,7 +1,6 @@
 <link rel="import" href="../polymer/polymer.html" />
 <link rel="import" href="../iron-icons/iron-icons.html" />
-<link rel="import" href="../iron-icons/editor-icons.html" />
-<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html" />
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html" />
 <link rel="import" href="../t-button/t-button.html" />
 <!--
     `<t-header>` is a polymer component that generates a header for mobile with a back button on left and right icon on right.
@@ -31,17 +30,16 @@
 
 <dom-module id="t-header">
     <template>
-    <style>
+    <style include="iron-flex">
     :host{
         display: block;
         position: relative;
     }
     .body {
         font-family: var(--header-font-family, --primary-font-family);
-        color: var(--light-color, #fff);
-/*      padding: 0 10px;  */
-        background: var(--base-color-1, #147be1);
-        height: var(-t-header-size,55px);
+        color: var(--t-header-color, #fff);
+        background: var(--t-header-bg, --base-color-1);
+        height: var(--t-header-size,55px);
     }
     :host([normal-heading]) a{
         z-index: 1;
@@ -51,7 +49,6 @@
     }
     :host([normal-heading]) .header__mainRow{
         position: absolute;
-        text-align: center;
         width: 100%;
         height: 100%;
         left: 0;
@@ -59,16 +56,14 @@
     :host([normal-heading]) .header__mainRow ::content h1{
         margin: 0 auto;
         font-size: 22px;
-        line-height: var(-t-header-size,55px);
+        line-height: var(--t-header-size,55px);
         font-weight: 300;
+
+        @apply(--t-header-normal);
     }
     iron-icon{
-        background: transparent;
-        min-width: 0;
-        color:  var(--light-color, #fff);
-        height: 30px;
-        width: 30px;
-        padding: 10px 5px;
+        padding: 10px;
+        @apply(--t-header-icons);
     }
     :host ::content p#detail{
       -ms-flex-pack: start;
@@ -158,6 +153,7 @@ Polymer({
         if(this.url !== ""){
             window.location.href = this.url;
         }
+        this.fire('left-button-click', {bubbles: false});
     },
 
     /*to fire an event for the right icon click.*/

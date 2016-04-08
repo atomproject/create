@@ -10,8 +10,12 @@
 
   <link rel="import" href="bower_components/t-page/t-page.html">
   <%
-    dependencies.forEach(function(name) {
-    %><link rel="import" href="bower_components/<%= name %>/<%= name %>.html"><%
+    dependencies.linkImports.forEach(function(dep) {
+      %><link rel="import" href="bower_components/<%= dep.relPath %>"><%
+    });
+
+    dependencies.scriptImports.forEach(function(dep) {
+      %><script type="text/javascript" src="bower_components/<%= dep.relPath %>"></script><%
     });
   %>
 

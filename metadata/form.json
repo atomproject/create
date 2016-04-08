@@ -1,9 +1,5 @@
 {
     "t-autosuggest": {
-        "attributes": {
-            "required": "",
-            "label": "sas Autosuggest"
-        },
         "property": {
             "name": "Autosuggest",
             "properties": [
@@ -44,14 +40,27 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "required": "",
+            "label": "sas Autosuggest"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-autosuggest",
+                "relPath": "t-autosuggest/t-autosuggest.html",
+                "install": "atomelements/t-autosuggest#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-button": {
-        "attributes": {
-            "class": "primary",
-            "raised": "",
-            "label": "label"
-        },
         "property": {
             "name": "Button",
             "properties": [
@@ -101,13 +110,34 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "class": "primary",
+            "raised": "",
+            "label": "label"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-button",
+                "relPath": "t-button/t-button.html",
+                "install": "atomelements/t-button#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "iron-icons",
+                "relPath": "iron-icons/iron-icons.html",
+                "install": "PolymerElements/iron-icons#^1.0.6",
+                "type": "link"
+            }
+        ]
     },
     "t-calendar": {
-        "attributes": {
-            "id": "one",
-            "required": ""
-        },
         "property": {
             "name": "Calendar",
             "properties": [
@@ -133,13 +163,27 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "id": "one",
+            "required": ""
+        },
+        "dependencies": [
+            {
+                "pkg": "t-calendar",
+                "relPath": "t-calendar/t-calendar.html",
+                "install": "atomelements/t-calendar#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-checkbox-group": {
-        "attributes": {
-            "label": "Title",
-            "data": "[\"First Choice\",\"Second Choice\",\"Third Choice\"]"
-        },
         "property": {
             "name": "Checkbox List",
             "properties": [
@@ -184,10 +228,27 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "label": "Title",
+            "data": "[\"First Choice\",\"Second Choice\",\"Third Choice\"]"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-checkbox-group",
+                "relPath": "t-checkbox-group/t-checkbox-group.html",
+                "install": "atomelements/t-checkbox-group#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-colorpicker": {
-        "attributes": {},
         "property": {
             "name": "Color Picker",
             "properties": [
@@ -213,10 +274,24 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {},
+        "dependencies": [
+            {
+                "pkg": "t-colorpicker",
+                "relPath": "t-colorpicker/t-colorpicker.html",
+                "install": "atomelements/t-colorpicker#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-dropdown": {
-        "attributes": {},
         "property": {
             "name": "DropDown",
             "properties": [
@@ -251,10 +326,24 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {},
+        "dependencies": [
+            {
+                "pkg": "t-dropdown",
+                "relPath": "t-dropdown/t-dropdown.html",
+                "install": "atomelements/t-dropdown#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-input": {
-        "attributes": {},
         "property": {
             "name": "Input Field",
             "properties": [
@@ -296,18 +385,36 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {},
+        "dependencies": [
+            {
+                "pkg": "t-input",
+                "relPath": "t-input/t-input.html",
+                "install": "atomelements/t-input#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-calendar",
+                "relPath": "t-calendar/t-calendar.html",
+                "install": "atomelements/t-calendar#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-autosuggest",
+                "relPath": "t-autosuggest/t-autosuggest.html",
+                "install": "atomelements/t-autosuggest#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-radio-group": {
-        "attributes": {
-            "id": "itineraryType",
-            "name": "itineraryType",
-            "data": "[\"RoundTrip\",\"OneWay\"]",
-            "class": "style-scope t-air-search x-scope t-radio-group-0",
-            "role": "radiogroup",
-            "tabindex": "0",
-            "label": "sas"
-        },
         "property": {
             "name": "Radio List",
             "properties": [
@@ -347,13 +454,32 @@
                 }
             ]
         },
-        "innerHTML": "\n"
+        "innerHTML": "\n",
+        "attributes": {
+            "id": "itineraryType",
+            "name": "itineraryType",
+            "data": "[\"RoundTrip\",\"OneWay\"]",
+            "class": "style-scope t-air-search x-scope t-radio-group-0",
+            "role": "radiogroup",
+            "tabindex": "0",
+            "label": "sas"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-radio-group",
+                "relPath": "t-radio-group/t-radio-group.html",
+                "install": "atomelements/t-radio-group#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-range": {
-        "attributes": {
-            "min": "10",
-            "max": "100"
-        },
         "property": {
             "name": "Button",
             "properties": [
@@ -374,10 +500,27 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "min": "10",
+            "max": "100"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-range",
+                "relPath": "t-range/t-range.html",
+                "install": "atomelements/t-range#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-section-header": {
-        "attributes": {},
         "property": {
             "name": "Section Header",
             "properties": [
@@ -393,15 +536,24 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {},
+        "dependencies": [
+            {
+                "pkg": "t-section-header",
+                "relPath": "t-section-header/t-section-header.html",
+                "install": "atomelements/t-section-header#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-slider": {
-        "attributes": {
-            "style": "width:100%",
-            "max": "10",
-            "step": "1",
-            "value": "3"
-        },
         "property": {
             "name": "Slider",
             "properties": [
@@ -437,13 +589,29 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "style": "width:100%",
+            "max": "10",
+            "step": "1",
+            "value": "3"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-slider",
+                "relPath": "t-slider/t-slider.html",
+                "install": "atomelements/t-slider#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-stepper": {
-        "attributes": {
-            "min": "0",
-            "max": "100"
-        },
         "property": {
             "name": "Stepper",
             "properties": [
@@ -496,12 +664,27 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "min": "0",
+            "max": "100"
+        },
+        "dependencies": [
+            {
+                "pkg": "t-stepper",
+                "relPath": "t-stepper/t-stepper.html",
+                "install": "atomelements/t-stepper#^1.0.0",
+                "type": "link"
+            },
+            {
+                "pkg": "t-shared-components",
+                "relPath": "t-shared-components/theme.html",
+                "install": "atomelements/t-shared-components#^1.0.0",
+                "type": "link"
+            }
+        ]
     },
     "t-form": {
-        "attributes": {
-            "class": "canvas empty vertical layout flex"
-        },
         "property": {
             "name": "Form",
             "properties": [
@@ -536,12 +719,13 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "class": "canvas empty vertical layout flex"
+        },
+        "dependencies": []
     },
     "t-page": {
-        "attributes": {
-            "class": "page canvas empty vertical layout flex"
-        },
         "property": {
             "name": "Page",
             "properties": [
@@ -557,6 +741,10 @@
                 }
             ]
         },
-        "innerHTML": ""
+        "innerHTML": "",
+        "attributes": {
+            "class": "page canvas empty vertical layout flex"
+        },
+        "dependencies": []
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "t-result-item",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "authors": [
     "Rahul Pilkhwal <rahul.pilkhwal@tavisca.com>",
     "Shailesh Kumar Srivastava <ssrivastava@tavisca.com>",
@@ -24,10 +24,10 @@
     "test",
     "tests"
   ],
-  "dependencies": { 
+  "dependencies": {
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "t-text-container": "travelnxtElements/t-text-container#master",
-    "iron-icons": "PolymerElements/iron-icons#1.0.3", 
+    "iron-icons": "PolymerElements/iron-icons#1.0.3",
     "polymer": "Polymer/polymer#^1.0.0"
   },
   "devDependencies": {

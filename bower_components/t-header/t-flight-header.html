@@ -1,7 +1,6 @@
 <link rel="import" href="../polymer/polymer.html" />
 <link rel="import" href="../iron-icons/iron-icons.html" />
-<link rel="import" href="../iron-icons/editor-icons.html" />
-<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html" />
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html" />
 <link rel="import" href="../t-text-container/travel-element-styles.html">
 <!--
     `<t-flight-header>` is a polymer component that generates the flight details data in order.
@@ -22,17 +21,14 @@
 -->
 <dom-module id="t-flight-header">
     <template>
+        <style include="iron-flex"></style>
         <style include="travel-element-styles">
         :host {
             display: block;
             width: 100%;
         }
         
-        .heading {
-            line-height: 20px;
-            text-transform: uppercase;
-        }
-        
+        .heading ,
         #detail {
             line-height: 20px;
         }
@@ -66,9 +62,9 @@
         </style>
         <div class="layout vertical">
             <div class="font-16 font-normal heading ellipsis">
-                <span class="places text-right">{{fromPlace}}</span>
+                <span class="places">{{fromPlace}}</span>
                 <iron-icon id="travelIcon" icon="{{_computedTravelIcon}}"></iron-icon>
-                <span class="places text-left">{{toPlace}}</span>
+                <span class="places">{{toPlace}}</span>
             </div>
             <p id="detail" on-click="_takeBack" class="layout horizontal center center-justified font-12">
                 <span>{{_getDate(departureDate)}}</span> 

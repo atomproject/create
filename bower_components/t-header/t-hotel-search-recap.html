@@ -1,7 +1,6 @@
 <link rel="import" href="../polymer/polymer.html" />
 <link rel="import" href="../iron-icons/iron-icons.html" />
-<link rel="import" href="../iron-icons/editor-icons.html" />
-<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html" />
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html" />
 <link rel="import" href="../t-text-container/travel-element-styles.html">
 <!--
     `<t-hotel-search-recap>` is a polymer component that generates the hotel details/passengers/ Journey details in order.
@@ -20,18 +19,16 @@
         </t-hotel-search-recap>`
 -->
 <dom-module id="t-hotel-search-recap">
+    <style include="iron-flex"></style>
     <style include="travel-element-styles">
         :host {
             display: block;
             width: 100%;
         }
         
-        h6 {
-            line-height: 20px;
-            
-        }
+        h6,
         #detail {
-            line-height: 20px;
+            line-height: var(--hotel-header-line-height, 20px);
         }
         
         #pencil {

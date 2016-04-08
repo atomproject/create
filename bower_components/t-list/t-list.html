@@ -16,6 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
 <link rel="import" href="../t-shared-components/jquery.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <!--
 
 `t-list` displays a virtual, 'infinite' list. The template inside
@@ -92,110 +93,110 @@ after the list became visible again. e.g.
 @demo demo/index.html
 -->
 <dom-module id="t-list">
-    <style>
-    :host {
-        display: block;
-        font-family: var(--primary-font-family, 'Open sans');
-    }
-    
-    .section-small {
-        padding: 10px ;
-    }    
-    .sorting .sorting-btn {
-        margin: 0;
-        padding: 0;
-        border-bottom: 1px solid var(--grey-two, #eeeeee);
-        background: var(--light-color, #fff);
-        overflow: hidden;
-        cursor: pointer;
-    }
-    
-    .filter-block {
-        border-bottom: 1px solid var(--grey-two, #eeeeee);
-        color: #bbbbbb;
-        font-size: var(--font-12, 12px);
-        padding: 12.5px;
-    }
-    
-    .filter-block iron-icon {
-        margin-left: 10px;
-    }
-    
-    .params a {
-        /* display: block; */
-        padding: 16px 0;
-        font-size: var(--font-12, 12px);
-        text-decoration: none;
-        color: var(--grey-five, #555555);
-        width: 100%;
-        position: relative;
-        text-align: center;
-        border-right: 1px solid var(--grey-two, #eeeeee);
-    }
-    
-    .params:last-child a {
-        border-right: 0;
-    }
-    
-    .absolute {
-        position: absolute;
-        width: 100%;
-        padding: 10px 0;
-        height: 100%;
-        z-index: 3;
-        background-color: #f5f5f5;
-    }
-    
-    .params iron-icon {
-        -webkit-transition: 0.3s all ease;
-        -moz-transition: 0.3s all ease;
-        -ms-transition: 0.3s all ease;
-        -o-transition: 0.3s all ease;
-        transition: 0.3s all ease;
-        -webkit-transform: rotate(90deg);
-        -moz-transform: rotate(90deg);
-        -ms-transform: rotate(90deg);
-        -o-transform: rotate(90deg);
-        transform: rotate(90deg);
-        /* position: absolute; */
-        display: none;
-        width: 17px;
-        height: 17px;
-        /* margin-left: 5px; */
-        /* top: 50%; */
-        margin-top: -5px;
-    }
-    
-    .params .active iron-icon {
-        display: -ms-inline-flexbox;
-        display: -webkit-inline-flex;
-        display: inline-flex;
-    }
-    
-    .params .active.desc iron-icon {
-        -webkit-transform: rotate(-90deg);
-        -moz-transform: rotate(-90deg);
-        -ms-transform: rotate(-90deg);
-        -o-transform: rotate(-90deg);
-        transform: rotate(-90deg);
-    }
-    
-    #ajaxLoaderContainer{
-        padding: 10px 0;
-     } 
-    .error-message{
-        font-size:var(--font-12,12px);
-        color:var(-grey-four,#777777);
-    }
+    <template>      
+        <style include="iron-flex">
+        :host {
+            display: block;
+            font-family: var(--primary-font-family, 'Open sans');
+        }
+        
+        .section-small {
+            padding: 10px ;
+        }    
+        .sorting .sorting-btn {
+            margin: 0;
+            padding: 0;
+            border-bottom: 1px solid var(--grey-two, #eeeeee);
+            background: var(--light-color, #fff);
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .filter-block {
+            border-bottom: 1px solid var(--grey-two, #eeeeee);
+            color: #bbbbbb;
+            font-size: var(--font-12, 12px);
+            padding: 12.5px;
+        }
+        
+        .filter-block iron-icon {
+            margin-left: 10px;
+        }
+        
+        .params a {
+            /* display: block; */
+            padding: 16px 0;
+            font-size: var(--font-12, 12px);
+            text-decoration: none;
+            color: var(--grey-five, #555555);
+            width: 100%;
+            position: relative;
+            text-align: center;
+            border-right: 1px solid var(--grey-two, #eeeeee);
+        }
+        
+        .params:last-child a {
+            border-right: 0;
+        }
+        
+        .absolute {
+            position: absolute;
+            width: 100%;
+            padding: 10px 0;
+            height: 100%;
+            z-index: 3;
+            background-color: #f5f5f5;
+        }
+        
+        .params iron-icon {
+            -webkit-transition: 0.3s all ease;
+            -moz-transition: 0.3s all ease;
+            -ms-transition: 0.3s all ease;
+            -o-transition: 0.3s all ease;
+            transition: 0.3s all ease;
+            -webkit-transform: rotate(90deg);
+            -moz-transform: rotate(90deg);
+            -ms-transform: rotate(90deg);
+            -o-transform: rotate(90deg);
+            transform: rotate(90deg);
+            /* position: absolute; */
+            display: none;
+            width: 17px;
+            height: 17px;
+            /* margin-left: 5px; */
+            /* top: 50%; */
+            margin-top: -5px;
+        }
+        
+        .params .active iron-icon {
+            display: -ms-inline-flexbox;
+            display: -webkit-inline-flex;
+            display: inline-flex;
+        }
+        
+        .params .active.desc iron-icon {
+            -webkit-transform: rotate(-90deg);
+            -moz-transform: rotate(-90deg);
+            -ms-transform: rotate(-90deg);
+            -o-transform: rotate(-90deg);
+            transform: rotate(-90deg);
+        }
+        
+        #ajaxLoaderContainer{
+            padding: 10px 0;
+         } 
+        .error-message{
+            font-size:var(--font-12,12px);
+            color:var(-grey-four,#777777);
+        }
 
-    .link {
-        color: var(--link-color,#0098ff);
-    }
-    </style>
-    <template>        
+        .link {
+            color: var(--link-color,#0098ff);
+        }
+        </style>  
         <div id="listContainer" >
             <div hidden="[[!withFilter]]">                
-                <t-filter opened excluded-filters= "[[excludedFilters]]"  filter-response-param="[[filterResponseParam]]" id="filter" search-label="[[filterSearchLabel]]" show-twelve-hour-clock="[[showTwelveHourClock]]" auto="[[auto]]" class="flex" style="overflow:auto" filter-api="[[filterApi]]" filter-api-params="[[filterApiParams]]" include-filters="[[includeFilters]]" on-filter-change="_applyFilters" on-filter-close="_closeModal" on-filter-open="_onFilterOpen" results-paging-info="[[data.pagingInfo]]" min-start-date="[[minStartDate]]" min-end-date="[[minEndDate]]"></t-filter>
+                <t-filter opened filter-icon="[[filterIcon]]" search-icon="[[searchIcon]]" excluded-filters="[[excludedFilters]]"  filter-response-param="[[filterResponseParam]]" id="filter" search-label="[[filterSearchLabel]]" show-twelve-hour-clock="[[showTwelveHourClock]]" auto="[[auto]]" class="flex" style="overflow:auto" filter-api="[[filterApi]]" filter-api-params="[[filterApiParams]]" include-filters="[[includeFilters]]" on-filter-change="_applyFilters" on-filter-close="_closeModal" on-filter-open="_onFilterOpen" results-paging-info="[[data.pagingInfo]]" min-start-date="[[minStartDate]]" min-end-date="[[minEndDate]]"></t-filter>
             </div>
             <div class="sorting paper-header" id="sortCntr">
                 <template is="dom-if" if$="[[withSorting]]">
@@ -229,7 +230,7 @@ after the list became visible again. e.g.
             </template>
             <!-- <div class="error-message " hidden$="[[_noResultsMatched]]">[[note]]</div> -->
             
-            <div class="layout vertical" style="height:100%">
+            <div class="layout">
                 <!--  selection-enabled has been removed to handle behaviour for Iphone-6-->
                 <t-simple-list id="list" selection-enabled items="{{_list}}" class="flex" on-selected-item-changed="_selectionChanged">
                     <content></content>
@@ -469,6 +470,15 @@ after the list became visible again. e.g.
                     value: 0
                 },
 
+                skipCount: {
+                    type: Number,
+                    value: 20
+                },
+
+                top: {
+                    type: Number
+                },
+
                 _filterSkip: {
                     type: Number,
                     value: 0
@@ -545,6 +555,19 @@ after the list became visible again. e.g.
                 minEndDate:{
                     type:Boolean,
                     value:false
+                },
+
+
+                /*Filter icon to be replaced and given value*/
+                filterIcon: {
+                    type: String,
+                    value: 'filter-list'
+                },
+
+                /*search icon to be replaced and given value*/
+                searchIcon: {
+                    type: String,
+                    value: 'search'
                 }
             },
 
@@ -789,19 +812,25 @@ after the list became visible again. e.g.
 
                 this.ajaxLoaderContainer =true;
                 if (this._isFiltering) {
-                    this._skip = this._skip + 20;
+                    this._skip = this._skip + this.skipCount;
                     this.$.applyFilterCall.url = this.filterResultsApi + "&" + this._defaultSorting + this.sortBy + "&$skip=" + this._skip;
+                    if(this.top){
+                        this.$.applyFilterCall.url += "&$top=" + this.top;
+                    }
                     this.$.applyFilterCall.body = JSON.stringify(this.$$('#filter').appliedFilters);
                     this.$.applyFilterCall.generateRequest();
                 } else {
                     if (!this._isFiltered) {
-                        this._skip = this._skip + 20;
+                        this._skip = this._skip + this.skipCount;
                         this.$.dataCall.url = this.dataApi + "&" + this._defaultSorting + this.sortBy + "&$skip=" + this._skip;
+                        if(this.top){
+                            this.$.dataCall.url += "&$top=" + this.top;
+                        }
                         this.$.dataCall.generateRequest();
                         this._scrollFired = true;
                     } else {
                         this._skip = 0;
-                        this._filterSkip = this._filterSkip + 20;
+                        this._filterSkip = this._filterSkip + this.skipCount;
                     }
                 }
             },

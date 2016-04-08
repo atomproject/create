@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html" />
 <link rel="import" href="../t-text-container/travel-element-styles.html" />
 <!--
 `t-result-item` is a flight result itinerary component. 
@@ -11,6 +11,7 @@ Example:
 -->
 <dom-module id="t-result-item">
     <template>
+    <style include="iron-flex"></style>
     <style include="travel-element-styles">
         :host {
             display: block;
@@ -81,7 +82,7 @@ Example:
             </style>
         </template>
             <div class="layout horizontal center border-bottom section-small" id="resultItem">
-                <div class="layout vertical flex content-section secondary-text">
+                <div class="layout flex content-section secondary-text">
                     <template is="dom-repeat" items="[[itinerary.legs]]">
                         <div class="flex layout horizontal center resultItem-roundTrip">
                             <div class="layout ">

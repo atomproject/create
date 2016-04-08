@@ -550,31 +550,39 @@
       },
 
       updateProperty: function(target, state, key, value) {
+        var dsState = state.dataSources[key];
+
         value = _.cloneDeep(value);
         target.set(key, value);
 
         value = _.cloneDeep(value);
         state.attributes[key] = value;
 
-        state.showDs = false;
+        if (dsState) {
+          dsState.showDs = false;
+        }
+
         state.html = this.generateCode(state);
       },
 
       updateDataSource: function(target, state, key, dataSource) {
-        var ds = state.dataSources[key];
+        var dsState = state.dataSources[key];
         var url = dataSource.url;
         var transform = dataSource.transform;
-        var dsTarget;
+        var dsTarget, ds;
 
-        if (!ds) {
+        if (!dsState) {
           ds = this.createDataSource(target, state, key);
+          dsState = ds.state;
+          dsTarget = this._dsTargets[dsState.id] = ds.target;
+        } else {
+          dsTarget = this._dsTargets[dsState.id];
         }
 
-        dsTarget = this._dsTargets[ds.id];
-        ds.attributes.url = dsTarget.url = url;
-        ds.attributes.transform = dsTarget.transform = transform;
+        dsState.attributes.url = dsTarget.url = url;
+        dsState.attributes.transform = dsTarget.transform = transform;
 
-        ds.showDs = true;
+        dsState.showDs = true;
         state.html = this.generateCode(state);
       },
 
@@ -585,51 +593,17 @@
 
         if (state.dataSources) {
           Object.keys(state.dataSources).forEach(function(key) {
-            var ds = state.dataSources[key];
+            var dsState = state.dataSources[key];
 
-            if (!ds.showDs) {
+            if (!dsState.showDs) {
               return;
             }
 
-            code += this.getComponentCode(ds.name, ds.attributes);
+            code += this.getComponentCode(dsState.name, dsState.attributes);
           }.bind(this));
         }
 
         return code;
-      },
-
-      createDataSource: function(target, state, key) {
-        var dsElement = document.createElement('dynamic-data-source');
-        var dataSource, className, id, targetClasses;
-
-        this._dsCounter = this._dsCounter || 0;
-        className = 'ds' + this._dsCounter++;
-        dsElement.propertyName = key;
-        dsElement.auto = true;
-        dsElement.target = '.' + className;
-
-        target.classList.add(className);
-        targetClasses = state.attributes.class || '';
-        targetClasses += ' ' + className;
-        state.attributes.class = targetClasses;
-
-        id = target.tagName + '.' + key + dsElement.target;
-        id = id.toLowerCase();
-
-        target.parentElement.appendChild(dsElement);
-        this._dsTargets[id] = dsElement;
-
-        dataSource = state.dataSources[key] = {
-          name: 'dynamic-data-source',
-          attributes: {
-            target: dsElement.target,
-            propertyName: key,
-            auto: true
-          },
-          id: id
-        };
-
-        return dataSource;
       },
       /* section: end */
 
