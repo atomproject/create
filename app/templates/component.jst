@@ -1,8 +1,12 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../t-form/t-form.html">
 <%
-  dependencies.forEach(function(name) {
-  %><link rel="import" href="../<%= name %>/<%= name %>.html"><%
+  dependencies.linkImports.forEach(function(dep) {
+    %><link rel="import" href="../<%= dep.relPath %>"><%
+  });
+
+  dependencies.scriptImports.forEach(function(dep) {
+    %><script type="text/javascript" src="../<%= dep.relPath %>"></script><%
   });
 %>
 

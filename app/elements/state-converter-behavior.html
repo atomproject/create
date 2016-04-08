@@ -2,7 +2,7 @@
 
 <script>
   Polymer.StateConverterBehavior = {
-    // Also assumes the property `this.metadata`. Used in `getNewElementState`.
+    // Also assumes the property `this.metadata`.
     properties: {
       templateCache: {
         type: Object,
@@ -21,21 +21,25 @@
           return item.posX === x && item.posY === y;
         });
         name = meta.name;
-      } else if (_.isObject(name)) {
+      }
+      else if (_.isObject(name)) {
         meta = name;
+
         return {
           posX: x, posY: y,
-          name: meta.name, html: meta.html,
+          name: meta.name,
+          html: meta.html, innerHTML: meta.innerHTML,
           attributes: meta.attributes, property: meta.property,
           dataSources: {}
         };
-      } else {
+      }
+      else {
         meta = this.metadata[name];
       }
 
       return {
         name: name, posX: x, posY: y,
-        html: meta.html,
+        html: meta.html, innerHTML: meta.innerHTML,
         attributes: _.cloneDeep(meta.attributes),
         property: _.cloneDeep(meta.property),
         dataSources: {}
@@ -86,33 +90,88 @@
       return rows;
     },
 
-    getComponentNames: function(states) {
-      var components = [];
+    getDependencies: function(states) {
+      var scriptImports = {}, linkImports = {};
+      var bower = {}, bowerDev = {}, metadata = this.metadata;
+      var components;
 
-      states
+      function toArray(obj) {
+        return Object.keys(obj)
+          .map(function(key) {
+            return obj[key];
+          })
+          .filter(function(val) {
+            return val !== undefined || val !== null;
+          });
+      }
+
+      function gatherImports(deps, type, imports) {
+        deps
+          .filter(function(dep) {
+            return dep.type === type;
+          })
+          // save only unique imports
+          .forEach(function(dep) {
+            imports[dep.relPath] = dep;
+          });
+      }
+
+      components = states
         .map(function(state) {
           return state.name;
         })
-        .sort()
-        .forEach(function(name) {
-          if (components.indexOf(name) === -1) {
-            components.push(name);
-          }
+        // get unique names
+        .filter(function(name, i, arr) {
+          return arr.indexOf(name) === i;
+        })
+        .sort();
+
+      components.forEach(function(name) {
+        var dependencies = metadata[name].dependencies;
+
+        dependencies.forEach(function(dep) {
+          bower[dep.pkg] = dep;
         });
 
-      return components;
+        gatherImports(dependencies, 'link', linkImports);
+        gatherImports(dependencies, 'script', scriptImports);
+      });
+
+      return {
+        bower: toArray(bower),
+        bowerDev: toArray(bowerDev),
+        linkImports: toArray(linkImports),
+        scriptImports: toArray(scriptImports)
+      };
     },
 
     getBowerFile: function(builderState, states) {
       var context = {};
+      var polyfill = {
+        pkg: 'webcomponentsjs',
+        install: '^0.7.19',
+        relPath: 'webcomponentsjs/webcomponents-lite.js',
+        type: 'script'
+      };
 
       if (!builderState || !states) {
         return;
       }
 
-      context.dependencies = this.getComponentNames(states);
-      context.dependencies.push(builderState.name);
+      context.dependencies = this.getDependencies(states);
       context.componentName = builderState.attributes.name;
+
+      // `type` and `relPath` are not needed
+      context.dependencies.bower.push({
+        pkg: builderState.name,
+        install: 'atomelements/' + builderState.name + '#^1.0.0'
+      });
+
+      if (builderState.isPage) {
+        context.dependencies.bower.push(polyfill);
+      } else {
+        context.dependencies.bowerDev.push(polyfill);
+      }
 
       return this.getFile('templates/bower.jst', context);
     },
@@ -162,7 +221,7 @@
       }
 
       context.rows = this.getStateHierarchy(states);
-      context.dependencies = this.getComponentNames(states);
+      context.dependencies = this.getDependencies(states);
       context.componentName = builderState.attributes.name;
 
       context.builderEndTag = endTag = '</' + builderState.name + '>';
