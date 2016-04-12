@@ -14,9 +14,10 @@
       }
     </style>
 
-    <t-radio-group label="{{label}}" pill-button on-selected-item-changed="changePage"
+    <t-radio-group label="{{label}}" pill-button
+      selected-item="{{_getSelectedItem(pages, selected)}}" on-selected-item-changed="changePage"
       data="{{pages}}"></t-radio-group>
-    <iron-pages id="pageSelector" selected="0">
+    <iron-pages selected="{{selected}}">
       <sheet-editor id="sd" title="{{label}}" value="{{value}}"></sheet-editor>
       <response-transformer id="dd" title="{{label}}" data-source="{{dataSource}}"
         url="{{url}}" transform="{{transform}}" translator="{{translator}}">
@@ -29,9 +30,21 @@
 
       properties: {
         label: String,
-        url: String,
-        transform: Function,
-        translator: Function,
+
+        url: {
+          type: String,
+          notify: true
+        },
+
+        transform: {
+          type: Function,
+          notify: true
+        },
+
+        translator: {
+          type: Function,
+          notify: true
+        },
 
         value: {
           type: Array,
@@ -48,7 +61,17 @@
           value: function() {
             return ["Static Data", "Dynamic Data"];
           }
+        },
+
+        selected: {
+          type: Number,
+          value: 0,
+          notify: true
         }
+      },
+
+      _getSelectedItem: function(pages, selected) {
+        return pages[selected];
       },
 
       changePage: function(event) {
@@ -68,7 +91,7 @@
             this.$.dd.saveDataSource();
           }
 
-          this.$.pageSelector.selected = newPage;
+          this.selected = newPage;
         }
       }
     });

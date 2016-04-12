@@ -35,50 +35,6 @@
         margin: 0;
       }
 
-      #editor-dialog .editors-container {
-        font-size: 14px;
-        box-sizing: border-box;
-        height: calc(100% - 136px);
-        width: 100%;
-        position: relative;
-      }
-
-      .left, .right {
-        position: absolute;
-        bottom: 0;
-        top: 0;
-      }
-
-      .left {
-        left: 24px;
-        right: calc(100% / 2);
-      }
-
-      .right {
-        left: calc(100% / 2);
-        right: 24px;
-      }
-
-      .right #transform,
-      .right #output {
-        height: calc(100% / 2);
-      }
-
-      #input {
-        height: calc(100% - 100px);
-      }
-
-      #input, #transform, #output {
-        border: 1px solid #777;
-      }
-
-      .right .transform-buttons {
-        position: absolute;
-        right: 2px;
-        top: 2px;
-        z-index: 110;
-      }
-
       highlightjs-element {
         max-height: 100px;
         overflow: hidden;
@@ -95,28 +51,41 @@
     <paper-toast id="toast"></paper-toast>
 
     <paper-dialog id="editor-dialog" modal>
-      <h2>{{title}} <paper-icon-button icon="indent:prettify" on-tap="prettify"></paper-icon-button></h2>
-      <div class="editors-container">
-        <div class="left">
-          <div class="input-url">
-            <t-input label="URL" value="{{url}}"></t-input>
-            <paper-icon-button icon="icons:arrow-forward" on-tap="generateRequest"></paper-icon-button>
-          </div>
-          <div id="input"></div>
+      <div id="wrapper" class="layout vertical fit">
+        <div class="header">
+          <h2>{{title}} <paper-icon-button icon="indent:prettify" on-tap="prettify"></paper-icon-button></h2>
         </div>
-        <div class="right">
-          <div id="transform"></div>
-          <div id="output"></div>
-          <div class="transform-buttons">
-            <paper-icon-button icon="icons:arrow-forward" on-tap="transformInput"></paper-icon-button>
+        <div class="flex layout horizontal">
+          <div class="left-section layout vertical flex">
+            <div class="input-url layout horizontal">
+              <t-input class="flex" label="URL" value="{{url}}"></t-input>
+              <paper-icon-button icon="icons:arrow-forward" on-tap="generateRequest"></paper-icon-button>
+            </div>
+            <div id="input" class="flex"></div>
+          </div>
+          <div class="layout vertical right-section flex">
+            <div class="right-section-top flex layout vertical ">
+              <div class="transform-buttons layout horizontal">
+                  <h2>Some bigger shit</h2>
+              </div>
+              <div class="transform-buttons layout horizontal">
+                  <div class="flex">Some line of text</div>
+                  <paper-icon-button icon="icons:arrow-forward" on-tap="transformInput"></paper-icon-button>
+              </div>
+              <div id="transform" class="flex"></div>
+            </div>
+            <div class="right-section-bottom layout vertical flex">
+              <div id="output" class="flex"></div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="buttons">
-        <paper-button dialog-dismiss on-tap="cancelChanges">Cancel</paper-button>
-        <paper-button dialog-confirm on-tap="saveDataSource" disabled="{{disableSave}}">Save</paper-button>
+        <div class="footer layout horizontal center end-justified">
+          <paper-button dialog-dismiss on-tap="cancelChanges">Cancel</paper-button>
+          <paper-button dialog-confirm on-tap="saveDataSource" disabled="{{disableSave}}">Save</paper-button>
+        </div>
       </div>
     </paper-dialog>
+
   </template>
   <script>
     Polymer({
@@ -127,17 +96,20 @@
 
         url: {
           type: String,
-          observer: 'urlChanged'
+          observer: 'urlChanged',
+          notify: true
         },
 
         transform: {
           type: Function,
-          observer: 'initTransform'
+          observer: 'initTransform',
+          notify: true
         },
 
         translator:{
           type: Function,
-          observer: 'initTranslator'
+          observer: 'initTranslator',
+          notify: true
         },
 
         dataSource: {

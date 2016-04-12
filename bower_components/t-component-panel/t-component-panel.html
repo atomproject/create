@@ -101,11 +101,13 @@
               </template>
               <template is="dom-if" if="{{_isType(attribute,'array')}}">
                 <array-editor value="{{attribute.value}}"
+                  selected="{{_getPage(attribute.selected)}}"
                   label="{{attribute.name}}"
                   url="{{attribute.url}}"
                   transform="{{attribute.transform}}"
                   translator="{{attribute.translator}}"
                   data-key$="{{attribute.key}}"
+                  on-selected-changed="_saveArrayPage"
                   on-value-changed="arrayChanged"
                   on-data-source-changed="dataSourceChanged">
                 </array-editor>
@@ -216,6 +218,20 @@ Polymer({
 
   _isLessThanThree: function(values) {
     return values.length <= 3;
+  },
+
+  _getPage: function(page) {
+    return page === undefined || page === null ? 0 : page;
+  },
+
+  _saveArrayPage: function(event) {
+    setTimeout(function() {
+      var attribute;
+
+      if (attribute = event.model.get('attribute')) {
+        attribute.selected = event.detail.value;
+      }
+    }.bind(this), 0);
   },
 
   getSections: function(properties) {

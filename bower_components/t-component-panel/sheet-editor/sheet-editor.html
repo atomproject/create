@@ -57,7 +57,7 @@
 
     <div class="snippet-container" on-tap="openDialog"></div>
     <div id="snippet"></div>
-    <paper-dialog id="dialog" on-iron-overlay-opened="dialogOpened" on-iron-overlay-closed="saveValue">
+    <paper-dialog id="dialog" modal on-iron-overlay-opened="dialogOpened" on-iron-overlay-closed="saveValue">
       <h2>{{title}}</h2>
       <div id="grid"></div>
       <div class="buttons">
@@ -189,7 +189,7 @@
       saveValue: function(event) {
         var value, lastRow = -1, lastCol = -1;
 
-        if (!event || event.detail.confirmed) {
+        if ((!event || event.detail.confirmed) && this.grid) {
           value = this.grid.getData();
 
           value.forEach(function(row, i) {
