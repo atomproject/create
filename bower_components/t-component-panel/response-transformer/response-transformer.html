@@ -44,6 +44,26 @@
         border-radius: 2px;
         --allow-overflow-x: hidden;
       }
+
+      .mtl {
+        margin-top: 15px;
+      }
+
+      .mtm {
+        margin-top: 10px;
+      }
+
+      .mlm {
+        margin-left: 10px;
+      }
+
+      #wrapper {
+        margin-bottom: 0;
+      }
+
+      #input, #transform, #output {
+        border: 1px solid #eee;
+      }
     </style>
 
     <highlightjs-element lang="json" text="{{snippet}}" on-tap="openEditor"></highlightjs-element>
@@ -52,34 +72,40 @@
 
     <paper-dialog id="editor-dialog" modal>
       <div id="wrapper" class="layout vertical fit">
-        <div class="header">
+        <div>
           <h2>{{title}} <paper-icon-button icon="indent:prettify" on-tap="prettify"></paper-icon-button></h2>
         </div>
-        <div class="flex layout horizontal">
-          <div class="left-section layout vertical flex">
-            <div class="input-url layout horizontal">
-              <t-input class="flex" label="URL" value="{{url}}"></t-input>
+        <div class="flex layout horizontal mtl">
+          <div class="layout vertical flex">
+            <div>
+              <h2>STEP 1: Enter URL which returns JSON response</h2>
+            </div>
+            <div class="layout horizontal mtm">
+              <t-input class="flex" label="URL" value="{{url}}" no-label-float></t-input>
               <paper-icon-button icon="icons:arrow-forward" on-tap="generateRequest"></paper-icon-button>
             </div>
-            <div id="input" class="flex"></div>
+            <div id="input" class="flex mtm"></div>
           </div>
-          <div class="layout vertical right-section flex">
-            <div class="right-section-top flex layout vertical ">
-              <div class="transform-buttons layout horizontal">
-                  <h2>Some bigger shit</h2>
+          <div class="layout vertical flex mlm">
+            <div class="flex layout vertical ">
+              <div class="layout horizontal">
+                <h2>STEP 2: Write JS function to transform the response</h2>
               </div>
-              <div class="transform-buttons layout horizontal">
-                  <div class="flex">Some line of text</div>
-                  <paper-icon-button icon="icons:arrow-forward" on-tap="transformInput"></paper-icon-button>
+              <div class="layout horizontal">
+                <div class="flex">You can only write one function with the name 'transform' that takes the JSON response as a single argument and converts it into an array of objects.</div>
+                <paper-icon-button icon="icons:arrow-forward" on-tap="transformInput"></paper-icon-button>
               </div>
-              <div id="transform" class="flex"></div>
+              <div id="transform" class="flex mtm"></div>
             </div>
-            <div class="right-section-bottom layout vertical flex">
-              <div id="output" class="flex"></div>
+            <div class="layout vertical flex mtl">
+              <div>
+                <h2>STEP 3: Check the output</h2>
+              </div>
+              <div id="output" class="flex mtm"></div>
             </div>
           </div>
         </div>
-        <div class="footer layout horizontal center end-justified">
+        <div class="buttons layout horizontal center end-justified">
           <paper-button dialog-dismiss on-tap="cancelChanges">Cancel</paper-button>
           <paper-button dialog-confirm on-tap="saveDataSource" disabled="{{disableSave}}">Save</paper-button>
         </div>
