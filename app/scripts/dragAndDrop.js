@@ -20,13 +20,19 @@ var dragAndDropSetup = function () {
     revert: 'invalid'
   });
 
+  stage.addEventListener('component-panel-changed', function(event) {
+    var name = event.detail.name;
+    var panelSettings = document.getElementById('panelSettings');
+
+    panelSettings.disabled = (name === 't-page' || name === 't-form');
+  });
+
   // trigger the click on the input element with `type='file'`
   $('#uploadJson').on('click', function () {
     document.querySelector('#uploadInput').click();
   });
 
   $('#canvasRefresh').on('click', function() {
-    var stage = document.querySelector('t-stage');
     var stateFile, builderState, states;
 
     if (!stage) {
@@ -47,7 +53,6 @@ var dragAndDropSetup = function () {
 
   // triggered when user selects a file, read the file and reset the builder
   $('#uploadInput').on('change', function() {
-    var stage = document.querySelector('t-stage');
     var files = this.files;
     var reader = new FileReader();
     var statusText = 'Builder restored to the state.json successfully.';
@@ -85,7 +90,6 @@ var dragAndDropSetup = function () {
   // create the zip file and and download it
   $('#downloadZip').on('click', function () {
     var zip = new JSZip();
-    var stage = document.querySelector('t-stage');
 
     if (!stage) {
       return;
@@ -113,7 +117,6 @@ var dragAndDropSetup = function () {
   });
 
   $('#downloadJson').on('click', function () {
-    var stage = document.querySelector('t-stage');
     var stateFile, content, builderState, states;
 
     if (!stage) {
@@ -134,14 +137,11 @@ var dragAndDropSetup = function () {
   });
 
   $('#panelSettings').on('click', function() {
-    var stage = document.querySelector('t-stage');
-
     stage.showPanelForBuilder();
   });
 
   // append form elements to form on click
   $('body').on('click', '.control', function (event) {
-    var stage = document.querySelector('t-stage');
     var category = event.currentTarget.getAttribute('data-category');
     var name = event.currentTarget.getAttribute('data-component');
 
@@ -185,7 +185,6 @@ var dragAndDropSetup = function () {
 
   // update the builder attributes on focus out and reset the text
   $('.headerText').on('blur', function () {
-    var stage = document.querySelector('t-stage');
     var heading = $(this).text().trim();
     var name = heading.toLowerCase().replace(/\s+/g, '-');
     var $this = $(this);

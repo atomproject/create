@@ -141,17 +141,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <nav-list>
               <div class="layout horizontal center property-panel-Header">
                 <input type="file" id="uploadInput" style="display: none;">
-                <paper-icon-button icon="fusion-c:settings" id="panelSettings"></paper-icon-button>
-                <paper-icon-button icon="fusion-d:refresh" id="canvasRefresh"></paper-icon-button>
+                <paper-icon-button icon="fusion-c:settings" id="panelSettings" title="Page settings"></paper-icon-button>
+                <paper-icon-button icon="fusion-d:refresh" id="canvasRefresh" title="Refresh components on canvas"></paper-icon-button>
                 <div class="settings-separator"></div>
                 <paper-menu-button>
-                  <paper-icon-button icon="fusion-a:download" class="dropdown-trigger"></paper-icon-button>
+                  <paper-icon-button icon="fusion-a:download" class="dropdown-trigger" title="Donwload"></paper-icon-button>
                   <paper-menu class="dropdown-content">
                     <paper-item id="downloadJson">JSON</paper-item>
                     <paper-item id="downloadZip">ZIP</paper-item>
                   </paper-menu>
                 </paper-menu-button>
-                <paper-icon-button icon="fusion-a:upload" id="uploadJson"></paper-icon-button>
+                <paper-icon-button icon="fusion-a:upload" id="uploadJson" title="Upload state file"></paper-icon-button>
               </div>
               <t-component-panel></t-component-panel>
             </nav-list>

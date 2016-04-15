@@ -782,6 +782,8 @@
       showComponentPanel: function(name, properties) {
         var sections = this.componentPanel.getSections(properties);
 
+        this.fire('component-panel-changed', {name: name});
+
         // something wierd is happening here, you have to reset the
         // sections to an empty array first only then component panel
         // renders properly
