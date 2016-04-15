@@ -1,26 +1,20 @@
 var dragAndDropSetup = function () {
-  var stateFile = localStorage.getItem('atom-builder');
+  var stateFile = localStorage.getItem('atom-refresh');
   var stage = document.querySelector('t-stage');
   var statesFireRef = new Firebase('https://atom-builder.firebaseio.com/states');
   var stateId = window.location.search.match(/id=([^&]+)/);
+  var codePreview = document.querySelector('code-preview');
 
-  localStorage.removeItem('atom-builder');
+  stage.addEventListener('builder-name-changed', function(event) {
+    $('.headerText').text(event.detail.name);
+  });
 
-  if (stateFile) {
-    // TODO: you shouldn't have to call this
-    stage.reset();
-    stage.recreateBuilder(stateFile);
-  }
-  else if (stateId && stateId[1]) {
-    stateId = stateId[1];
+  stage.addEventListener('component-panel-changed', function(event) {
+    var name = event.detail.name;
+    var panelSettings = document.getElementById('panelSettings');
 
-    statesFireRef.child(stateId).once('value')
-      .then(function(newDataRef) {
-        // TODO: you shouldn't have to call this
-        stage.reset();
-        stage.recreateBuilder(newDataRef.val());
-      });
-  }
+    panelSettings.disabled = (name === 't-page' || name === 't-form');
+  });
 
   // draggable menu items setup
   $('.control').draggable({
@@ -30,13 +24,6 @@ var dragAndDropSetup = function () {
     helper: 'clone',
     cursor: 'move',
     revert: 'invalid'
-  });
-
-  stage.addEventListener('component-panel-changed', function(event) {
-    var name = event.detail.name;
-    var panelSettings = document.getElementById('panelSettings');
-
-    panelSettings.disabled = (name === 't-page' || name === 't-form');
   });
 
   // trigger the click on the input element with `type='file'`
@@ -70,6 +57,7 @@ var dragAndDropSetup = function () {
         url += '?id=' + id;
 
         window.history.pushState({}, '', url);
+        stage.resetDirty();
       });
   });
 
@@ -85,7 +73,7 @@ var dragAndDropSetup = function () {
 
     try {
       stateFile = stage.getStateFile(builderState, states);
-      localStorage.setItem('atom-builder', stateFile);
+      localStorage.setItem('atom-refresh', stateFile);
     } catch (exception) {
     } finally {
       window.location.reload();
@@ -194,10 +182,6 @@ var dragAndDropSetup = function () {
     $('.component-list').toggleClass('active');
   });
 
-  $('t-stage').on('builder-name-changed', function(ev) {
-    $('.headerText').text(ev.originalEvent.detail);
-  });
-
   $('.headerText').on('keydown', function (e) {
     if (e.which === 13) {
       $(this).blur();
@@ -237,13 +221,50 @@ var dragAndDropSetup = function () {
         $this.text('Untitled Page');
       }
     } else {
-      stage.updateBuilderState('heading', heading);
-      stage.updateBuilderState('name', name);
+      stage.updatePath({path: 'heading', value: heading, useBuilder: true});
+      stage.updatePath({path: 'name', value: name, useBuilder: true});
     }
 
     this.scrollLeft = 0;
     $this.addClass('inactive');
   });
+
+  // restore state of stage
+  codePreview.stage = stage;
+  localStorage.removeItem('atom-refresh');
+
+  if (stateFile) {
+    // TODO: you shouldn't have to call this
+    stage.reset();
+    stage.recreateBuilder(stateFile);
+  }
+  else if (stateId && stateId[1]) {
+    stateId = stateId[1];
+
+    statesFireRef.child(stateId).once('value')
+      .then(function(newDataRef) {
+        // TODO: you shouldn't have to call this
+        stage.reset();
+        stage.recreateBuilder(newDataRef.val());
+      });
+  }
+  else if (localStorage.getItem('atom-preview')) {
+    stateFile = localStorage.getItem('atom-preview');
+
+    // TODO: you shouldn't have to call this
+    stage.reset();
+    stage.recreateBuilder(stateFile);
+    localStorage.removeItem('atom-preview');
+  }
+
+  window.onbeforeunload = function() {
+    if (stage.isDirty() &&
+      !localStorage.getItem('atom-refresh') &&
+      !localStorage.getItem('atom-preview')) {
+
+      return 'All changes will be lost!';
+    }
+  }.bind(this);
 
   // //code to disable the default behaviour of the tab
   // $(document).on('keydown', '#componentSearch',function (objEvent) {

@@ -76,7 +76,6 @@
         },
         builderType: String,
         componentPanel: Object,
-        metadata: Object,
 
         _dsTargets: {
           type: Object,
@@ -97,18 +96,12 @@
       draggedPosX: null,
       builderState: null,
 
-      ready: function() {
-        window.onbeforeunload = function() {
-          if (this.builderType && this._elementSateList.length &&
-            !localStorage.getItem('atom-builder')) {
-
-            return 'All changes will be lost!';
-          }
-        }.bind(this);
+      isDirty: function() {
+        return this._isDirty;
       },
 
-      isPage: function(builderType) {
-        return builderType === 't-page';
+      resetDirty: function() {
+        this._isDirty = false;
       },
 
       /* section: wire up */
@@ -129,39 +122,6 @@
             return;
           }
         }
-      },
-
-      getMetadata: function(builderType) {
-        var loc = _.template('metadata/<%= type %>.json');
-        var type = this.isPage(builderType) ? 'page' : 'form';
-
-        loc = loc({ type: type });
-        return Promise.resolve()
-          .then(function() {
-            if (!this.metadata) {
-              return Promise.resolve($.getJSON(loc));
-            }
-          }.bind(this))
-          .then(function(metadata) {
-            if (this.metadata) {
-              return this.metadata;
-            }
-
-            Object.keys(metadata).forEach(function(name) {
-              var attributes, meta = metadata[name];
-              var innerHTML = meta.innerHTML || '';
-
-              if (meta.attributes) {
-                attributes = meta.attributes;
-              } else {
-                attributes = meta.attributes = {};
-              }
-
-              meta.html = this.getComponentCode(name, attributes, innerHTML);
-            }.bind(this));
-
-            this.metadata = metadata;
-          }.bind(this));
       },
 
       setupListeners: function() {
@@ -338,7 +298,8 @@
             this.querySelector(this.builderType).setFields();
           }.bind(this), 0);
         }
-        console.log(this._elementSateList);
+
+        this._isDirty = true;
       },
 
       unmerge: function(el) {
@@ -379,7 +340,8 @@
         }.bind(this));
 
         fieldContainer.classList.remove('grouped');
-        console.log(this._elementSateList);
+
+        this._isDirty = true;
       },
 
       duplicate: function(el) {
@@ -420,7 +382,8 @@
 
         container.insertBefore(newFieldContainer, insertAt);
         Polymer.updateStyles();
-        console.log(this._elementSateList);
+
+        this._isDirty = true;
       },
 
       remove: function(el) {
@@ -462,7 +425,8 @@
         }.bind(this));
 
         this.showPanelForBuilder();
-        console.log(this._elementSateList);
+
+        this._isDirty = true;
       },
 
       merge: function(mergedContainer, draggedPosX) {
@@ -492,7 +456,8 @@
             --state.posX;
           }
         }.bind(this));
-        console.log(this._elementSateList);
+
+        this._isDirty = true;
       },
 
       relocate: function(relocatedContainer, draggedPosX) {
@@ -515,17 +480,28 @@
             --state.posX;
           }
         }.bind(this));
-        console.log(this._elementSateList);
+
+        this._isDirty = true;
       },
       /* section: end */
 
       /* section: update state */
       updatePath: function(event) {
-        var key = event.detail.path;
-        var value = event.detail.value;
-        var dataSource = event.detail.dataSource;
+        var state, container, dataSource, key, value;
         var target = this.componentPanelTarget;
-        var state, container;
+        var input;
+
+        // overload this method, it can either be called as callback
+        // of an event or called directly
+        input = event.detail !== undefined ? event.detail : event;
+
+        key = input.path;
+        value = input.value;
+        dataSource = input.dataSource;
+
+        if (input.useBuilder) {
+          target = this.querySelector(this.builderType);
+        }
 
         if (!target || !key ||
             ((value === undefined || value === null) && !dataSource)) {
@@ -533,8 +509,9 @@
           return;
         }
 
+        this._isDirty = true;
+
         if ($(target).is(this.builderType)) {
-          target = this.querySelector(this.builderType);
           state = this.builderState;
         } else {
           container = $(target).closest('.fieldset');
@@ -585,26 +562,6 @@
         dsState.showDs = true;
         state.html = this.generateCode(state);
       },
-
-      generateCode: function(state) {
-        var name = state.name, attributes = state.attributes;
-        var innerHTML = state.innerHTML;
-        var code = this.getComponentCode(name, attributes, innerHTML);
-
-        if (state.dataSources) {
-          Object.keys(state.dataSources).forEach(function(key) {
-            var dsState = state.dataSources[key];
-
-            if (!dsState.showDs) {
-              return;
-            }
-
-            code += this.getComponentCode(dsState.name, dsState.attributes);
-          }.bind(this));
-        }
-
-        return code;
-      },
       /* section: end */
 
       /* section: download */
@@ -648,6 +605,7 @@
         this.componentPanelTarget = this.querySelector(this.builderType);
         this.builderState = this.getNewElementState(this.builderType);
         this.draggedPosX = null;
+        this.resetDirty();
 
         $('li.field-container', this).remove();
       },
@@ -658,6 +616,10 @@
         var builder = this.querySelector(this.builderType);
 
         stateFile = JSON.parse(stateFile);
+
+        if (stateFile.type !== this.builderType) {
+          return;
+        }
 
         // re-create the builder state
         name = this.builderState.name = stateFile.type;
@@ -684,7 +646,7 @@
 
         // emit event to show header text
         if (attributes.heading) {
-          this.fire('builder-name-changed', attributes.heading);
+          this.fire('builder-name-changed', {name: attributes.heading});
         }
 
         // re-create elements in the builder

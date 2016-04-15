@@ -77,7 +77,9 @@
     "code-generator-behavior": "atomproject/code-generator-behavior#^1.0.0",
     "t-component-panel": "atomproject/t-component-panel#^1.0.0",
     "t-result-item": "travelnxtelements/t-result-item#master",
-    "dynamic-data-source": "atomproject/dynamic-data-source#^1.0.0"
+    "dynamic-data-source": "atomproject/dynamic-data-source#^1.0.0",
+    "firebase-element": "GoogleWebComponents/firebase-element#^1.0.12",
+    "paper-toggle-button": "polymerelements/paper-toggle-button#^1.1.2"
   },
   "resolutions": {
     "iron-icons": "^1.0.6"

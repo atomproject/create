@@ -1,15 +1,21 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/code-generator-behavior/code-generator-behavior.html">
 
 <script>
   Polymer.StateConverterBehavior = {
-    // Also assumes the property `this.metadata`.
+    behaviors: [
+      Polymer.CodeGeneratorBehavior
+    ],
+
     properties: {
       templateCache: {
         type: Object,
         value: function() {
           return {};
         }
-      }
+      },
+
+      metadata: Object,
     },
 
     _dsCounter: 0,
@@ -257,7 +263,7 @@
       return Promise.resolve();
     },
 
-    getFile: function(templatePath, context) {
+    getTemplate: function(templatePath) {
       var template = this.templateCache[templatePath];
 
       return Promise.resolve(template)
@@ -274,8 +280,28 @@
             this.templateCache[templatePath] = template;
           }
 
-          return template(context);
+          return template;
         }.bind(this));
+    },
+
+    getFile: function(templatePath, context) {
+      var templatePromises = [
+        this.getTemplate('templates/dependencies.jst'),
+        this.getTemplate('templates/code.jst')
+      ];
+
+      return Promise.all(templatePromises)
+        .then(templates => {
+          // process partials
+          var deps = templates.shift()(context.dependencies);
+          var code = templates.shift()(context);
+
+          context.textDependencies = deps;
+          context.textCode = code;
+        })
+        .catch(() => {})
+        .then(() => this.getTemplate(templatePath))
+        .then(template => template(context));
     },
 
     getBuilderFile: function(builderState, states) {
@@ -294,12 +320,71 @@
 
       if (builderState.isPage) {
         context.pageName = context.componentName.replace('t-', '');
+        context.dependencies.base = 'bower_components';
         templatePath = 'templates/page.jst';
       } else {
+        context.dependencies.base = '..';
         templatePath = 'templates/component.jst';
       }
 
       return this.getFile(templatePath, context);
+    },
+
+    isPage: function(builderType) {
+      return builderType === 't-page';
+    },
+
+    getMetadata: function(builderType) {
+      return Promise.resolve()
+        .then(function() {
+          var type;
+
+          if (!this.metadata) {
+            type = this.isPage(builderType) ? 'page' : 'form';
+
+            return Promise.resolve($.getJSON(`metadata/${type}.json`));
+          }
+        }.bind(this))
+        .then(function(metadata) {
+          if (this.metadata) {
+            return this.metadata;
+          }
+
+          Object.keys(metadata).forEach(function(name) {
+            var attributes, meta = metadata[name];
+            var innerHTML = meta.innerHTML || '';
+
+            if (meta.attributes) {
+              attributes = meta.attributes;
+            } else {
+              attributes = meta.attributes = {};
+            }
+
+            meta.html = this.getComponentCode(name, attributes, innerHTML);
+          }.bind(this));
+
+          this.metadata = metadata;
+        }.bind(this));
+    },
+
+    generateCode: function(state) {
+      var name = state.name, attributes = state.attributes;
+      var innerHTML = state.innerHTML;
+      var code = this.getComponentCode(name, attributes, innerHTML);
+
+      if (state.dataSources) {
+        Object.keys(state.dataSources).forEach(function(key) {
+          var dsState = state.dataSources[key];
+
+          if (!dsState.showDs) {
+            return;
+          }
+
+          code += this.getComponentCode(dsState.name, dsState.attributes);
+        }.bind(this));
+      }
+
+      return code;
     }
   };
 </script>
