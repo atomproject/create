@@ -692,13 +692,13 @@
           fieldContainer = this.getWrapper();
 
           row.forEach(function(column, posY) {
-            column.html = this.generateCode(column);
             state = this.getNewElementState(column, posX, posY);
+            state.html = this.generateCode(state);
             this.push('_elementSateList', state);
 
             //TODO: persist category in the state file
-            //TODO: column.html and html must end up being same
-            fieldSet = this.getFieldset(column.name, '', column.html);
+            //TODO: state.html and html must end up being same
+            fieldSet = this.getFieldset(state.name, '', state.html);
             fieldContainer.appendChild(fieldSet);
           }.bind(this));
 

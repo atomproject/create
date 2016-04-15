@@ -15,7 +15,7 @@
     _dsCounter: 0,
 
     getNewElementState: function(name, x, y) {
-      var meta, states;
+      var meta, states, innerHTML;
 
       if (_.isArray(name)) {
         states = name;
@@ -26,11 +26,12 @@
       }
       else if (_.isObject(name)) {
         meta = name;
+        innerHTML = this.metadata[meta.name].innerHTML;
 
         return {
           posX: x, posY: y,
           name: meta.name,
-          html: meta.html, innerHTML: meta.innerHTML,
+          html: meta.html, innerHTML: innerHTML,
           attributes: meta.attributes, property: meta.property,
           dataSources: {}
         };

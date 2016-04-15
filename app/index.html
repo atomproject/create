@@ -76,6 +76,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     .property-panel-Header [icon] {
       color: var(--default-primary-color);
     }
+
+    .property-panel-Header [icon][disabled] {
+      color: var(--grey-three);
+    }
   </style>
 </head>
 
@@ -143,6 +147,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <input type="file" id="uploadInput" style="display: none;">
                 <paper-icon-button icon="fusion-c:settings" id="panelSettings" title="Page settings"></paper-icon-button>
                 <paper-icon-button icon="fusion-d:refresh" id="canvasRefresh" title="Refresh components on canvas"></paper-icon-button>
+                <paper-icon-button icon="fusion-e:save" id="saveState" title="Save the changes"></paper-icon-button>
                 <div class="settings-separator"></div>
                 <paper-menu-button>
                   <paper-icon-button icon="fusion-a:download" class="dropdown-trigger" title="Donwload"></paper-icon-button>

@@ -1,6 +1,8 @@
 var dragAndDropSetup = function () {
   var stateFile = localStorage.getItem('atom-builder');
   var stage = document.querySelector('t-stage');
+  var statesFireRef = new Firebase('https://atom-builder.firebaseio.com/states');
+  var stateId = window.location.search.match(/id=([^&]+)/);
 
   localStorage.removeItem('atom-builder');
 
@@ -8,6 +10,16 @@ var dragAndDropSetup = function () {
     // TODO: you shouldn't have to call this
     stage.reset();
     stage.recreateBuilder(stateFile);
+  }
+  else if (stateId && stateId[1]) {
+    stateId = stateId[1];
+
+    statesFireRef.child(stateId).once('value')
+      .then(function(newDataRef) {
+        // TODO: you shouldn't have to call this
+        stage.reset();
+        stage.recreateBuilder(newDataRef.val());
+      });
   }
 
   // draggable menu items setup
@@ -30,6 +42,35 @@ var dragAndDropSetup = function () {
   // trigger the click on the input element with `type='file'`
   $('#uploadJson').on('click', function () {
     document.querySelector('#uploadInput').click();
+  });
+
+  $('#saveState').on('click', function() {
+    var builderState, states;
+
+    if (!stage) {
+      return;
+    }
+
+    builderState = stage.builderState;
+    states = stage._elementSateList;
+
+    Promise.resolve(stage.getStateFile(builderState, states))
+      .then(function(stateFile) {
+        if (!stateFile) {
+          return ;
+        }
+
+        return statesFireRef.push(stateFile);
+      })
+      .then(function(newDataRef) {
+        var id = newDataRef.key();
+        var url = window.location.origin;
+
+        url += window.location.pathname;
+        url += '?id=' + id;
+
+        window.history.pushState({}, '', url);
+      });
   });
 
   $('#canvasRefresh').on('click', function() {
