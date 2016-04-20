@@ -197,7 +197,6 @@
             padding-left: 20px!important;
             line-height: 18px;
             color: var(--primary-text-color, #333333);
-            font-weight: 600;
         }
         ::content .display-value,
         .secondary-text{
@@ -288,10 +287,17 @@
                                             <template is="dom-if" if="[[_isRating(key.category)]]" as="key">
                                                 <template is="dom-repeat" items="[[key.items]]" as="item">
                                                     <div class="layout item-layout justified style-scope t-component-panel">
-                                                        <t-checkbox data-type$="[[key.type]]" data-label$="{{key.label}}" name$="[[item.name]]" value$="[[item.value]]" on-checked-change="_checkChanged">
+                                                        <t-checkbox data-type$="[[key.type]]" data-label$="{{key.label}}"  data-category$="[[key.category]]" name$="[[item.name]]" value$="[[item.value]]" on-checked-change="_checkChanged">
                                                             <div class="layout horizontal center font-12 justified">
                                                                 <t-starrating disabled stars="5" rate="[[item.name]]"></t-starrating>
-                                                                <div class="display-value">[[item.displayValue]]</div>
+                                                                <div class="display-value">
+                                                                    <template is="dom-if" if="[[currency]]">
+                                                                        [[currency]] [[item.value]]
+                                                                    </template>
+                                                                    <template is="dom-if" if="[[!currency]]">
+                                                                        [[item.displayValue]]
+                                                                    </template>
+                                                                </div>
                                                             </div>
                                                         </t-checkbox>
                                                     </div>
@@ -396,6 +402,11 @@ Polymer({
         filterApi: {
             type: String,
             value: ''
+        },
+
+        /*Pass currency */
+        currency: {
+            type: String
         },
 
         appliedFilters: {
@@ -814,6 +825,9 @@ Polymer({
 
     _getDisplayLabel: function(key) {
         if (key.items[0].additionalInfo && key.items[0].additionalInfo[0].value.toLowerCase() !== 'ticks') {
+            if(this.currency){
+                return key.label + ' ( ' + this.currency + ' )';
+            }
             return key.label + ' (' + key.items[0].additionalInfo[0].value + ')';
         }
         return key.label;

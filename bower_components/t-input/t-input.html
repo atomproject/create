@@ -43,7 +43,7 @@ style this element.
 
 </style>		
 			<template is="dom-if" if="[[!multiLine]]">
-				<t-master-input id="input" label="{{label}}" type="{{type}}" validate-on-blur="{{validateOnBlur}}" auto-validate$="{{autoValidate}}"  disabled$="{{disabled}}"  no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}" maxlength="{{maxLength}}" pattern="{{pattern}}" error-message="{{errorMessage}}" prevent-invalid-input$="{{preventInvalidInput}}" required$="{{required}}" value="{{value}}" on-value-change="_invalid" autocapitalize$="[[autocapitalize]]" autocorrect$="[[autocorrect]]" autocomplete$="[[autocomplete]]"></t-master-input>
+				<t-master-input id="input" label="{{label}}" type="{{type}}" min="{{min}}" max="{{max}}" validate-on-blur="{{validateOnBlur}}" auto-validate$="{{autoValidate}}"  disabled$="{{disabled}}"  no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}" maxlength="{{maxLength}}" pattern="{{pattern}}" error-message="{{errorMessage}}" prevent-invalid-input$="{{preventInvalidInput}}" required$="{{required}}" value="{{value}}" on-value-change="_invalid" autocapitalize$="[[autocapitalize]]" autocorrect$="[[autocorrect]]" autocomplete$="[[autocomplete]]"></t-master-input>
 			</template>
 			<template is="dom-if" if="[[multiLine]]">
 				<t-textarea id="input" label="{{label}}" disabled$="{{disabled}}" validate-on-blur="{{validateOnBlur}}"  no-label-float$="{{noLabelFloat}}" char-counter$="{{charCounter}}"  maxlength="{{maxLength}}" value="{{value}}" error-message="{{errorMessage}}" rows$="{{rows}}" max-rows$="{{maxRows}}" required$="{{required}}" ></t-textarea>
@@ -148,6 +148,26 @@ Polymer({
 			type:Number,
 			reflectToAttribute: true
 		},
+
+		/**
+	       * The minimum (numeric or date-time) input value.
+	       * If you're using PaperInputBehavior to implement your own paper-input-like
+	       * element, bind this to the `<input is="iron-input">`'s `min` property.
+	       */
+	      min: {
+	        type: String
+	      },
+
+	      /**
+	       * The maximum (numeric or date-time) input value.
+	       * Can be a String (e.g. `"2000-1-1"`) or a Number (e.g. `2`).
+	       * If you're using PaperInputBehavior to implement your own paper-input-like
+	       * element, bind this to the `<input is="iron-input">`'s `max` property.
+	       */
+	      max: {
+	        type: String
+	      },
+
 
 		/**
        * Set to true to auto-validate the input value. Bind this to the `<paper-input-container>`'s

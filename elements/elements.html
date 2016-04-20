@@ -12,7 +12,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <!-- Iron elements -->
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 
 <!-- Paper elements -->
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
@@ -59,6 +58,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <!-- Builder elements -->
 <link rel="import" href="../elements/fusion-icons.html">
 <link rel="import" href="../elements/t-stage.html">
+<link rel="import" href="../elements/code-preview.html">
 
 
 <!-- Misc. elements -->
@@ -72,3 +72,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/t-menu/t-submenu.html">
 <link rel="import" href="../bower_components/t-scaffold/t-scaffold.html">
 <link rel="import" href="../bower_components/dynamic-data-source/dynamic-data-source.html">
+<!--
+This is only used in the script `dragAndDrop.js` script so it should be added
+as a script dependency like `lodash` but since there also exists a firebase
+element which is likely to be imported somewhere in the dependency tree I think
+it would be wiser to include it as a link import so that duplicate scripts
+are not run.
+`elements.vulcanized.html` loads before app.js so we have the reference to
+`Firebase` in `dragAndDrop.js`
+ -->
+ <link rel="import" href="../bower_components/firebase-element/firebase.html">

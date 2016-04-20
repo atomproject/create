@@ -1,0 +1,13 @@
+<%= builderStartTag %>
+  <div class="form flex">
+    <%
+      rows.forEach(function(row) {
+        %><div class="horizontal flex layout grouped"><%
+          row.forEach(function(column) {
+            %><div class="flex fieldset"><%= column.html %></div><%
+          });
+        %></div><%
+      });
+    %>
+  </div>
+<%= builderEndTag %>

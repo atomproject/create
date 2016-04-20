@@ -1,0 +1,9 @@
+<%
+  linkImports.forEach(function(dep) {
+    %><link rel="import" href="<%= base %>/<%= dep.relPath %>"><%
+  });
+
+  scriptImports.forEach(function(dep) {
+    %><script type="text/javascript" src="<%= base %>/<%= dep.relPath %>"></script><%
+  });
+%>

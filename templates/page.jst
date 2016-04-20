@@ -9,30 +9,10 @@
   <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 
   <link rel="import" href="bower_components/t-page/t-page.html">
-  <%
-    dependencies.linkImports.forEach(function(dep) {
-      %><link rel="import" href="bower_components/<%= dep.relPath %>"><%
-    });
 
-    dependencies.scriptImports.forEach(function(dep) {
-      %><script type="text/javascript" src="bower_components/<%= dep.relPath %>"></script><%
-    });
-  %>
-
+  <%= textDependencies %>
 </head>
 <body unresolved>
-  <%= builderStartTag %>
-    <div class="flex">
-      <%
-        rows.forEach(function(row) {
-          %><div class="horizontal flex layout grouped"><%
-            row.forEach(function(column) {
-              %><div class="flex fieldset"><%= column.html %></div><%
-            });
-          %></div><%
-        });
-      %>
-    </div>
-  <%= builderEndTag %>
+  <%= textCode %>
 </body>
 </html>

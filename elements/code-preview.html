@@ -1,0 +1,186 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/firebase-element/firebase.html">
+<link rel="import" href="state-converter-behavior.html">
+
+<dom-module id="code-preview">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        padding: 5px 10px;
+        border-radius: 2px 2px;
+        background-color: rgba(197, 197, 197, 0.5);
+      }
+
+      span {
+        margin-right: 10px;
+      }
+    </style>
+
+    <div class="layout horizontal highlight">
+      <span>Preview: </span> <paper-toggle-button checked="{{isPreview}}"></paper-toggle-button>
+    </div>
+
+    <paper-toast id="toast"></paper-toast>
+  </template>
+  <script>
+    Polymer({
+      is: 'code-preview',
+
+      behaviors: [
+        Polymer.CodeGeneratorBehavior,
+        Polymer.StateConverterBehavior
+      ],
+
+      properties: {
+        isPreview: {
+          type: Boolean,
+          value: function() {
+            return /.*\/preview.*/.test(window.location.pathname);
+          }
+        },
+
+        stage: Object
+      },
+
+      observers: [
+        'toPreview(isPreview, stage)',
+        'toBuilder(isPreview)'
+      ],
+
+      getStateId: function() {
+        let stateId = window.location.search.match(/id=([^&]+)/);
+
+        if (stateId && stateId[1]) {
+          return stateId[1];
+        }
+      },
+
+      attached: function() {
+        if (!this.isPreview) {
+          return;
+        }
+
+        let statesFireRef = new Firebase('https://atom-builder.firebaseio.com/states');
+        let stateId = this.getStateId();
+        let stateP;
+
+        if (stateId) {
+          stateP = statesFireRef.child(stateId).once('value')
+            .then(function(newDataRef) {
+              // create the code for this page
+
+              return newDataRef.val();
+            });
+        } else {
+          let stateFile = localStorage.getItem('atom-preview');
+          localStorage.removeItem('atom-preview');
+
+          // done so that page refresh don't result in nothing
+          stateFile = stateFile || localStorage.getItem('atom-preview-temp');
+          localStorage.setItem('atom-preview-temp', stateFile);
+
+          stateP = Promise.resolve(stateFile);
+        }
+
+        stateP
+          .then(stateFile => {
+            if (stateFile) {
+              this._stateFile = stateFile;
+              stateFile = JSON.parse(stateFile);
+
+              return this.getMetadata(stateFile.type).then(() => {
+                this.createPreview(stateFile);
+              });
+            } else {
+              return Promise.reject('No state file found');
+            }
+          })
+          .catch(() => {
+            let url = window.location.href;
+            url = url.replace(/preview(\.\w+)?/, 'page');
+            window.location = url;
+          });
+      },
+
+      changePageTitle: function(builderState) {
+        let titleEl = document.head.querySelector('title');
+        let title = builderState.attributes.heading || 'untitled';
+        let type = this.isPage(builderState.name);
+
+        type = type ? 'Page' : 'Form';
+        titleEl.text = `${title} - Atom ${type}`;
+      },
+
+      createPreview: function(stateFile) {
+        let builderState = {};
+        builderState.name = stateFile.type;
+        builderState.attributes = stateFile.attributes;
+        builderState.html = this.getComponentCode(builderState.name,
+          builderState.attributes);
+
+        stateFile.rows.forEach((row, posX) => {
+          row.forEach((column, posY) => {
+            column = this.getNewElementState(column, posX, posY);
+            column = this.generateCode(column);
+          });
+        });
+
+        let context = {}, endTag;
+        context.rows = stateFile.rows;
+        context.builderEndTag = endTag = `</${builderState.name}>`;
+        context.builderStartTag = builderState.html.replace(endTag, '');
+
+        this._builderState = builderState;
+        this.changePageTitle(builderState);
+
+        this.getTemplate('templates/code.jst').then(template => {
+          let code = template(context);
+          let div = document.createElement('div');
+
+          div.innerHTML = code;
+          document.body.appendChild(div);
+        });
+      },
+
+      toPreview: function(isPreview, stage) {
+        if (!isPreview) {
+          return;
+        }
+
+        try {
+          if (!this.getStateId()) {
+            let builderState = stage.builderState;
+            let states = stage._elementSateList;
+            let stateFile = stage.getStateFile(builderState, states);
+            localStorage.setItem('atom-preview', stateFile);
+          }
+
+          let re = /(form)|(page)(\.\w+)?/;
+          let url = window.location.href.replace(re, 'preview.html');
+          window.location = url;
+        } catch (exception) {
+          this.$.toast.text = 'Something went wrong. Could not switch to preview';
+          this.$.toast.open();
+        }
+      },
+
+      toBuilder: function(isPreview) {
+        if (isPreview || !this._builderState || !this._stateFile) {
+          return;
+        }
+
+        localStorage.setItem('atom-preview', this._stateFile);
+
+        let type = this._builderState.name === 't-page' ? 'page' : 'form';
+        let url = window.location.href.replace(/preview(\.\w+)?/, type);
+        window.location = url;
+      }
+    });
+  </script>
+</dom-module>
