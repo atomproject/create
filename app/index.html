@@ -163,6 +163,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <t-stage class="content layout vertical fit container" builder-type="[[builderType]]"></t-stage>
           </t-scaffold>
           <iron-ajax url="[[builderUrl]]" content-type="application/json" handle-as="json" id="manifestAjax" on-response="_onElementsReceived"></iron-ajax>
+          <code-preview></code-preview>
         </section>
         <section data-route="browser" style="height:100%">
           <paper-header-panel class="list-panel" main mode="seamed">
@@ -210,7 +211,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </div>
 
     <paper-toast id="toast"></paper-toast>
-    <code-preview></code-preview>
   </template>
   <platinum-sw-register auto-register clients-claim skip-waiting on-service-worker-installed="displayInstalledToast">
     <platinum-sw-cache default-cache-strategy="fastest" cache-config-file="cache-config.json">
