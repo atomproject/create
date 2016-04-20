@@ -426,7 +426,7 @@
 
         this.showPanelForBuilder();
 
-        this._isDirty = true;
+        this._isDirty = Boolean(this._elementSateList.length);
       },
 
       merge: function(mergedContainer, draggedPosX) {
@@ -509,7 +509,7 @@
           return;
         }
 
-        this._isDirty = true;
+        this._isDirty = Boolean(this._elementSateList.length);
 
         if ($(target).is(this.builderType)) {
           state = this.builderState;
