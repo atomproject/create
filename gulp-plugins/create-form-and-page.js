@@ -7,9 +7,9 @@ let File = require('gulp-util').File;
 let PLUGIN_NAME = 'create-form-and-page';
 
 module.exports = function() {
-  var form, page;
-
   return through.obj(function (file, enc, cb) {
+    let form, page;
+
     if (file.isBuffer()) {
       form = new File(file);
       page = new File(file);

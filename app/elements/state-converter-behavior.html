@@ -3,6 +3,7 @@
 
 <script>
   Polymer.StateConverterBehavior = {
+
     behaviors: [
       Polymer.CodeGeneratorBehavior
     ],
@@ -21,18 +22,16 @@
     _dsCounter: 0,
 
     getNewElementState: function(name, x, y) {
-      var meta, states, innerHTML;
+      let meta;
 
       if (_.isArray(name)) {
-        states = name;
-        meta = states.find(function(item) {
-          return item.posX === x && item.posY === y;
-        });
+        let states = name;
+        meta = states.find(item => item.posX === x && item.posY === y);
         name = meta.name;
       }
       else if (_.isObject(name)) {
         meta = name;
-        innerHTML = this.metadata[meta.name].innerHTML;
+        let innerHTML = this.metadata[meta.name].innerHTML;
 
         return {
           posX: x, posY: y,
@@ -57,24 +56,23 @@
 
     createDataSource: function(target, state, key) {
       var dsElement = document.createElement('dynamic-data-source');
-      var dsState, className, id, targetClasses;
 
-      className = 'ds' + this._dsCounter++;
+      let className = `ds${this._dsCounter++}`;
       dsElement.propertyName = key;
       dsElement.auto = true;
-      dsElement.target = '.' + className;
+      dsElement.target = `.${className}`;
 
       target.classList.add(className);
-      targetClasses = state.attributes.class || '';
-      targetClasses += ' ' + className;
+      let targetClasses = state.attributes.class || '';
+      targetClasses += ` ${className}`;
       state.attributes.class = targetClasses;
 
-      id = target.tagName + '.' + key + dsElement.target;
+      let id = `${target.tagName}.${key}${dsElement.target}`;
       id = id.toLowerCase();
 
       target.parentElement.appendChild(dsElement);
 
-      dsState = state.dataSources[key] = {
+      let dsState = state.dataSources[key] = {
         name: 'dynamic-data-source',
         attributes: {
           // `dsElement.target` is the selector not an element
@@ -93,7 +91,6 @@
     },
 
     getStateFile: function(builderState, states) {
-      var stateFile;
 
       if (!builderState || !states) {
         return;
@@ -103,7 +100,7 @@
         throw new Error('No elements to download');
       }
 
-      stateFile = {
+      let stateFile = {
         type: builderState.name,
         attributes: builderState.attributes,
         property: builderState.property,
@@ -114,17 +111,15 @@
     },
 
     getStateHierarchy: function(states) {
-      var rows = [];
+      let rows = [];
 
-      states.forEach(function(state) {
-        var row, column;
-
+      states.forEach(state => {
         if (!rows[state.posX]) {
           rows[state.posX] = [];
         }
 
-        row = rows[state.posX];
-        column = row[state.posY] = {};
+        let row = rows[state.posX];
+        let column = row[state.posY] = {};
 
         column.name = state.name;
         column.html = state.html;
@@ -137,56 +132,40 @@
     },
 
     getDependencies: function(states) {
-      var scriptImports = {}, linkImports = {};
-      var bower = {}, bowerDev = {}, metadata = this.metadata;
-      var componentNames, showDs;
+      let scriptImports = {}, linkImports = {};
+      let bower = {}, bowerDev = {}, metadata = this.metadata;
 
       function toArray(obj) {
         return Object.keys(obj)
-          .map(function(key) {
-            return obj[key];
-          })
-          .filter(function(val) {
-            return val !== undefined || val !== null;
-          });
+          .map(key => obj[key])
+          .filter(val => val !== undefined || val !== null);
       }
 
       function gatherImports(deps, type, imports) {
         deps
-          .filter(function(dep) {
-            return dep.type === type;
-          })
+          .filter(dep => dep.type === type)
           // save only unique imports
-          .forEach(function(dep) {
-            imports[dep.relPath] = dep;
-          });
+          .forEach(dep => imports[dep.relPath] = dep);
       }
 
-      componentNames = states
-        .map(function(state) {
-          return state.name;
-        })
+      let componentNames = states
+        .map(state => state.name)
         // get unique names
-        .filter(function(name, i, arr) {
-          return arr.indexOf(name) === i;
-        })
+        .filter((name, i, arr) => arr.indexOf(name) === i)
         .sort();
 
-      componentNames.forEach(function(name) {
-        var dependencies = metadata[name].dependencies;
-
-        dependencies.forEach(function(dep) {
-          bower[dep.pkg] = dep;
-        });
+      componentNames.forEach(name => {
+        let dependencies = metadata[name].dependencies;
+        dependencies.forEach(dep => bower[dep.pkg] = dep);
 
         gatherImports(dependencies, 'link', linkImports);
         gatherImports(dependencies, 'script', scriptImports);
       });
 
-      showDs = states.reduce(function(showDs, state) {
-        var dataSources = state.dataSources;
+      let showDs = states.reduce((showDs, state) => {
+        let dataSources = state.dataSources;
 
-        (Object.keys(dataSources)).forEach(function(key) {
+        Object.keys(dataSources).forEach(key => {
           showDs = showDs || dataSources[key].showDs;
         });
 
@@ -211,19 +190,19 @@
     },
 
     getBowerDependencies: function(builderState, states) {
-      var dependencies = this.getDependencies(states);
-      var polyfill = {
-        pkg: 'webcomponentsjs',
-        install: '^0.7.19',
-        relPath: 'webcomponentsjs/webcomponents-lite.js',
-        type: 'script'
-      };
-
+      let dependencies = this.getDependencies(states);
       // `type` and `relPath` are not needed
       dependencies.bower.push({
         pkg: builderState.name,
         install: 'atomelements/' + builderState.name + '#^1.0.0'
       });
+
+      let polyfill = {
+        pkg: 'webcomponentsjs',
+        install: '^0.7.19',
+        relPath: 'webcomponentsjs/webcomponents-lite.js',
+        type: 'script'
+      };
 
       if (builderState.isPage) {
         dependencies.bower.push(polyfill);
@@ -235,12 +214,11 @@
     },
 
     getBowerFile: function(builderState, states) {
-      var context = {};
-
       if (!builderState || !states) {
         return;
       }
 
+      let context = {};
       context.dependencies = this.getBowerDependencies(builderState, states);
       context.componentName = builderState.attributes.name;
 
@@ -248,12 +226,11 @@
     },
 
     getDemoFile: function(builderState) {
-      var context = {};
-
       if (!builderState) {
         return;
       }
 
+      let context = {};
       context.componentName = builderState.attributes.name;
 
       if (!builderState.isPage) {
@@ -264,28 +241,26 @@
     },
 
     getTemplate: function(templatePath) {
-      var template = this.templateCache[templatePath];
-
-      return Promise.resolve(template)
-        .then(function(template) {
+      return Promise.resolve(this.templateCache[templatePath])
+        .then(template => {
           if (!template) {
             return $.get(templatePath);
           }
 
           return template;
         })
-        .then(function(template) {
+        .then(template => {
           if (!_.isFunction(template)) {
             template = _.template(template);
             this.templateCache[templatePath] = template;
           }
 
           return template;
-        }.bind(this));
+        });
     },
 
     getFile: function(templatePath, context) {
-      var templatePromises = [
+      let templatePromises = [
         this.getTemplate('templates/dependencies.jst'),
         this.getTemplate('templates/code.jst')
       ];
@@ -305,12 +280,11 @@
     },
 
     getBuilderFile: function(builderState, states) {
-      var context = {}, endTag, templatePath;
-
       if (!builderState || !states) {
         return;
       }
 
+      let context = {}, endTag, templatePath;
       context.rows = this.getStateHierarchy(states);
       context.dependencies = this.getDependencies(states);
       context.componentName = builderState.attributes.name;
@@ -336,23 +310,21 @@
 
     getMetadata: function(builderType) {
       return Promise.resolve()
-        .then(function() {
-          var type;
-
+        .then(() => {
           if (!this.metadata) {
-            type = this.isPage(builderType) ? 'page' : 'form';
+            let type = this.isPage(builderType) ? 'page' : 'form';
 
             return Promise.resolve($.getJSON(`metadata/${type}.json`));
           }
-        }.bind(this))
-        .then(function(metadata) {
+        })
+        .then(metadata => {
           if (this.metadata) {
             return this.metadata;
           }
 
-          Object.keys(metadata).forEach(function(name) {
-            var attributes, meta = metadata[name];
-            var innerHTML = meta.innerHTML || '';
+          Object.keys(metadata).forEach(name => {
+            let attributes, meta = metadata[name];
+            let innerHTML = meta.innerHTML || '';
 
             if (meta.attributes) {
               attributes = meta.attributes;
@@ -361,28 +333,30 @@
             }
 
             meta.html = this.getComponentCode(name, attributes, innerHTML);
-          }.bind(this));
+          });
 
           this.metadata = metadata;
-        }.bind(this));
+        });
     },
 
     generateCode: function(state) {
-      var name = state.name, attributes = state.attributes;
-      var innerHTML = state.innerHTML;
-      var code = this.getComponentCode(name, attributes, innerHTML);
+      let name = state.name, attributes = state.attributes;
+      let innerHTML = state.innerHTML;
+      let code = this.getComponentCode(name, attributes, innerHTML);
 
-      if (state.dataSources) {
-        Object.keys(state.dataSources).forEach(function(key) {
-          var dsState = state.dataSources[key];
-
-          if (!dsState.showDs) {
-            return;
-          }
-
-          code += this.getComponentCode(dsState.name, dsState.attributes);
-        }.bind(this));
+      if (!state.dataSources) {
+        return code;
       }
+
+      Object.keys(state.dataSources).forEach(key => {
+        let dsState = state.dataSources[key];
+
+        if (!dsState.showDs) {
+          return;
+        }
+
+        code += this.getComponentCode(dsState.name, dsState.attributes);
+      });
 
       return code;
     }

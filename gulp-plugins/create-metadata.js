@@ -2,8 +2,8 @@
 
 // TODO: extract innerHTML also
 
-var promisify = require('promisify-node');
-var readFile = promisify(require('fs').readFile);
+let promisify = require('promisify-node');
+let readFile = promisify(require('fs').readFile);
 let cheerio = require('cheerio');
 let through = require('through2');
 let PluginError = require('gulp-util').PluginError;
@@ -12,9 +12,7 @@ let hydrolysis = require('hydrolysis');
 let PLUGIN_NAME = 'create-metadata';
 
 function toCamelCase(dash) {
-  return dash.replace(/-([a-z])/g, function(m) {
-    return m[1].toUpperCase();
-  });
+  return dash.replace(/-([a-z])/g, m => m[1].toUpperCase());
 }
 
 function createMetadata(file, enc, cb) {
@@ -113,9 +111,7 @@ function createMetadata(file, enc, cb) {
         scripts = Object.keys(scripts)
           .map(parse.bind(null, 'script'))
           .filter(filter)
-          .filter(function(script) {
-            return script && script.pkg !== 'webcomponentsjs';
-          });
+          .filter(script => script && script.pkg !== 'webcomponentsjs');
 
         return [].concat(scripts, docs);
       })
@@ -158,7 +154,7 @@ function createMetadata(file, enc, cb) {
 }
 
 module.exports = function() {
-  return through.obj(function (file, enc, cb) {
+  return through.obj((file, enc, cb) => {
     if (file.isBuffer()) {
       createMetadata(file, enc, cb);
     }

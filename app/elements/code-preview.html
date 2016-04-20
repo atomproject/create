@@ -54,7 +54,7 @@
       ],
 
       getStateId: function() {
-        var stateId = window.location.search.match(/id=([^&]+)/);
+        let stateId = window.location.search.match(/id=([^&]+)/);
 
         if (stateId && stateId[1]) {
           return stateId[1];
@@ -62,13 +62,13 @@
       },
 
       attached: function() {
-        var statesFireRef = new Firebase('https://atom-builder.firebaseio.com/states');
-        var stateId = this.getStateId();
-        var stateP, stateFile;
-
         if (!this.isPreview) {
           return;
         }
+
+        let statesFireRef = new Firebase('https://atom-builder.firebaseio.com/states');
+        let stateId = this.getStateId();
+        let stateP;
 
         if (stateId) {
           stateP = statesFireRef.child(stateId).once('value')
@@ -78,7 +78,7 @@
               return newDataRef.val();
             });
         } else {
-          stateFile = localStorage.getItem('atom-preview');
+          let stateFile = localStorage.getItem('atom-preview');
           localStorage.removeItem('atom-preview');
 
           // done so that page refresh don't result in nothing
@@ -102,25 +102,23 @@
             }
           })
           .catch(() => {
-            var url = window.location.href;
-
+            let url = window.location.href;
             url = url.replace(/preview(\.\w+)?/, 'page');
             window.location = url;
           });
       },
 
       changePageTitle: function(builderState) {
-        var titleEl = document.head.querySelector('title');
-        var title = builderState.attributes.heading || 'untitled';
-        var type = this.isPage(builderState.name);
+        let titleEl = document.head.querySelector('title');
+        let title = builderState.attributes.heading || 'untitled';
+        let type = this.isPage(builderState.name);
 
         type = type ? 'Page' : 'Form';
         titleEl.text = `${title} - Atom ${type}`;
       },
 
       createPreview: function(stateFile) {
-        var builderState = {}, context = {}, endTag;
-
+        let builderState = {};
         builderState.name = stateFile.type;
         builderState.attributes = stateFile.attributes;
         builderState.html = this.getComponentCode(builderState.name,
@@ -133,6 +131,7 @@
           });
         });
 
+        let context = {}, endTag;
         context.rows = stateFile.rows;
         context.builderEndTag = endTag = `</${builderState.name}>`;
         context.builderStartTag = builderState.html.replace(endTag, '');
@@ -141,8 +140,8 @@
         this.changePageTitle(builderState);
 
         this.getTemplate('templates/code.jst').then(template => {
-          var code = template(context);
-          var div = document.createElement('div');
+          let code = template(context);
+          let div = document.createElement('div');
 
           div.innerHTML = code;
           document.body.appendChild(div);
@@ -150,40 +149,36 @@
       },
 
       toPreview: function(isPreview, stage) {
-        var re = /(form)|(page)(\.\w+)?/;
-        var url = window.location.href.replace(re, 'preview.html');
-        var builderState, states, stateFile;
-
         if (!isPreview) {
           return;
         }
 
         try {
           if (!this.getStateId()) {
-            builderState = stage.builderState;
-            states = stage._elementSateList;
-            stateFile = stage.getStateFile(builderState, states);
+            let builderState = stage.builderState;
+            let states = stage._elementSateList;
+            let stateFile = stage.getStateFile(builderState, states);
             localStorage.setItem('atom-preview', stateFile);
           }
 
+          let re = /(form)|(page)(\.\w+)?/;
+          let url = window.location.href.replace(re, 'preview.html');
           window.location = url;
         } catch (exception) {
           this.$.toast.text = 'Something went wrong. Could not switch to preview';
           this.$.toast.open();
-          this.isPreview = false;
         }
       },
 
       toBuilder: function(isPreview) {
-        var type, url;
-
         if (isPreview || !this._builderState || !this._stateFile) {
           return;
         }
 
         localStorage.setItem('atom-preview', this._stateFile);
-        type = this._builderState.name === 't-page' ? 'page' : 'form';
-        url = window.location.href.replace(/preview(\.\w+)?/, type);
+
+        let type = this._builderState.name === 't-page' ? 'page' : 'form';
+        let url = window.location.href.replace(/preview(\.\w+)?/, type);
         window.location = url;
       }
     });
