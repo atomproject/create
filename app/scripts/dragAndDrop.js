@@ -1,28 +1,110 @@
-var dragAndDropSetup = function () {
-  var stateFile = localStorage.getItem('atom-refresh');
-  var stage = document.querySelector('t-stage');
-  var statesFireRef = new Firebase('https://atom-builder.firebaseio.com/states');
-  var stateId = window.location.search.match(/id=([^&]+)/);
-  var codePreview = document.querySelector('code-preview');
+/*** url manipulation helpers ***/
+function parseUrlSearch(search) {
+  search = search[0] === '?' ? search.slice(1) : search;
+  let params = search.split('&');
 
-  stage.addEventListener('builder-name-changed', function(event) {
+  if (!params) {
+    return {};
+  }
+
+  search = {};
+  params.forEach(param => {
+    param.replace(/([^=]+)=(.+)$/, (m, key, val) => search[key] = val);
+  });
+
+  return search;
+}
+
+function getQueryParam(key) {
+  return parseUrlSearch(window.location.search)[key];
+}
+
+function setQueryParam(key, value) {
+  let search = parseUrlSearch(window.location.search);
+  search[key] = value;
+
+  let searchStr = Object.keys(search)
+    .map(key => key && search[key] ? `${key}=${search[key]}` : '')
+    .join('&');
+
+  searchStr = searchStr ? `?${searchStr}` : '';
+
+  let parser = document.createElement('a');
+  parser.href = window.location.href;
+  parser.search = searchStr;
+
+  return parser.href;
+}
+/********************************/
+
+function recreateStage(stage, stateFile) {
+  if (!stage) {
+    return;
+  }
+
+  stage.reset();
+  stage.recreateBuilder(stateFile);
+}
+
+function getStateFile(stage) {
+  if (!stage) {
+    return;
+  }
+
+  let builderState = stage.builderState;
+  let states = stage._elementSateList;
+
+  return stage.getStateFile(builderState, states);
+}
+
+function showToast(str) {
+  app.$.toast.text = str.toString();
+  app.$.toast.open();
+}
+
+window.dragAndDropSetup = () => {
+  let statesFireRef = new Firebase('https://atom-builder.firebaseio.com/states');
+  let stage = document.querySelector('t-stage');
+  let codePreview = document.querySelector('code-preview');
+
+  /*** evennt handlers for stage ***/
+  stage.addEventListener('builder-name-changed', event => {
     $('.headerText').text(event.detail.name);
   });
 
-  stage.addEventListener('component-panel-changed', function(event) {
-    var name = event.detail.name;
-    var panelSettings = document.getElementById('panelSettings');
+  stage.addEventListener('component-panel-changed', event => {
+    let name = event.detail.name;
+    let panelSettings = document.getElementById('panelSettings');
 
     panelSettings.disabled = (name === 't-page' || name === 't-form');
   });
 
-  function dsap() {
-    $('#saveState')[0].disabled = codePreview.disabled = !stage.isDirty;
+  function disableSave() {
+    $('#saveState')[0].disabled  = !stage.isDirty;
   }
 
-  dsap();
+  function disablePreview() {
+    codePreview.disabled = stage.isEmpty;
+  }
 
-  stage.addEventListener('is-dirty-changed', dsap);
+  function removeId() {
+    if (stage.isDirty && getQueryParam('id')) {
+      let url = setQueryParam('id');
+      window.history.pushState({}, '', url);
+    }
+  }
+
+  function dirtyChanged() {
+    disableSave();
+    removeId();
+  }
+
+  dirtyChanged();
+  disablePreview();
+
+  stage.addEventListener('is-dirty-changed', dirtyChanged);
+  stage.addEventListener('is-empty-changed', disablePreview);
+  /*********************************/
 
   // draggable menu items setup
   $('.control').draggable({
@@ -35,52 +117,23 @@ var dragAndDropSetup = function () {
   });
 
   // trigger the click on the input element with `type='file'`
-  $('#uploadJson').on('click', function () {
-    document.querySelector('#uploadInput').click();
+  $('#uploadJson').on('click', function() {
+    $('#uploadInput')[0].click();
   });
 
   $('#saveState').on('click', function() {
-    var builderState, states;
-
-    if (!stage) {
-      return;
-    }
-
-    builderState = stage.builderState;
-    states = stage._elementSateList;
-
-    Promise.resolve(stage.getStateFile(builderState, states))
-      .then(function(stateFile) {
-        if (!stateFile) {
-          return ;
-        }
-
-        return statesFireRef.push(stateFile);
-      })
-      .then(function(newDataRef) {
-        var id = newDataRef.key();
-        var url = window.location.origin;
-
-        url += window.location.pathname;
-        url += '?id=' + id;
-
+    Promise.resolve(getStateFile(stage))
+      .then(stateFile => stateFile && statesFireRef.push(stateFile))
+      .then(newDataRef => {
+        let url = setQueryParam('id', newDataRef.key());
         window.history.pushState({}, '', url);
         stage.resetDirty();
       });
   });
 
   $('#canvasRefresh').on('click', function() {
-    var stateFile, builderState, states;
-
-    if (!stage) {
-      return;
-    }
-
-    builderState = stage.builderState;
-    states = stage._elementSateList;
-
     try {
-      stateFile = stage.getStateFile(builderState, states);
+      let stateFile = getStateFile(stage);
       localStorage.setItem('atom-refresh', stateFile);
     } catch (exception) {
     } finally {
@@ -90,34 +143,25 @@ var dragAndDropSetup = function () {
 
   // triggered when user selects a file, read the file and reset the builder
   $('#uploadInput').on('change', function() {
-    var files = this.files;
-    var reader = new FileReader();
-    var statusText = 'Builder restored to the state.json successfully.';
-    var stateFile;
-
-    files = Array.prototype.slice.call(files);
-    stateFile = files.find(function(file) {
-      return file.name.match(/^[^\.]+\.json/i);
-    });
+    let files = Array.from(this.files);
+    let stateFile = files.find(file => file.name.match(/^[^\.]+\.json/i));
 
     if (!stateFile) {
-      app.$.toast.text = 'Not a json file. You can only upload a json file.';
-      app.$.toast.open();
+      showToast('Not a json file. You can only upload a json file.');
+
       return;
     }
 
+    let reader = new FileReader();
+    let statusText = 'Builder restored to the state.json successfully.';
     reader.addEventListener('load', function(ev) {
-      // TODO: you shouldn't have to call this
-      stage.reset();
-
       try {
-        stage.recreateBuilder(ev.target.result);
+        recreateStage(stage, ev.target.result);
       } catch (exception) {
         statusText = 'The syntax of state file is not valid.';
       }
 
-      app.$.toast.text = statusText;
-      app.$.toast.open();
+      showToast(statusText);
     });
 
     reader.readAsText(stateFile);
@@ -125,17 +169,15 @@ var dragAndDropSetup = function () {
 
 
   // create the zip file and and download it
-  $('#downloadZip').on('click', function () {
-    var zip = new JSZip();
+  $('#downloadZip').on('click', function() {
+    let zip = new JSZip();
 
     if (!stage) {
       return;
     }
 
     stage.getDownloadFiles()
-      .then(function(files) {
-        var content;
-
+      .then(files => {
         zip.file(files.name, files.builderFile);
         zip.file('state.json', files.stateFile);
         zip.file('bower.json', files.bowerFile);
@@ -144,32 +186,19 @@ var dragAndDropSetup = function () {
           zip.folder('demo').file('index.html', files.demoFile);
         }
 
-        content = zip.generate({ type: 'blob' });
+        let content = zip.generate({ type: 'blob' });
         saveAs(content, files.name.replace('.html', '.zip'));
       })
-      .catch(function(reason) {
-        app.$.toast.text = reason.toString();
-        app.$.toast.open();
-      });
+      .catch(reason => showToast(reason));
   });
 
-  $('#downloadJson').on('click', function () {
-    var stateFile, content, builderState, states;
-
-    if (!stage) {
-      return;
-    }
-
-    builderState = stage.builderState;
-    states = stage._elementSateList;
-
+  $('#downloadJson').on('click', function() {
     try {
-      stateFile = stage.getStateFile(builderState, states);
-      content = new Blob([stateFile], {type: 'text/plain;charset=utf-8'});
+      let stateFile = getStateFile(stage);
+      let content = new Blob([stateFile], {type: 'text/plain;charset=utf-8'});
       saveAs(content, 'state.json');
     } catch (exception) {
-      app.$.toast.text = exception.toString();
-      app.$.toast.open();
+      showToast(exception.toString());
     }
   });
 
@@ -178,19 +207,19 @@ var dragAndDropSetup = function () {
   });
 
   // append form elements to form on click
-  $('body').on('click', '.control', function (event) {
-    var category = event.currentTarget.getAttribute('data-category');
-    var name = event.currentTarget.getAttribute('data-component');
+  $('body').on('click', '.control', function(event) {
+    let category = event.currentTarget.getAttribute('data-category');
+    let name = event.currentTarget.getAttribute('data-component');
 
     stage.addToBuilder(name, category);
   });
 
   // TODO: what does this do?
-  $('.component-list').on('click', 'paper-item.menu-item', function () {
+  $('.component-list').on('click', 'paper-item.menu-item', function() {
     $('.component-list').toggleClass('active');
   });
 
-  $('.headerText').on('keydown', function (e) {
+  $('.headerText').on('keydown', function(e) {
     if (e.which === 13) {
       $(this).blur();
       // workaround for webkit's bug
@@ -199,28 +228,26 @@ var dragAndDropSetup = function () {
   });
 
   // select the header text on focus
-  $('.headerText').on('focus', function () {
-    var el = this;
+  $('.headerText').on('focus', function() {
+    let el = this;
 
     function selectElementContents(el) {
-      var range = document.createRange();
+      let range = document.createRange();
       range.selectNodeContents(el);
-      var sel = window.getSelection();
+      let sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
     }
 
     $(this).removeClass('inactive');
-    requestAnimationFrame(function () {
-      selectElementContents(el);
-    });
+    requestAnimationFrame(() => selectElementContents(el));
   });
 
   // update the builder attributes on focus out and reset the text
-  $('.headerText').on('blur', function () {
-    var heading = $(this).text().trim();
-    var name = heading.toLowerCase().replace(/\s+/g, '-');
-    var $this = $(this);
+  $('.headerText').on('blur', function() {
+    let heading = $(this).text().trim();
+    let name = heading.toLowerCase().replace(/\s+/g, '-');
+    let $this = $(this);
 
     if (heading.length === 0) {
       if ($this.hasClass('form-header')) {
@@ -237,64 +264,33 @@ var dragAndDropSetup = function () {
     $this.addClass('inactive');
   });
 
-  // restore state of stage
+  /*** restore state of stage ***/
+  let stateId = getQueryParam('id');
+  let stateFile = localStorage.getItem('atom-refresh');
+
   codePreview.stage = stage;
   localStorage.removeItem('atom-refresh');
 
   if (stateFile) {
-    // TODO: you shouldn't have to call this
-    stage.reset();
-    stage.recreateBuilder(stateFile);
+    recreateStage(stage, stateFile);
   }
-  else if (stateId && stateId[1]) {
-    stateId = stateId[1];
-
+  else if (stateId) {
     statesFireRef.child(stateId).once('value')
-      .then(function(newDataRef) {
-        // TODO: you shouldn't have to call this
-        stage.reset();
-        stage.recreateBuilder(newDataRef.val());
-      });
+      .then(newDataRef => recreateStage(stage, newDataRef.val()));
   }
   else if (localStorage.getItem('atom-preview')) {
     stateFile = localStorage.getItem('atom-preview');
-
-    // TODO: you shouldn't have to call this
-    stage.reset();
-    stage.recreateBuilder(stateFile);
+    recreateStage(stage, stateFile);
     localStorage.removeItem('atom-preview');
   }
 
-  window.onbeforeunload = function() {
+  window.onbeforeunload = () => {
     if (stage.isDirty &&
       !localStorage.getItem('atom-refresh') &&
       !localStorage.getItem('atom-preview')) {
 
       return 'All changes will be lost!';
     }
-  }.bind(this);
-
-  // //code to disable the default behaviour of the tab
-  // $(document).on('keydown', '#componentSearch',function (objEvent) {
-  //   if (objEvent.keyCode === 9) {  //tab pressed
-  //     objEvent.preventDefault();
-  //   }
-  // });
-  // document.addEventListener('adjust-dom',function () {
-  //   var form = document.querySelector('.form');
-  //   $('.form').html(Polymer.dom(form).innerHTML);
-  // });
-
-  // //event listener for elements autosuggest
-  // document.addEventListener('on-autosuggest-select', function (event) {
-  //   var component = event.detail;
-  //   draggedControl = component.selectedItem.Name;
-
-  //   attachControlToForm(component.selectedItem.Category);
-
-  //   //clear autoggest and remove focus from there after attaching
-  //   component.$.autoSuggest.value = '';
-  //   component.$.autoSuggest.blur();
-  //   event.stopPropagation();
-  // });
+  };
+  /******************************/
 };
