@@ -8,6 +8,7 @@
   <template>
     <style>
       :host {
+        z-index: 1000;
         display: block;
         position: fixed;
         bottom: 10px;
@@ -23,7 +24,7 @@
     </style>
 
     <div class="layout horizontal highlight">
-      <span>Preview: </span> <paper-toggle-button checked="{{isPreview}}"></paper-toggle-button>
+      <span>Preview: </span> <paper-toggle-button checked="{{isPreview}}" disabled="{{disabled}}"></paper-toggle-button>
     </div>
 
     <paper-toast id="toast"></paper-toast>
@@ -43,6 +44,11 @@
           value: function() {
             return /.*\/preview.*/.test(window.location.pathname);
           }
+        },
+
+        disabled: {
+          type: Boolean,
+          value: false
         },
 
         stage: Object
@@ -110,11 +116,15 @@
 
       changePageTitle: function(builderState) {
         let titleEl = document.head.querySelector('title');
-        let title = builderState.attributes.heading || 'untitled';
+        let title = builderState.attributes.heading;
         let type = this.isPage(builderState.name);
 
+        if (!title) {
+          title = type ? 'Untitled Page' : 'Untitled Form';
+        }
+
         type = type ? 'Page' : 'Form';
-        titleEl.text = `${title} - Atom ${type}`;
+        titleEl.text = `${title} - Atom ${type}s`;
       },
 
       createPreview: function(stateFile) {

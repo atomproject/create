@@ -70,12 +70,21 @@
           type: Array,
           value: function() { return []; }
         },
+
         componentPanelTarget: {
           type: Object,
           notify: true
         },
+
         builderType: String,
+
         componentPanel: Object,
+
+        isDirty: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
 
         _dsTargets: {
           type: Object,
@@ -96,12 +105,8 @@
       draggedPosX: null,
       builderState: null,
 
-      isDirty: function() {
-        return this._isDirty;
-      },
-
       resetDirty: function() {
-        this._isDirty = false;
+        this.isDirty = false;
       },
 
       /* section: wire up */
@@ -299,7 +304,7 @@
           }.bind(this), 0);
         }
 
-        this._isDirty = true;
+        this.isDirty = true;
       },
 
       unmerge: function(el) {
@@ -340,8 +345,6 @@
         }.bind(this));
 
         fieldContainer.classList.remove('grouped');
-
-        this._isDirty = true;
       },
 
       duplicate: function(el) {
@@ -382,8 +385,6 @@
 
         container.insertBefore(newFieldContainer, insertAt);
         Polymer.updateStyles();
-
-        this._isDirty = true;
       },
 
       remove: function(el) {
@@ -426,7 +427,7 @@
 
         this.showPanelForBuilder();
 
-        this._isDirty = Boolean(this._elementSateList.length);
+        this.isDirty = Boolean(this._elementSateList.length);
       },
 
       merge: function(mergedContainer, draggedPosX) {
@@ -456,8 +457,6 @@
             --state.posX;
           }
         }.bind(this));
-
-        this._isDirty = true;
       },
 
       relocate: function(relocatedContainer, draggedPosX) {
@@ -480,8 +479,6 @@
             --state.posX;
           }
         }.bind(this));
-
-        this._isDirty = true;
       },
       /* section: end */
 
@@ -509,7 +506,7 @@
           return;
         }
 
-        this._isDirty = Boolean(this._elementSateList.length);
+        this.isDirty = true;
 
         if ($(target).is(this.builderType)) {
           state = this.builderState;
@@ -678,6 +675,8 @@
         if (!this._elementSateList.length) {
           throw new Error('No elements found in the state file');
         }
+
+        this.isDirty = Boolean(this._elementSateList.length);
       },
       /* section: end */
 
