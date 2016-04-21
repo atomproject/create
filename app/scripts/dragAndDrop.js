@@ -16,6 +16,14 @@ var dragAndDropSetup = function () {
     panelSettings.disabled = (name === 't-page' || name === 't-form');
   });
 
+  function dsap() {
+    $('#saveState')[0].disabled = codePreview.disabled = !stage.isDirty;
+  }
+
+  dsap();
+
+  stage.addEventListener('is-dirty-changed', dsap);
+
   // draggable menu items setup
   $('.control').draggable({
     addClasses: false,
@@ -258,7 +266,7 @@ var dragAndDropSetup = function () {
   }
 
   window.onbeforeunload = function() {
-    if (stage.isDirty() &&
+    if (stage.isDirty &&
       !localStorage.getItem('atom-refresh') &&
       !localStorage.getItem('atom-preview')) {
 
