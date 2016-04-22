@@ -1,1 +1,443 @@
-var dragAndDropSetup=function(){function e(){$("#saveState")[0].disabled=r.disabled=!n.isDirty}var t=localStorage.getItem("atom-refresh"),n=document.querySelector("t-stage"),a=new Firebase("https://atom-builder.firebaseio.com/states"),o=window.location.search.match(/id=([^&]+)/),r=document.querySelector("code-preview");n.addEventListener("builder-name-changed",function(e){$(".headerText").text(e.detail.name)}),n.addEventListener("component-panel-changed",function(e){var t=e.detail.name,n=document.getElementById("panelSettings");n.disabled="t-page"===t||"t-form"===t}),e(),n.addEventListener("is-dirty-changed",e),$(".control").draggable({addClasses:!1,scroll:!1,appendTo:"body",helper:"clone",cursor:"move",revert:"invalid"}),$("#uploadJson").on("click",function(){document.querySelector("#uploadInput").click()}),$("#saveState").on("click",function(){var e,t;n&&(e=n.builderState,t=n._elementSateList,Promise.resolve(n.getStateFile(e,t)).then(function(e){return e?a.push(e):void 0}).then(function(e){var t=e.key(),a=window.location.origin;a+=window.location.pathname,a+="?id="+t,window.history.pushState({},"",a),n.resetDirty()}))}),$("#canvasRefresh").on("click",function(){var e,t,a;if(n){t=n.builderState,a=n._elementSateList;try{e=n.getStateFile(t,a),localStorage.setItem("atom-refresh",e)}catch(o){}finally{window.location.reload()}}}),$("#uploadInput").on("change",function(){var e,t=this.files,a=new FileReader,o="Builder restored to the state.json successfully.";return t=Array.prototype.slice.call(t),(e=t.find(function(e){return e.name.match(/^[^\.]+\.json/i)}))?(a.addEventListener("load",function(e){n.reset();try{n.recreateBuilder(e.target.result)}catch(t){o="The syntax of state file is not valid."}app.$.toast.text=o,app.$.toast.open()}),void a.readAsText(e)):(app.$.toast.text="Not a json file. You can only upload a json file.",void app.$.toast.open())}),$("#downloadZip").on("click",function(){var e=new JSZip;n&&n.getDownloadFiles().then(function(t){var n;e.file(t.name,t.builderFile),e.file("state.json",t.stateFile),e.file("bower.json",t.bowerFile),t.demoFile&&e.folder("demo").file("index.html",t.demoFile),n=e.generate({type:"blob"}),saveAs(n,t.name.replace(".html",".zip"))})["catch"](function(e){app.$.toast.text=e.toString(),app.$.toast.open()})}),$("#downloadJson").on("click",function(){var e,t,a,o;if(n){a=n.builderState,o=n._elementSateList;try{e=n.getStateFile(a,o),t=new Blob([e],{type:"text/plain;charset=utf-8"}),saveAs(t,"state.json")}catch(r){app.$.toast.text=r.toString(),app.$.toast.open()}}}),$("#panelSettings").on("click",function(){n.showPanelForBuilder()}),$("body").on("click",".control",function(e){var t=e.currentTarget.getAttribute("data-category"),a=e.currentTarget.getAttribute("data-component");n.addToBuilder(a,t)}),$(".component-list").on("click","paper-item.menu-item",function(){$(".component-list").toggleClass("active")}),$(".headerText").on("keydown",function(e){13===e.which&&($(this).blur(),window.getSelection().removeAllRanges())}),$(".headerText").on("focus",function(){function e(e){var t=document.createRange();t.selectNodeContents(e);var n=window.getSelection();n.removeAllRanges(),n.addRange(t)}var t=this;$(this).removeClass("inactive"),requestAnimationFrame(function(){e(t)})}),$(".headerText").on("blur",function(){var e=$(this).text().trim(),t=e.toLowerCase().replace(/\s+/g,"-"),a=$(this);0===e.length?a.hasClass("form-header")?a.text("Untitled Form"):a.text("Untitled Page"):(n.updatePath({path:"heading",value:e,useBuilder:!0}),n.updatePath({path:"name",value:t,useBuilder:!0})),this.scrollLeft=0,a.addClass("inactive")}),r.stage=n,localStorage.removeItem("atom-refresh"),t?(n.reset(),n.recreateBuilder(t)):o&&o[1]?(o=o[1],a.child(o).once("value").then(function(e){n.reset(),n.recreateBuilder(e.val())})):localStorage.getItem("atom-preview")&&(t=localStorage.getItem("atom-preview"),n.reset(),n.recreateBuilder(t),localStorage.removeItem("atom-preview")),window.onbeforeunload=function(){return!n.isDirty||localStorage.getItem("atom-refresh")||localStorage.getItem("atom-preview")?void 0:"All changes will be lost!"}.bind(this)};!function(e){"use strict";var t=e.querySelector("#app"),n=window.location.pathname.replace("/create","");t.baseUrl="",t.menu=null,""===window.location.port&&(t.baseUrl="/create"),"/page"===n?(t.builderType="t-page",t.isPage=!0,t.builderUrl="page-manifest.json",t.canvasName="Untitled Page",t.tab="page",t.route="canvas"):"/form"===n?(t.builderType="t-form",t.isPage=!1,t.builderUrl="form-manifest.json",t.canvasName="Untitled Form",t.tab="form",t.route="canvas"):"/"===n&&(t.tab="form",t.route="browser"),t._getElementsInCategory=function(e){var n=t.menu.elements.filter(function(t){return t.category===e.name});return n},t.filterComponents=function(e,n){var a;return e?($(".component-list").hasClass("active")||($(".component-list").addClass("active"),$("#allElements").addClass("active")),a=n?t.menu.elements.filter(function(e){return e.category===n}):t.menu.elements,e=e.toLowerCase(),function(t){var n=t.displayName.toLowerCase();return-1!==n.indexOf(e)}):null},t._getIcon=function(e){return e?"fusion:"+e:"fusion-b:atom-logo"},t._getPropertySource=function(){return"bower_components/"+t.builderType+"/property.json"},t.toggleAccordion=function(t){var n=t.currentTarget,a=e.querySelector(".menu-item.active");n.classList.contains("active")?n.classList.remove("active"):n.classList.add("active"),a&&a.classList.remove("active")},t._onElementsReceived=function(e){t.menu=e.detail.response,setTimeout(dragAndDropSetup)},t.displayInstalledToast=function(){Polymer.dom(e).querySelector("platinum-sw-cache").disabled||Polymer.dom(e).querySelector("#caching-complete").show()},t.addEventListener("dom-change",function(){t.$.manifestAjax&&t.$.manifestAjax.generateRequest()}),window.addEventListener("WebComponentsReady",function(){var e=$("t-component-panel")[0],t=$("t-stage")[0];t.componentPanel=e})}(document);
+(function(document) {
+  'use strict';
+  let statesFireRef = new Firebase('https://atom-builder.firebaseio.com/states');
+
+  /*** url manipulation helpers ***/
+  function parseUrlSearch(search) {
+    search = search[0] === '?' ? search.slice(1) : search;
+    let params = search.split('&');
+
+    if (!params) {
+      return {};
+    }
+
+    search = {};
+    params.forEach(param => {
+      param.replace(/([^=]+)=(.+)$/, (m, key, val) => search[key] = val);
+    });
+
+    return search;
+  }
+
+  function getQueryParam(key) {
+    return parseUrlSearch(window.location.search)[key];
+  }
+
+  function setQueryParam(key, value) {
+    let search = parseUrlSearch(window.location.search);
+    search[key] = value;
+
+    let searchStr = Object.keys(search)
+      .map(key => key && search[key] ? `${key}=${search[key]}` : '')
+      .join('&');
+
+    searchStr = searchStr ? `?${searchStr}` : '';
+
+    let parser = document.createElement('a');
+    parser.href = window.location.href;
+    parser.search = searchStr;
+
+    return parser.href;
+  }
+  /********************************/
+
+  function recreateStage(stage, stateFile) {
+    if (!stage) {
+      return;
+    }
+
+    stage.reset();
+    stage.recreateBuilder(stateFile);
+  }
+
+  function getStateFile(stage) {
+    if (!stage) {
+      return;
+    }
+
+    let builderState = stage.builderState;
+    let states = stage._elementSateList;
+
+    return stage.getStateFile(builderState, states);
+  }
+
+  function showToast(str) {
+    app.$.toast.text = str.toString();
+    app.$.toast.open();
+  }
+
+  function setupStageEventListeners() {
+    let stage = document.querySelector('t-stage');
+    let codePreview = document.querySelector('code-preview');
+
+    stage.addEventListener('builder-name-changed', event => {
+      $('.headerText').text(event.detail.name);
+    });
+
+    stage.addEventListener('component-panel-changed', event => {
+      let name = event.detail.name;
+      let panelSettings = document.getElementById('panelSettings');
+
+      panelSettings.disabled = (name === 't-page' || name === 't-form');
+    });
+
+    function disableSave() {
+      $('#saveState')[0].disabled  = !stage.isDirty;
+    }
+
+    function disablePreview() {
+      codePreview.disabled = stage.isEmpty;
+    }
+
+    function removeId() {
+      if (stage.isDirty && getQueryParam('id')) {
+        let url = setQueryParam('id');
+        window.history.pushState({}, '', url);
+      }
+    }
+
+    function dirtyChanged() {
+      disableSave();
+      removeId();
+    }
+
+    dirtyChanged();
+    disablePreview();
+
+    stage.addEventListener('is-dirty-changed', dirtyChanged);
+    stage.addEventListener('is-empty-changed', disablePreview);
+  }
+
+  function setupToolbarEventListeners() {
+    let stage = document.querySelector('t-stage');
+
+    // trigger the click on the input element with `type='file'`
+    $('#uploadJson').on('click', function() {
+      $('#uploadInput')[0].click();
+    });
+
+    $('#saveState').on('click', function() {
+      Promise.resolve(getStateFile(stage))
+        .then(stateFile => stateFile && statesFireRef.push(stateFile))
+        .then(newDataRef => {
+          let url = setQueryParam('id', newDataRef.key());
+          window.history.pushState({}, '', url);
+          stage.resetDirty();
+        });
+    });
+
+    $('#canvasRefresh').on('click', function() {
+      try {
+        let stateFile = getStateFile(stage);
+        localStorage.setItem('atom-refresh', stateFile);
+      } catch (exception) {
+      } finally {
+        window.location.reload();
+      }
+    });
+
+    // triggered when user selects a file, read the file and reset the builder
+    $('#uploadInput').on('change', function() {
+      let files = Array.from(this.files);
+      let stateFile = files.find(file => file.name.match(/^[^\.]+\.json/i));
+
+      if (!stateFile) {
+        showToast('Not a json file. You can only upload a json file.');
+
+        return;
+      }
+
+      let reader = new FileReader();
+      let statusText = 'Builder restored to the state.json successfully.';
+      reader.addEventListener('load', function(ev) {
+        try {
+          recreateStage(stage, ev.target.result);
+        } catch (exception) {
+          statusText = 'The syntax of state file is not valid.';
+        }
+
+        showToast(statusText);
+      });
+
+      reader.readAsText(stateFile);
+    });
+
+
+    // create the zip file and and download it
+    $('#downloadZip').on('click', function() {
+      let zip = new JSZip();
+
+      if (!stage) {
+        return;
+      }
+
+      stage.getDownloadFiles()
+        .then(files => {
+          zip.file(files.name, files.builderFile);
+          zip.file('state.json', files.stateFile);
+          zip.file('bower.json', files.bowerFile);
+
+          if (files.demoFile) {
+            zip.folder('demo').file('index.html', files.demoFile);
+          }
+
+          let content = zip.generate({ type: 'blob' });
+          saveAs(content, files.name.replace('.html', '.zip'));
+        })
+        .catch(reason => showToast(reason));
+    });
+
+    $('#downloadJson').on('click', function() {
+      try {
+        let stateFile = getStateFile(stage);
+        let content = new Blob([stateFile], {type: 'text/plain;charset=utf-8'});
+        saveAs(content, 'state.json');
+      } catch (exception) {
+        showToast(exception.toString());
+      }
+    });
+
+    $('#panelSettings').on('click', function() {
+      stage.showPanelForBuilder();
+    });
+  }
+
+  function setupHeaderEventListeners() {
+    let stage = document.querySelector('t-stage');
+
+    $('.headerText').on('keydown', function(e) {
+      if (e.which === 13) {
+        $(this).blur();
+        // workaround for webkit's bug
+        window.getSelection().removeAllRanges();
+      }
+    });
+
+    // select the header text on focus
+    $('.headerText').on('focus', function() {
+      let el = this;
+
+      function selectElementContents(el) {
+        let range = document.createRange();
+        range.selectNodeContents(el);
+        let sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+
+      $(this).removeClass('inactive');
+      requestAnimationFrame(() => selectElementContents(el));
+    });
+
+    // update the builder attributes on focus out and reset the text
+    $('.headerText').on('blur', function() {
+      let heading = $(this).text().trim();
+      let name = heading.toLowerCase().replace(/\s+/g, '-');
+      let $this = $(this);
+
+      if (heading.length === 0) {
+        if ($this.hasClass('form-header')) {
+          $this.text('Untitled Form');
+        } else {
+          $this.text('Untitled Page');
+        }
+      } else {
+        stage.updatePath({path: 'heading', value: heading, useBuilder: true});
+        stage.updatePath({path: 'name', value: name, useBuilder: true});
+      }
+
+      this.scrollLeft = 0;
+      $this.addClass('inactive');
+    });
+  }
+
+  function setupMenuEventListeners() {
+    let stage = document.querySelector('t-stage');
+
+    // draggable menu items setup
+    $('.control').draggable({
+      addClasses: false,
+      scroll: false,
+      appendTo: 'body',
+      helper: 'clone',
+      cursor: 'move',
+      revert: 'invalid'
+    });
+
+    // append form elements to form on click
+    $('body').on('click', '.control', function(event) {
+      let category = event.currentTarget.getAttribute('data-category');
+      let name = event.currentTarget.getAttribute('data-component');
+
+      stage.addToBuilder(name, category);
+    });
+
+    // TODO: what does this do?
+    $('.component-list').on('click', 'paper-item.menu-item', function() {
+      $('.component-list').toggleClass('active');
+    });
+  }
+
+  function restoreStageState() {
+    let stage = document.querySelector('t-stage');
+    let codePreview = document.querySelector('code-preview');
+    let stateId = getQueryParam('id');
+    let stateFile = localStorage.getItem('atom-refresh');
+
+    codePreview.stage = stage;
+    localStorage.removeItem('atom-refresh');
+
+    if (stateFile) {
+      recreateStage(stage, stateFile);
+    }
+    else if (stateId) {
+      statesFireRef.child(stateId).once('value')
+        .then(newDataRef => recreateStage(stage, newDataRef.val()));
+    }
+    else if (localStorage.getItem('atom-preview')) {
+      stateFile = localStorage.getItem('atom-preview');
+      recreateStage(stage, stateFile);
+      localStorage.removeItem('atom-preview');
+    }
+
+    window.onbeforeunload = () => {
+      if (stage.isDirty &&
+        !localStorage.getItem('atom-refresh') &&
+        !localStorage.getItem('atom-preview')) {
+
+        return 'All changes will be lost!';
+      }
+    };
+  }
+
+  function setupEventListeners() {
+    setupStageEventListeners();
+    setupToolbarEventListeners();
+    setupHeaderEventListeners();
+    setupMenuEventListeners();
+    restoreStageState();
+  }
+
+
+  // Grab a reference to our auto-binding template
+  // and give it some initial binding values
+  // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
+  var app = document.querySelector('#app');
+  var pathname = window.location.pathname.replace('/create', '');
+
+  // Sets app default base URL
+  app.baseUrl = '';
+  app.menu = null;
+
+
+  if (window.location.port === '') {
+    app.baseUrl = '/create';
+  }
+
+  if (pathname === '/page') {
+    app.builderType = 't-page';
+    app.isPage = true;
+    app.builderUrl = 'page-manifest.json';
+    app.canvasName = 'Untitled Page';
+    app.tab='page';
+    app.route ='canvas';
+  } else if (pathname === '/form') {
+    app.builderType ='t-form';
+    app.isPage = false;
+    app.builderUrl = 'form-manifest.json';
+    app.canvasName = 'Untitled Form';
+    app.tab='form';
+    app.route ='canvas';
+
+  } else if (pathname === '/') {
+    app.tab='form';
+    app.route ='browser';
+  }
+
+  // Get elements for menu for a given category
+  app._getElementsInCategory = function(category) {
+    var elements = app.menu.elements.filter(function(element) {
+      return element.category === category.name;
+    });
+    return elements;
+  };
+
+  app.filterComponents = function(searchTerm, category) {
+    var filtered;
+
+    if (!searchTerm) {
+      return null;
+    }
+
+    if (!$('.component-list').hasClass('active')) {
+      $('.component-list').addClass('active');
+      $('#allElements').addClass('active');
+    }
+
+    if (!category) {
+      filtered = app.menu.elements;
+    } else {
+      filtered = app.menu.elements.filter(function(el) {
+        return el.category === category;
+      });
+    }
+
+    searchTerm = searchTerm.toLowerCase();
+
+    return function(el) {
+      var name = el.displayName.toLowerCase();
+      return name.indexOf(searchTerm) !== -1;
+    };
+  };
+
+  app._getIcon = function(icon) {
+    return icon ? 'fusion:' + icon : 'fusion-b:atom-logo';
+  };
+
+  app._getPropertySource = function(){
+    return 'bower_components/'+app.builderType+'/property.json';
+  };
+
+  //toggle accordion for menu
+  app.toggleAccordion = function(e) {
+    var currentElement = e.currentTarget;
+    var activeItem = document.querySelector('.menu-item.active');
+
+    if (currentElement.classList.contains('active')) {
+      currentElement.classList.remove('active');
+    } else {
+      currentElement.classList.add('active');
+    }
+
+    if (activeItem) {
+      activeItem.classList.remove('active');
+    }
+  };
+
+  app._onElementsReceived = function(event){
+    app.menu = event.detail.response;
+    setTimeout(setupEventListeners);
+  };
+
+  app.displayInstalledToast = function() {
+    // Check to make sure caching is actually enabled—it won't be in the dev environment.
+    if (!Polymer.dom(document).querySelector('platinum-sw-cache').disabled) {
+      Polymer.dom(document).querySelector('#caching-complete').show();
+    }
+  };
+
+  // Listen for template bound event to know when bindings
+  // have resolved and content has been stamped to the page
+  app.addEventListener('dom-change', function() {
+    if (!app.$.manifestAjax) return;
+    app.$.manifestAjax.generateRequest();
+  });
+
+  // See https://github.com/Polymer/polymer/issues/1381
+  window.addEventListener('WebComponentsReady', function() {
+    var panel = $('t-component-panel')[0];
+    var stage = $('t-stage')[0];
+
+    stage.componentPanel = panel;
+  });
+})(document);

@@ -1,5 +1,14 @@
 <!-- TODO: add jquery ui and jquery ui nested sortable as dependencies -->
 
+<!--
+NOTE 1: Though these properties are derived from the array `_elementStatesList`
+        they cannot be setup as the computed properties because how deep the
+        changes to the array should affect these properties. The array is very
+        deep and any deep change should change properties, since doing this is
+        a bit tricky resorting to simpler means of explicitly changing them
+        when the array is changed.
+-->
+
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/t-form/t-form.html">
 <link rel="import" href="../bower_components/t-page/t-page.html">
@@ -80,9 +89,25 @@
 
         componentPanel: Object,
 
-        isDirty: {
+        /**
+         * Tells whether the state of the canvas changed
+         * since the last time it was wasn't dirty
+         * @type {Boolean}
+         */
+        isDirty: { // see note 1 at the top of the file
           type: Boolean,
           value: false,
+          notify: true
+        },
+
+        /**
+         * Tells whether there is any element currently present
+         * on the canvas
+         * @type {Boolean}
+         */
+        isEmpty: { // see note 1 at the top of the file
+          type: Boolean,
+          value: true,
           notify: true
         },
 
@@ -305,6 +330,7 @@
         }
 
         this.isDirty = true;
+        this.isEmpty = false;
       },
 
       unmerge: function(el) {
@@ -428,6 +454,7 @@
         this.showPanelForBuilder();
 
         this.isDirty = Boolean(this._elementSateList.length);
+        this.isEmpty = !Boolean(this._elementSateList.length);
       },
 
       merge: function(mergedContainer, draggedPosX) {
@@ -677,6 +704,7 @@
         }
 
         this.isDirty = Boolean(this._elementSateList.length);
+        this.isEmpty = !Boolean(this._elementSateList.length);
       },
       /* section: end */
 
