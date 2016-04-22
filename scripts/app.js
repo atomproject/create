@@ -89,22 +89,10 @@
       codePreview.disabled = stage.isEmpty;
     }
 
-    function removeId() {
-      if (stage.isDirty && getQueryParam('id')) {
-        let url = setQueryParam('id');
-        window.history.pushState({}, '', url);
-      }
-    }
-
-    function dirtyChanged() {
-      disableSave();
-      removeId();
-    }
-
-    dirtyChanged();
+    disableSave();
     disablePreview();
 
-    stage.addEventListener('is-dirty-changed', dirtyChanged);
+    stage.addEventListener('is-dirty-changed', disableSave);
     stage.addEventListener('is-empty-changed', disablePreview);
   }
 
@@ -283,6 +271,7 @@
     let codePreview = document.querySelector('code-preview');
     let stateId = getQueryParam('id');
     let stateFile = localStorage.getItem('atom-refresh');
+    let statePromise;
 
     codePreview.stage = stage;
     localStorage.removeItem('atom-refresh');
@@ -291,7 +280,7 @@
       recreateStage(stage, stateFile);
     }
     else if (stateId) {
-      statesFireRef.child(stateId).once('value')
+      statePromise = statesFireRef.child(stateId).once('value')
         .then(newDataRef => recreateStage(stage, newDataRef.val()));
     }
     else if (localStorage.getItem('atom-preview')) {
@@ -299,6 +288,47 @@
       recreateStage(stage, stateFile);
       localStorage.removeItem('atom-preview');
     }
+
+    // Okay, so we want the id in url, if it is there, to remain
+    // there until user __actually__ changes something. Now since
+    // component panel generates change events even for initial values
+    // (the values from property.json) we have to distinguish between
+    // user interactions and other auto generated events. So, we only
+    // consider removing the id in url once the state to be restored has
+    // been resolved.
+    (statePromise || Promise.resolve())
+      .catch(() => {})
+      .then(() => {
+        // now we have the state to which the canvas/stage will be restored to
+        stage.resetDirty();
+
+        // remove the id from url if state has changed (this is indicated
+        // by the `stage.isDirty` variable)
+        function removeId() {
+          if (stage.isDirty && getQueryParam('id')) {
+            let url = setQueryParam('id');
+            window.history.pushState({}, '', url);
+          }
+        }
+
+        function setupRemoveId() {
+          removeId();
+          // consider removing the id when state becomes dirty
+          stage.addEventListener('is-dirty-changed', removeId);
+        }
+
+        // don't do any id removal and its setup until some user
+        // interaction is detected
+        $('body').one('click', setupRemoveId);
+
+        // the colorpicker in component panel doesn't allow the click
+        // events in it to bubble so we have to wait until the colorpicker
+        // is available in dom (random timeout of `100ms`) and then setup
+        // listenere directly on it
+        setTimeout(() => {
+          $('.sp-preview').one('click', setupRemoveId);
+        }, 100);
+      });
 
     window.onbeforeunload = () => {
       if (stage.isDirty &&
@@ -322,13 +352,11 @@
   // Grab a reference to our auto-binding template
   // and give it some initial binding values
   // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
-  var app = document.querySelector('#app');
-  var pathname = window.location.pathname.replace('/create', '');
+  let pathname = window.location.pathname.replace('/create', '');
 
   // Sets app default base URL
   app.baseUrl = '';
   app.menu = null;
-
 
   if (window.location.port === '') {
     app.baseUrl = '/create';
@@ -339,31 +367,32 @@
     app.isPage = true;
     app.builderUrl = 'page-manifest.json';
     app.canvasName = 'Untitled Page';
-    app.tab='page';
+    app.tab ='page';
     app.route ='canvas';
   } else if (pathname === '/form') {
     app.builderType ='t-form';
     app.isPage = false;
     app.builderUrl = 'form-manifest.json';
     app.canvasName = 'Untitled Form';
-    app.tab='form';
+    app.tab ='form';
     app.route ='canvas';
 
   } else if (pathname === '/') {
-    app.tab='form';
+    app.tab ='form';
     app.route ='browser';
   }
 
   // Get elements for menu for a given category
   app._getElementsInCategory = function(category) {
-    var elements = app.menu.elements.filter(function(element) {
+    var elements = app.menu.elements.filter(element => {
       return element.category === category.name;
     });
+
     return elements;
   };
 
   app.filterComponents = function(searchTerm, category) {
-    var filtered;
+    let filtered;
 
     if (!searchTerm) {
       return null;
@@ -377,31 +406,30 @@
     if (!category) {
       filtered = app.menu.elements;
     } else {
-      filtered = app.menu.elements.filter(function(el) {
-        return el.category === category;
-      });
+      filtered = app.menu.elements.filter(el => el.category === category);
     }
 
     searchTerm = searchTerm.toLowerCase();
 
     return function(el) {
-      var name = el.displayName.toLowerCase();
+      let name = el.displayName.toLowerCase();
+
       return name.indexOf(searchTerm) !== -1;
     };
   };
 
   app._getIcon = function(icon) {
-    return icon ? 'fusion:' + icon : 'fusion-b:atom-logo';
+    return icon ? `fusion:${icon}` : 'fusion-b:atom-logo';
   };
 
   app._getPropertySource = function(){
-    return 'bower_components/'+app.builderType+'/property.json';
+    return `bower_components/${app.builderType}/property.json`;
   };
 
   //toggle accordion for menu
   app.toggleAccordion = function(e) {
-    var currentElement = e.currentTarget;
-    var activeItem = document.querySelector('.menu-item.active');
+    let currentElement = e.currentTarget;
+    let activeItem = document.querySelector('.menu-item.active');
 
     if (currentElement.classList.contains('active')) {
       currentElement.classList.remove('active');
@@ -429,7 +457,10 @@
   // Listen for template bound event to know when bindings
   // have resolved and content has been stamped to the page
   app.addEventListener('dom-change', function() {
-    if (!app.$.manifestAjax) return;
+    if (!app.$.manifestAjax) {
+      return;
+    }
+
     app.$.manifestAjax.generateRequest();
   });
 

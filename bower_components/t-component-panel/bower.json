@@ -41,9 +41,9 @@
     "paper-toast": "polymerelements/paper-toast#^1.2.0",
     "iron-icon": "polymerelements/iron-icon#^1.0.7",
     "handsontable": "^0.23.0",
-    "firebase": "^2.4.1",
     "iron-pages": "polymerelements/iron-pages#^1.0.7",
-    "code-generator-behavior": "atomproject/code-generator-behavior#^1.0.0"
+    "code-generator-behavior": "atomproject/code-generator-behavior#^1.0.0",
+    "firebase-element": "GoogleWebComponents/firebase-element#^1.0.12"
   },
   "devDependencies": {
     "webcomponentsjs": "^0.7.14",
@@ -51,5 +51,5 @@
     "t-shared-components": "atomelements/t-shared-components#^1.0.0",
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.6"
   },
-  "version": "1.5.2"
+  "version": "1.5.3"
 }
