@@ -80,13 +80,26 @@ NOTE 1: Though these properties are derived from the array `_elementStatesList`
           value: function() { return []; }
         },
 
+        /**
+         * The target which receives the changes made in component panel
+         * @type {Object}
+         */
         componentPanelTarget: {
           type: Object,
           notify: true
         },
 
+        /**
+         * The type of the builder it can either be `page` or `form`
+         * @type {String}
+         */
         builderType: String,
 
+        /**
+         * Dom reference to the component panel, this is provided
+         * by somebody else (app.js in this particular case)
+         * @type {[type]}
+         */
         componentPanel: Object,
 
         /**
@@ -111,6 +124,12 @@ NOTE 1: Though these properties are derived from the array `_elementStatesList`
           notify: true
         },
 
+        /**
+         * In case of data sources the change is applied not to
+         * the actual element but another element that sits beside it,
+         * the data source element. This hash maps a change to its ds element.
+         * @type {Object}
+         */
         _dsTargets: {
           type: Object,
           value: function() { return {}; }
@@ -290,7 +309,7 @@ NOTE 1: Though these properties are derived from the array `_elementStatesList`
           return state.posX === posX && state.posY === posY;
         });
 
-        return {x: posX, y: posY, state: state};
+        return state;
       },
       /* section: end */
 
@@ -540,7 +559,7 @@ NOTE 1: Though these properties are derived from the array `_elementStatesList`
         } else {
           container = $(target).closest('.fieldset');
           container = container[0];
-          state = this.getElementState(container).state;
+          state = this.getElementState(container);
         }
 
         if (dataSource) {
@@ -719,7 +738,7 @@ NOTE 1: Though these properties are derived from the array `_elementStatesList`
           return;
         }
 
-        state = this.getElementState(el).state;
+        state = this.getElementState(el);
 
         $(this.componentPanelTarget)
           .closest('li.field-container')

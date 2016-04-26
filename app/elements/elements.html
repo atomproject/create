@@ -73,12 +73,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/t-scaffold/t-scaffold.html">
 <link rel="import" href="../bower_components/dynamic-data-source/dynamic-data-source.html">
 <!--
-This is only used in the script `dragAndDrop.js` script so it should be added
+This is only used in the script `app.js` so it should be added
 as a script dependency like `lodash` but since there also exists a firebase
 element which is likely to be imported somewhere in the dependency tree I think
 it would be wiser to include it as a link import so that duplicate scripts
-are not run.
+are neither run nor included.
 `elements.vulcanized.html` loads before app.js so we have the reference to
-`Firebase` in `dragAndDrop.js`
+`Firebase` available in `app.js`
  -->
  <link rel="import" href="../bower_components/firebase-element/firebase.html">
